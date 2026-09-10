@@ -288,6 +288,11 @@ export interface ExperienceItem {
   period: string;
   highlights: string[];
   accent: string;
+  logo?: string;
+  isInternship?: boolean;
+  bgColor?: string;
+  glowColor?: string;
+  textColor?: string;
 }
 
 export const EXPERIENCE_ITEMS: ExperienceItem[] = [
@@ -301,7 +306,12 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
       'Managing Git branching strategies, automated testing, and DevOps CI/CD pipelines.',
       'Supervising and maintaining a multi-tenant microservices cloud infrastructure.',
     ],
-    accent: '#15cea9',
+    accent: '#99ff66',
+    logo: '/assets/experience/valinnov.png',
+    isInternship: false,
+    bgColor: '#144346',
+    glowColor: '#99ff66',
+    textColor: '#ffffff',
   },
   {
     id: 'valinnov-fullstack',
@@ -314,7 +324,12 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
       'High-fidelity UX/UI interface design using Figma.',
       'Active pull request reviews and quality assurance.',
     ],
-    accent: '#2bbece',
+    accent: '#99ff66',
+    logo: '/assets/experience/valinnov.png',
+    isInternship: true,
+    bgColor: '#144346',
+    glowColor: '#99ff66',
+    textColor: '#ffffff',
   },
   {
     id: 'dxc-tech',
@@ -325,7 +340,12 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
       'End-to-end fullstack application design and development.',
       'Team leadership, workflow tracking, and project milestone deliveries.',
     ],
-    accent: '#a78bfa',
+    accent: '#6399f0',
+    logo: '/assets/experience/dxc.png',
+    isInternship: true,
+    bgColor: '#ffffff',
+    glowColor: '#6399f0',
+    textColor: '#1c1b20',
   },
   {
     id: 'pareto',
@@ -336,7 +356,12 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
       'Fullstack solution development and feature enhancements.',
       'Project milestone tracking and cross-functional team coordination.',
     ],
-    accent: '#ff779c',
+    accent: '#5bb2f0',
+    logo: '/assets/experience/pareto.png',
+    isInternship: true,
+    bgColor: '#ffffff',
+    glowColor: '#c8e5ff',
+    textColor: '#1c1b20',
   },
   {
     id: 'mca',
@@ -347,6 +372,10 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
       'Fullstack software engineering and internal web tooling integration.',
     ],
     accent: '#4da81f',
+    isInternship: true,
+    bgColor: '#ffffff',
+    glowColor: '#4da81f',
+    textColor: '#1c1b20',
   },
   {
     id: 'alternative-it',
@@ -357,6 +386,10 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
       'Mobile application design, cross-platform UI prototyping, and development.',
     ],
     accent: '#66c0f4',
+    isInternship: true,
+    bgColor: '#ffffff',
+    glowColor: '#66c0f4',
+    textColor: '#1c1b20',
   },
 ];
 

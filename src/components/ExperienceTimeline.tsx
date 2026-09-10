@@ -8,28 +8,46 @@ interface BlobCardProps {
   isActive: boolean;
 }
 
+const hexToRgba = (hex: string, alpha: number) => {
+  const clean = hex.replace('#', '');
+  if (clean.length === 6) {
+    const r = parseInt(clean.slice(0, 2), 16);
+    const g = parseInt(clean.slice(2, 4), 16);
+    const b = parseInt(clean.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  return hex;
+};
+
 const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
   const color = item.accent ?? '#15cea9';
+  const glowColor = item.glowColor ?? item.accent ?? '#15cea9';
+  const bgColor = item.bgColor ?? '#ffffff';
+  const isDark = bgColor !== '#ffffff';
+  const textColor = item.textColor ?? (isDark ? '#ffffff' : '#1c1b20');
+  const subtextColor = isDark ? 'rgba(255, 255, 255, 0.90)' : '#4a4860';
   const R = 20;
 
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: 360 }}>
-      {/* White card base with neumorphic/elevation shadow */}
+      {/* Card base with custom background and glow elevation */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           borderRadius: R,
-          background: '#ffffff',
+          background: bgColor,
           boxShadow: isActive
-            ? '16px 16px 50px rgba(180, 175, 200, 0.4), -16px -16px 50px #ffffff'
+            ? (isDark
+                ? `16px 16px 50px rgba(0,0,0,0.45), 0 0 45px ${glowColor}44`
+                : `16px 16px 50px rgba(180, 175, 200, 0.35), 0 0 35px ${glowColor}33, -16px -16px 50px #ffffff`)
             : '4px 4px 18px rgba(0,0,0,0.06)',
-          transition: 'box-shadow 0.5s ease',
+          transition: 'box-shadow 0.5s ease, background 0.4s ease',
           zIndex: 0,
         }}
       />
 
-      {/* Animated fluid blob layer */}
+      {/* Animated fluid blob layer with custom glow color */}
       {isActive && (
         <div
           style={{
@@ -43,8 +61,8 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
             pointerEvents: 'none',
           }}
         >
-          <div className="news-blob news-blob--1" style={{ backgroundColor: color }} />
-          <div className="news-blob news-blob--2" style={{ backgroundColor: color }} />
+          <div className="news-blob news-blob--1" style={{ backgroundColor: glowColor }} />
+          <div className="news-blob news-blob--2" style={{ backgroundColor: glowColor }} />
         </div>
       )}
 
@@ -58,7 +76,9 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
           bottom: 6,
           zIndex: 2,
           borderRadius: R - 4,
-          background: isActive ? 'rgba(255,255,255,0.72)' : 'rgba(255,255,255,0.96)',
+          background: isActive
+            ? hexToRgba(bgColor, isDark ? 0.78 : 0.76)
+            : hexToRgba(bgColor, isDark ? 0.95 : 0.96),
           backdropFilter: isActive ? 'blur(160px)' : 'none',
           WebkitBackdropFilter: isActive ? 'blur(160px)' : 'none',
           padding: 'clamp(24px, 3.5vw, 40px)',
@@ -79,53 +99,103 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
             transition={{ duration: 0.35, delay: 0.06 }}
             style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
           >
-            {/* Header: Company & Badge */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200/70 pb-3">
-              <div>
-                <span
-                  style={{
-                    color,
-                    fontFamily: '"Archivo Black", sans-serif',
-                    fontSize: '0.78rem',
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {item.period}
-                </span>
-                <h3
-                  style={{
-                    margin: '4px 0 0',
-                    fontSize: 'clamp(1.3rem, 2.4vw, 1.85rem)',
-                    color: '#1c1b20',
-                    fontFamily: '"Archivo Black", sans-serif',
-                    lineHeight: 1.15,
-                  }}
-                >
-                  {item.company}
-                </h3>
+            {/* Header: Company, Logo & Badges */}
+            <div
+              className="flex flex-wrap items-center justify-between gap-3 pb-3"
+              style={{
+                borderBottom: isDark
+                  ? '1px solid rgba(255, 255, 255, 0.16)'
+                  : '1px solid rgba(0, 0, 0, 0.08)',
+              }}
+            >
+              <div className="flex items-center gap-3.5 min-w-0">
+                {item.logo && (
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center p-2 flex-shrink-0 shadow-sm"
+                    style={{
+                      background: isDark ? 'rgba(255, 255, 255, 0.14)' : '#ffffff',
+                      border: isDark
+                        ? '1px solid rgba(255, 255, 255, 0.22)'
+                        : '1px solid rgba(0, 0, 0, 0.08)',
+                    }}
+                  >
+                    <img
+                      src={item.logo}
+                      alt={`${item.company} logo`}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                )}
+                <div>
+                  <span
+                    style={{
+                      color: isDark ? glowColor : color,
+                      fontFamily: '"Archivo Black", sans-serif',
+                      fontSize: '0.76rem',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {item.period}
+                  </span>
+                  <h3
+                    style={{
+                      margin: '3px 0 0',
+                      fontSize: 'clamp(1.25rem, 2.3vw, 1.8rem)',
+                      color: textColor,
+                      fontFamily: '"Archivo Black", sans-serif',
+                      lineHeight: 1.15,
+                    }}
+                  >
+                    {item.company}
+                  </h3>
+                </div>
               </div>
 
-              <span
-                className="px-3 py-1 rounded-full text-xs font-bold shadow-sm"
-                style={{
-                  backgroundColor: `${color}18`,
-                  color: color,
-                  border: `1.5px solid ${color}44`,
-                  fontFamily: '"Archivo Black", sans-serif',
-                }}
-              >
-                {item.role}
-              </span>
+              {/* Badges: Internship & Role */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {item.isInternship && (
+                  <span
+                    className="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase shadow-sm"
+                    style={{
+                      backgroundColor: isDark
+                        ? 'rgba(255, 255, 255, 0.16)'
+                        : 'rgba(100, 116, 139, 0.12)',
+                      color: isDark ? '#ffffff' : '#475569',
+                      border: isDark
+                        ? '1px solid rgba(255, 255, 255, 0.3)'
+                        : '1px solid rgba(100, 116, 139, 0.25)',
+                      fontFamily: '"Archivo Black", sans-serif',
+                    }}
+                  >
+                    Internship
+                  </span>
+                )}
+                <span
+                  className="px-3 py-1 rounded-full text-xs font-bold shadow-sm"
+                  style={{
+                    backgroundColor: isDark ? `${glowColor}24` : `${color}18`,
+                    color: isDark ? glowColor : color,
+                    border: isDark ? `1.5px solid ${glowColor}66` : `1.5px solid ${color}44`,
+                    fontFamily: '"Archivo Black", sans-serif',
+                  }}
+                >
+                  {item.role}
+                </span>
+              </div>
             </div>
 
             {/* Bullet Highlights */}
             <ul className="space-y-2.5 my-2">
               {item.highlights.map((highlight, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-zinc-700 text-xs sm:text-sm leading-relaxed font-sans">
+                <li
+                  key={idx}
+                  className="flex items-start gap-2.5 text-xs sm:text-sm leading-relaxed font-sans"
+                  style={{ color: subtextColor }}
+                >
                   <span
                     className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
-                    style={{ backgroundColor: color }}
+                    style={{ backgroundColor: isDark ? glowColor : color }}
                   />
                   <span>{highlight}</span>
                 </li>
@@ -319,18 +389,25 @@ export const ExperienceTimeline: React.FC = () => {
                       }}
                     />
                     <div className="flex flex-col">
-                      <span
-                        style={{
-                          margin: 0,
-                          fontSize: '0.88rem',
-                          lineHeight: 1.25,
-                          color: isCurrent ? '#1c1b20' : '#6b6880',
-                          fontFamily: '"Archivo Black", sans-serif',
-                          transition: 'color 0.3s ease',
-                        }}
-                      >
-                        {item.company}
-                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span
+                          style={{
+                            margin: 0,
+                            fontSize: '0.88rem',
+                            lineHeight: 1.25,
+                            color: isCurrent ? '#1c1b20' : '#6b6880',
+                            fontFamily: '"Archivo Black", sans-serif',
+                            transition: 'color 0.3s ease',
+                          }}
+                        >
+                          {item.company}
+                        </span>
+                        {item.isInternship && (
+                          <span className="text-[9px] font-sans font-bold px-1.5 py-0.5 rounded bg-zinc-200/90 text-zinc-600 uppercase tracking-wider">
+                            Intern
+                          </span>
+                        )}
+                      </div>
                       <span
                         className="text-[11px] font-sans font-semibold tracking-wide"
                         style={{ color: isCurrent ? nodeColor : '#8e8b9f' }}
