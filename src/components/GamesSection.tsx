@@ -78,7 +78,19 @@ export const GamesSection: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-                <span style={{ fontSize: 26, flexShrink: 0 }}>{g.emoji}</span>
+                <div
+                  className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-zinc-200/80 bg-zinc-100 flex items-center justify-center shadow-sm"
+                  style={{
+                    boxShadow: `0 2px 10px ${g.color}25`,
+                  }}
+                >
+                  <img
+                    src={g.image}
+                    alt={g.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
                 <div>
                   <p style={{ margin: 0, color: '#1c1b20', fontSize: '0.95rem', marginBottom: 2 }}>
                     {g.title}

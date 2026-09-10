@@ -1,5 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import type { Project, ProjectSection as IProjectSection } from '../data/portfolioData';
+import { TechIcon } from './TechIcon';
+import {
+  TbWorld,
+  TbApi,
+  TbBrowser,
+  TbDice,
+  TbDeviceGamepad2,
+  TbTrees,
+  TbUser,
+} from 'react-icons/tb';
+
+const getProjectIcon = (iconName: string, className = 'w-5 h-5 flex-shrink-0') => {
+  switch (iconName) {
+    case 'language':
+      return <TbWorld className={className} />;
+    case 'api':
+      return <TbApi className={className} />;
+    case 'web':
+      return <TbBrowser className={className} />;
+    case 'casino':
+      return <TbDice className={className} />;
+    case 'sports_esports':
+      return <TbDeviceGamepad2 className={className} />;
+    case 'landscape':
+      return <TbTrees className={className} />;
+    case 'accessibility_new':
+      return <TbUser className={className} />;
+    default:
+      return <TbWorld className={className} />;
+  }
+};
 
 interface ImageCarouselProps {
   images: string[];
@@ -149,16 +180,21 @@ const CardBody: React.FC<{ project: Project; accent: string }> = ({ project, acc
         <span
           key={t}
           style={{
-            padding: '5px 14px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '5px 12px',
             borderRadius: 999,
             background: `${accent}14`,
             border: `1px solid ${accent}33`,
             color: accent,
-            fontSize: '0.7rem',
+            fontSize: '0.72rem',
             letterSpacing: '0.03em',
+            fontFamily: 'Archivo Black, sans-serif',
           }}
         >
-          {t}
+          <TechIcon name={t} className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>{t}</span>
         </span>
       ))}
     </div>
@@ -309,9 +345,10 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section }) => {
                 }}
               >
                 <span
-                  className="material-symbols-rounded"
                   style={{
-                    fontSize: 22,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     flexShrink: 0,
                     color: isActive ? section.accent : 'rgba(140,135,165,0.85)',
                     transition: 'color 0.3s ease',
@@ -319,7 +356,7 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section }) => {
                     userSelect: 'none',
                   }}
                 >
-                  {p.icon}
+                  {getProjectIcon(p.icon)}
                 </span>
                 <span
                   style={{

@@ -1,5 +1,35 @@
 import React, { useState } from 'react';
+import {
+  FaGithub,
+  FaLinkedin,
+  FaInstagram,
+  FaItchIo,
+  FaYoutube,
+  FaDiscord,
+} from 'react-icons/fa6';
 import { PERSONAL_INFO, SOCIALS } from '../data/portfolioData';
+
+const getSocialIcon = (name: string, color: string) => {
+  const norm = name.trim().toLowerCase();
+  const style = { color, fontSize: '1.35rem' };
+  switch (norm) {
+    case 'github':
+      return <FaGithub style={style} />;
+    case 'linkedin':
+      return <FaLinkedin style={style} />;
+    case 'instagram':
+      return <FaInstagram style={style} />;
+    case 'itch.io':
+    case 'itch':
+      return <FaItchIo style={style} />;
+    case 'youtube':
+      return <FaYoutube style={style} />;
+    case 'discord':
+      return <FaDiscord style={style} />;
+    default:
+      return <FaGithub style={style} />;
+  }
+};
 
 export const ConnectSection: React.FC = () => {
   const [copied, setCopied] = useState(false);
@@ -108,9 +138,7 @@ export const ConnectSection: React.FC = () => {
               style={{ '--cube-color': s.color } as React.CSSProperties}
             >
               <div className="icon">
-                <span className="material-symbols-rounded" style={{ color: s.color }}>
-                  {s.icon}
-                </span>
+                {getSocialIcon(s.name, s.color)}
               </div>
               <div className="cube">
                 <span className="side front">{s.name}</span>

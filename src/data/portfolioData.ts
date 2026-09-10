@@ -30,7 +30,8 @@ export interface Skill {
 
 export interface GameReview {
   title: string;
-  emoji: string;
+  image: string;
+  emoji?: string;
   rating: number;
   color: string;
   opinion: string;
@@ -223,7 +224,7 @@ export const SKILLS: Skill[] = [
 export const PLAYED_GAMES: GameReview[] = [
   {
     title: 'Hollow Knight',
-    emoji: '🦋',
+    image: '/assets/games/hollow-knight.jpg',
     rating: 5,
     color: '#15cea9',
     opinion:
@@ -231,7 +232,7 @@ export const PLAYED_GAMES: GameReview[] = [
   },
   {
     title: 'Cyberpunk 2077',
-    emoji: '🌆',
+    image: '/assets/games/cyberpunk-2077.jpg',
     rating: 4,
     color: '#ff779c',
     opinion:
@@ -239,7 +240,7 @@ export const PLAYED_GAMES: GameReview[] = [
   },
   {
     title: 'Hades',
-    emoji: '⚔️',
+    image: '/assets/games/hades.jpg',
     rating: 5,
     color: '#2bbece',
     opinion:
@@ -247,7 +248,7 @@ export const PLAYED_GAMES: GameReview[] = [
   },
   {
     title: 'Minecraft',
-    emoji: '⛏️',
+    image: '/assets/games/minecraft.png',
     rating: 5,
     color: '#15cea9',
     opinion:
@@ -255,7 +256,7 @@ export const PLAYED_GAMES: GameReview[] = [
   },
   {
     title: 'Elden Ring',
-    emoji: '💀',
+    image: '/assets/games/elden-ring.jpg',
     rating: 4,
     color: '#ff779c',
     opinion:
@@ -263,7 +264,7 @@ export const PLAYED_GAMES: GameReview[] = [
   },
   {
     title: 'Portal 2',
-    emoji: '🌀',
+    image: '/assets/games/portal-2.jpg',
     rating: 5,
     color: '#2bbece',
     opinion:
