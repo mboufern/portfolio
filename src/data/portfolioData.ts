@@ -280,6 +280,85 @@ export const SOCIALS: SocialLink[] = [
   { name: 'Discord', url: 'https://discord.com', color: '#7289da', icon: 'forum' },
 ];
 
+export interface ExperienceItem {
+  id: string;
+  company: string;
+  role: string;
+  period: string;
+  highlights: string[];
+  accent: string;
+}
+
+export const EXPERIENCE_ITEMS: ExperienceItem[] = [
+  {
+    id: 'valinnov-lead',
+    company: 'Valinnov',
+    role: 'Tech Lead & Architect',
+    period: 'February 2025 – Present',
+    highlights: [
+      'Leading the engineering development team and architecture design.',
+      'Managing Git branching strategies, automated testing, and DevOps CI/CD pipelines.',
+      'Supervising and maintaining a multi-tenant microservices cloud infrastructure.',
+    ],
+    accent: '#15cea9',
+  },
+  {
+    id: 'valinnov-fullstack',
+    company: 'Valinnov',
+    role: 'Junior Fullstack Developer',
+    period: 'October 2024 – February 2025',
+    highlights: [
+      'Fullstack web development and modular component architecture.',
+      'Agile / SCRUM epic design and user story refinement.',
+      'High-fidelity UX/UI interface design using Figma.',
+      'Active pull request reviews and quality assurance.',
+    ],
+    accent: '#2bbece',
+  },
+  {
+    id: 'dxc-tech',
+    company: 'DXC Technology',
+    role: 'Fullstack Developer & Team Coordinator',
+    period: 'February 2024 – August 2024',
+    highlights: [
+      'End-to-end fullstack application design and development.',
+      'Team leadership, workflow tracking, and project milestone deliveries.',
+    ],
+    accent: '#a78bfa',
+  },
+  {
+    id: 'pareto',
+    company: 'Pareto',
+    role: 'Fullstack Developer',
+    period: 'April 2023 – July 2023',
+    highlights: [
+      'Fullstack solution development and feature enhancements.',
+      'Project milestone tracking and cross-functional team coordination.',
+    ],
+    accent: '#ff779c',
+  },
+  {
+    id: 'mca',
+    company: 'Management Consulting and Account',
+    role: 'Fullstack Developer',
+    period: 'April 2022 – July 2022',
+    highlights: [
+      'Fullstack software engineering and internal web tooling integration.',
+    ],
+    accent: '#4da81f',
+  },
+  {
+    id: 'alternative-it',
+    company: 'Alternative IT',
+    role: 'Mobile Developer',
+    period: 'June 2021 – July 2021',
+    highlights: [
+      'Mobile application design, cross-platform UI prototyping, and development.',
+    ],
+    accent: '#66c0f4',
+  },
+];
+
 export interface NavigationItem {
   key: string;
   route: string;
@@ -290,6 +369,7 @@ export interface NavigationItem {
 
 export const NAVIGATION_ITEMS: NavigationItem[] = [
   { key: 'intro', route: '/', label: 'Overview', icon: 'person', accent: '#15cea9' },
+  { key: 'experience', route: '/experience', label: 'Experience', icon: 'work', accent: '#15cea9' },
   { key: 'software', route: '/software', label: 'Software', icon: 'terminal', accent: '#2bbece' },
   { key: 'gamedev', route: '/gamedev', label: 'Game Dev', icon: 'sports_esports', accent: '#ff779c' },
   { key: '3d', route: '/3d-art', label: '3D Art', icon: 'view_in_ar', accent: '#a78bfa' },
