@@ -6,6 +6,7 @@ import {
 } from '../data/portfolioData';
 import { Navigation } from '../components/Navigation';
 import { HeroSection } from '../components/HeroSection';
+import { ExperienceSection } from '../components/ExperienceSection';
 import { ProjectSection } from '../components/ProjectSection';
 import { GamesSection } from '../components/GamesSection';
 import { ConnectSection } from '../components/ConnectSection';
@@ -15,7 +16,6 @@ export const PortfolioApp: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState(0);
-  const [waveCount, setWaveCount] = useState(0);
   const isProgrammaticScroll = useRef(false);
 
   // Map route to section index
@@ -91,20 +91,21 @@ export const PortfolioApp: React.FC = () => {
       >
         {/* Section 0: Hero / Intro */}
         <section
+          className="w-full h-screen relative flex flex-col justify-center bg-white"
+          style={{ scrollSnapAlign: 'start' }}
+        >
+          <HeroSection />
+        </section>
+
+        {/* Section 1: Experience */}
+        <section
           className="w-full h-screen relative flex flex-col justify-center"
           style={{ scrollSnapAlign: 'start' }}
         >
-          <HeroSection
-            waveCount={waveCount}
-            onFlipCard={() => setWaveCount((c) => c + 1)}
-            onNavigateSection={(idx, route) => {
-              handleNavigate(idx);
-              navigate(route);
-            }}
-          />
+          <ExperienceSection isActive={activeSection === 1} />
         </section>
 
-        {/* Sections 1–3: Project Sections (Software, GameDev, 3D Art) */}
+        {/* Sections 2–4: Project Sections (Software, GameDev, 3D Art) */}
         {PROJECT_SECTIONS.map((sec) => (
           <section
             key={sec.key}
@@ -118,7 +119,7 @@ export const PortfolioApp: React.FC = () => {
           </section>
         ))}
 
-        {/* Section 4: Games Played */}
+        {/* Section 5: Games Played */}
         <section
           className="w-full h-screen relative flex flex-col justify-center bg-[#f8f7fc]"
           style={{ scrollSnapAlign: 'start' }}
@@ -126,7 +127,7 @@ export const PortfolioApp: React.FC = () => {
           <GamesSection />
         </section>
 
-        {/* Section 5: Connect */}
+        {/* Section 6: Connect */}
         <section
           className="w-full h-screen relative flex flex-col justify-center bg-white"
           style={{ scrollSnapAlign: 'start' }}

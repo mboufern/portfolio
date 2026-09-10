@@ -6,6 +6,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<PortfolioApp />} />
+        <Route path="/experience" element={<PortfolioApp />} />
         <Route path="/software" element={<PortfolioApp />} />
         <Route path="/gamedev" element={<PortfolioApp />} />
         <Route path="/3d-art" element={<PortfolioApp />} />
