@@ -77,7 +77,7 @@ function createCapsuleImage(n: SkillNode): HTMLCanvasElement {
   ctx.font = `${FONT_SIZE}px 'Archivo Black', sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(110,100,155,0.72)';
+  ctx.fillStyle = 'rgba(175,170,205,0.92)';
   ctx.fillText(n.label, cx, cy);
 
   return canvas;

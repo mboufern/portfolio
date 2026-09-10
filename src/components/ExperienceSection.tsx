@@ -35,7 +35,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ isActive }
       </motion.div>
 
       {/* ── Foreground: Experience Timeline Component ── */}
-      <div className="relative z-10 w-full flex items-center justify-center pointer-events-none">
+      <div className="relative z-20 w-full flex items-center justify-center pointer-events-none">
         <ExperienceTimeline />
       </div>
     </div>

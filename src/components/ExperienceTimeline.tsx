@@ -223,7 +223,7 @@ export const ExperienceTimeline: React.FC = () => {
       `}</style>
 
       {/* Section Header */}
-      <div className="text-center mb-6 animate-[fade-in-up_0.6s_ease_forwards]">
+      <div className="text-center mb-6 animate-[fade-in-up_0.6s_ease_forwards] relative z-30">
         <p
           style={{
             fontSize: '0.78rem',
@@ -237,19 +237,29 @@ export const ExperienceTimeline: React.FC = () => {
           Track Record & Engineering
         </p>
         <h2
-          className="text-zinc-900 font-black tracking-tight"
+          className="text-zinc-900 font-black tracking-tight relative z-30"
           style={{ fontSize: 'clamp(1.8rem, 3.8vw, 3rem)' }}
         >
           Work Experience
         </h2>
       </div>
 
-      <div className="w-full flex flex-row items-center justify-center gap-8 md:gap-14">
+      <div className="w-full flex flex-row items-center justify-center gap-8 md:gap-14 relative z-20">
         {/* ── Left: Connected Timeline Navigation ── */}
         <div
-          className="experience-timeline-nav flex-shrink-0"
+          className="experience-timeline-nav flex-shrink-0 relative"
           style={{ width: 'clamp(220px, 25vw, 290px)' }}
         >
+          {/* Soft White Glow Backdrop */}
+          <div
+            aria-hidden="true"
+            className="absolute -inset-8 -z-10 rounded-[36px] pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0) 80%)',
+              filter: 'blur(20px)',
+            }}
+          />
           <div style={{ position: 'relative', height: ITEM_H * 4.5 }}>
             {/* Scrollable list */}
             <div
