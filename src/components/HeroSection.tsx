@@ -4,13 +4,7 @@ import { PERSONAL_INFO } from '../data/portfolioData';
 import { CyclingTitle } from './CyclingTitle';
 import logoSvg from '../assets/logo.svg';
 
-interface HeroSectionProps {
-  waveCount?: number;
-  onFlipCard?: () => void;
-  onNavigateSection?: (idx: number, route: string) => void;
-}
-
-export const HeroSection: React.FC<HeroSectionProps> = () => {
+export const HeroSection: React.FC = () => {
   return (
     <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center bg-white">
       {/* Main Content */}
