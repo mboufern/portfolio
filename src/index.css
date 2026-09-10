@@ -224,3 +224,63 @@
   color: #0fa68a;
   box-shadow: 0 0 16px rgba(21, 206, 169, 0.3);
 }
+
+/* ── Experience card blob animation ─────────────────────────────────── */
+@keyframes blob-bounce {
+  0% {
+    transform: translate(-100%, -100%) translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate(-100%, -100%) translate3d(100%, 0, 0);
+  }
+  50% {
+    transform: translate(-100%, -100%) translate3d(100%, 100%, 0);
+  }
+  75% {
+    transform: translate(-100%, -100%) translate3d(0, 100%, 0);
+  }
+  100% {
+    transform: translate(-100%, -100%) translate3d(0, 0, 0);
+  }
+}
+
+@keyframes blob-bounce-reverse {
+  0% {
+    transform: translate(-100%, -100%) translate3d(100%, 100%, 0);
+  }
+  25% {
+    transform: translate(-100%, -100%) translate3d(0, 100%, 0);
+  }
+  50% {
+    transform: translate(-100%, -100%) translate3d(0, 0, 0);
+  }
+  75% {
+    transform: translate(-100%, -100%) translate3d(100%, 0, 0);
+  }
+  100% {
+    transform: translate(-100%, -100%) translate3d(100%, 100%, 0);
+  }
+}
+
+.news-blob {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 60%;
+  height: 100%;
+  border-radius: 50%;
+  opacity: 0.9;
+  filter: blur(20px);
+}
+
+.news-blob--1 {
+  animation: blob-bounce 10s infinite ease-in-out;
+}
+
+.news-blob--2 {
+  opacity: 0.55;
+  filter: blur(28px);
+  animation: blob-bounce-reverse 7s infinite ease;
+}
+
