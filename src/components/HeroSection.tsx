@@ -1,84 +1,52 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { CyclingTitle } from './CyclingTitle';
-import { FlipCard } from './FlipCard';
-import { SkillCanvas } from './SkillCanvas';
+import logoSvg from '../assets/logo.svg';
 
 interface HeroSectionProps {
-  waveCount: number;
-  onFlipCard: () => void;
-  onNavigateSection: (idx: number, route: string) => void;
+  waveCount?: number;
+  onFlipCard?: () => void;
+  onNavigateSection?: (idx: number, route: string) => void;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({
-  waveCount,
-  onFlipCard,
-  onNavigateSection,
-}) => {
+export const HeroSection: React.FC<HeroSectionProps> = () => {
   return (
-    <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center">
-      {/* Vignette Overlay */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(circle at center, transparent 40%, rgba(12, 60, 68, 0.18) 100%)',
-        }}
-      />
-
-      {/* D3 Skills Simulation Canvas */}
-      <SkillCanvas triggerWave={waveCount} />
-
+    <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center bg-white">
       {/* Main Content */}
       <div
-        className="relative z-10 flex flex-col-reverse md:flex-row items-center justify-center gap-8 md:gap-14 px-6 md:px-12 w-full max-w-6xl pointer-events-none"
-        style={{ paddingTop: 60 }}
+        className="relative z-10 flex flex-col-reverse md:flex-row items-center justify-center gap-10 md:gap-20 px-6 md:px-12 w-full max-w-6xl"
+        style={{ paddingTop: 20 }}
       >
         {/* Bio / Heading */}
-        <div className="text-center md:text-left pointer-events-auto max-w-xl animate-[fade-in-up_0.6s_ease_forwards]">
+        <div className="text-center md:text-left max-w-xl animate-[fade-in-up_0.6s_ease_forwards]">
           <h1
             className="text-zinc-900 leading-none tracking-tight font-black"
-            style={{ fontSize: 'clamp(2.2rem, 5vw, 4.8rem)', marginBottom: 12 }}
+            style={{ fontSize: 'clamp(2.5rem, 5.5vw, 5.2rem)', marginBottom: 16 }}
           >
             {PERSONAL_INFO.firstName}
             <br />
             {PERSONAL_INFO.lastName}
           </h1>
 
-          <div className="mb-6 min-h-[2em] flex items-center justify-center md:justify-start">
+          <div className="min-h-[2.4em] flex items-center justify-center md:justify-start">
             <CyclingTitle />
-          </div>
-
-          <div className="flex flex-wrap gap-2.5 justify-center md:justify-start">
-            {[
-              { label: 'Software', idx: 1, route: '/software', color: '#2bbece' },
-              { label: 'Game Dev', idx: 2, route: '/gamedev', color: '#ff779c' },
-              { label: '3D Art', idx: 3, route: '/3d-art', color: '#a78bfa' },
-              { label: 'Games', idx: 4, route: '/games', color: '#ff779c' },
-              { label: 'Connect', idx: 5, route: '/connect', color: '#15cea9' },
-            ].map(({ label, idx, route, color }) => (
-              <button
-                key={label}
-                className="hero-btn"
-                onClick={() => onNavigateSection(idx, route)}
-                style={
-                  {
-                    '--btn-color': color,
-                    '--btn-bg': `${color}22`,
-                    '--btn-shadow': `${color}44`,
-                    '--btn-shadow-hover': `${color}88`,
-                  } as React.CSSProperties
-                }
-              >
-                {label} →
-              </button>
-            ))}
           </div>
         </div>
 
-        {/* 3D Interactive Flip Card */}
-        <div className="pointer-events-auto flex-shrink-0">
-          <FlipCard onFlip={onFlipCard} />
+        {/* Animated SVG Logo: starts blurry and smaller, animates to clear & larger with ease-in */}
+        <div className="flex-shrink-0 flex items-center justify-center">
+          <motion.img
+            src={logoSvg}
+            alt={`${PERSONAL_INFO.name} Logo`}
+            className="w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 object-contain drop-shadow-sm select-none"
+            initial={{ scale: 0.82, filter: 'blur(16px)', opacity: 0.15 }}
+            animate={{ scale: 1.0, filter: 'blur(0px)', opacity: 1 }}
+            transition={{
+              duration: 0.85,
+              ease: [0.42, 0, 1, 1], // ease-in
+            }}
+          />
         </div>
       </div>
     </div>
