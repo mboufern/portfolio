@@ -1,6 +1,29 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { EXPERIENCE_ITEMS, type ExperienceItem } from '../data/portfolioData';
+import {
+  EXPERIENCE_ITEMS,
+  calculateTotalExperience,
+  type ExperienceItem,
+} from '../data/portfolioData';
+import {
+  TbSchool,
+  TbBriefcase,
+  TbCrown,
+  TbCode,
+  TbDeviceMobile,
+} from 'react-icons/tb';
+
+/* ─── Role Icon Selector ─────────────────────────────────────────── */
+const getRoleIcon = (role: string) => {
+  const lower = role.toLowerCase();
+  if (lower.includes('lead') || lower.includes('architect')) {
+    return TbCrown;
+  }
+  if (lower.includes('mobile')) {
+    return TbDeviceMobile;
+  }
+  return TbCode;
+};
 
 /* ─── Blob Card Component ────────────────────────────────────────── */
 interface BlobCardProps {
@@ -26,6 +49,7 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
   const isDark = bgColor !== '#ffffff';
   const textColor = item.textColor ?? (isDark ? '#ffffff' : '#1c1b20');
   const subtextColor = isDark ? 'rgba(255, 255, 255, 0.90)' : '#4a4860';
+  const isValinnov = item.company.toLowerCase().includes('valinnov');
   const R = 20;
 
   return (
@@ -111,18 +135,25 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
               <div className="flex items-center gap-3.5 min-w-0">
                 {item.logo && (
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center p-2 flex-shrink-0 shadow-sm"
+                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 ${
+                      isValinnov ? 'p-0 overflow-hidden' : 'p-2 sm:p-2.5'
+                    }`}
                     style={{
-                      background: isDark ? 'rgba(255, 255, 255, 0.14)' : '#ffffff',
+                      background: isDark
+                        ? (isValinnov ? 'transparent' : 'rgba(255, 255, 255, 0.14)')
+                        : '#ffffff',
                       border: isDark
-                        ? '1px solid rgba(255, 255, 255, 0.22)'
+                        ? (isValinnov ? '1.5px solid rgba(255, 255, 255, 0.25)' : '1px solid rgba(255, 255, 255, 0.22)')
                         : '1px solid rgba(0, 0, 0, 0.08)',
+                      boxShadow: isDark
+                        ? '0 4px 16px rgba(0, 0, 0, 0.35)'
+                        : '0 4px 16px rgba(0, 0, 0, 0.06)',
                     }}
                   >
                     <img
                       src={item.logo}
                       alt={`${item.company} logo`}
-                      className="w-full h-full object-contain"
+                      className={`w-full h-full ${isValinnov ? 'object-cover' : 'object-contain'}`}
                     />
                   </div>
                 )}
@@ -152,36 +183,65 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
                 </div>
               </div>
 
-              {/* Badges: Internship & Role */}
+              {/* Badges: Employment Type & Role */}
               <div className="flex items-center gap-2 flex-wrap">
-                {item.isInternship && (
+                {item.isInternship ? (
                   <span
-                    className="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase backdrop-blur-md transition-all duration-300 shadow-sm"
                     style={{
                       backgroundColor: isDark
-                        ? 'rgba(255, 255, 255, 0.16)'
-                        : 'rgba(100, 116, 139, 0.12)',
+                        ? 'rgba(255, 255, 255, 0.12)'
+                        : 'rgba(100, 116, 139, 0.09)',
                       color: isDark ? '#ffffff' : '#475569',
                       border: isDark
-                        ? '1px solid rgba(255, 255, 255, 0.3)'
-                        : '1px solid rgba(100, 116, 139, 0.25)',
+                        ? '1px solid rgba(255, 255, 255, 0.28)'
+                        : '1px solid rgba(148, 163, 184, 0.35)',
                       fontFamily: '"Archivo Black", sans-serif',
+                      boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.03)',
                     }}
                   >
-                    Internship
+                    <TbSchool className="w-3.5 h-3.5 opacity-85 flex-shrink-0" />
+                    <span>Internship</span>
+                  </span>
+                ) : (
+                  <span
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase backdrop-blur-md transition-all duration-300 shadow-sm"
+                    style={{
+                      backgroundColor: isDark ? 'rgba(153, 255, 102, 0.16)' : 'rgba(21, 206, 169, 0.14)',
+                      color: isDark ? '#99ff66' : '#0d9488',
+                      border: isDark
+                        ? '1px solid rgba(153, 255, 102, 0.45)'
+                        : '1px solid rgba(21, 206, 169, 0.45)',
+                      fontFamily: '"Archivo Black", sans-serif',
+                      boxShadow: isDark ? '0 0 12px rgba(153, 255, 102, 0.25)' : '0 0 12px rgba(21, 206, 169, 0.2)',
+                    }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse flex-shrink-0" />
+                    <TbBriefcase className="w-3.5 h-3.5 opacity-85 flex-shrink-0" />
+                    <span>Full-Time</span>
                   </span>
                 )}
-                <span
-                  className="px-3 py-1 rounded-full text-xs font-bold shadow-sm"
-                  style={{
-                    backgroundColor: isDark ? `${glowColor}24` : `${color}18`,
-                    color: isDark ? glowColor : color,
-                    border: isDark ? `1.5px solid ${glowColor}66` : `1.5px solid ${color}44`,
-                    fontFamily: '"Archivo Black", sans-serif',
-                  }}
-                >
-                  {item.role}
-                </span>
+
+                {(() => {
+                  const RoleIcon = getRoleIcon(item.role);
+                  return (
+                    <span
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 shadow-sm"
+                      style={{
+                        background: isDark
+                          ? `linear-gradient(135deg, ${glowColor}2e, ${glowColor}10)`
+                          : `linear-gradient(135deg, ${color}20, ${color}0a)`,
+                        color: isDark ? glowColor : color,
+                        border: isDark ? `1.5px solid ${glowColor}77` : `1.5px solid ${color}55`,
+                        boxShadow: isDark ? `0 0 16px ${glowColor}25` : `0 0 14px ${color}16`,
+                        fontFamily: '"Archivo Black", sans-serif',
+                      }}
+                    >
+                      <RoleIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span>{item.role}</span>
+                    </span>
+                  );
+                })()}
               </div>
             </div>
 
@@ -220,6 +280,7 @@ export const ExperienceTimeline: React.FC = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
   const cooldown = useRef(false);
   const touchStartY = useRef<number | null>(null);
+  const totalExperience = useMemo(() => calculateTotalExperience(EXPERIENCE_ITEMS), []);
 
   /* Auto-scroll timeline to keep active item in center */
   useEffect(() => {
@@ -296,15 +357,15 @@ export const ExperienceTimeline: React.FC = () => {
       <div className="text-center mb-6 animate-[fade-in-up_0.6s_ease_forwards] relative z-30">
         <p
           style={{
-            fontSize: '0.78rem',
+            fontSize: '0.82rem',
             textTransform: 'uppercase',
             color: '#15cea9',
             fontFamily: '"Archivo Black", sans-serif',
-            letterSpacing: '0.1em',
+            letterSpacing: '0.12em',
             marginBottom: 4,
           }}
         >
-          Track Record & Engineering
+          {totalExperience.text} of Experience
         </p>
         <h2
           className="text-zinc-900 font-black tracking-tight relative z-30"
@@ -402,9 +463,13 @@ export const ExperienceTimeline: React.FC = () => {
                         >
                           {item.company}
                         </span>
-                        {item.isInternship && (
+                        {item.isInternship ? (
                           <span className="text-[9px] font-sans font-bold px-1.5 py-0.5 rounded bg-zinc-200/90 text-zinc-600 uppercase tracking-wider">
                             Intern
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-sans font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 uppercase tracking-wider border border-emerald-300/50">
+                            Lead
                           </span>
                         )}
                       </div>

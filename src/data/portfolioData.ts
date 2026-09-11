@@ -286,6 +286,8 @@ export interface ExperienceItem {
   company: string;
   role: string;
   period: string;
+  startDate: string; // 'YYYY-MM'
+  endDate?: string;  // 'YYYY-MM' or undefined for 'Present'
   highlights: string[];
   accent: string;
   logo?: string;
@@ -301,6 +303,7 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
     company: 'Valinnov',
     role: 'Tech Lead & Architect',
     period: 'February 2025 – Present',
+    startDate: '2025-02',
     highlights: [
       'Leading the engineering development team and architecture design.',
       'Managing Git branching strategies, automated testing, and DevOps CI/CD pipelines.',
@@ -318,6 +321,8 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
     company: 'Valinnov',
     role: 'Junior Fullstack Developer',
     period: 'October 2024 – February 2025',
+    startDate: '2024-10',
+    endDate: '2025-01',
     highlights: [
       'Fullstack web development and modular component architecture.',
       'Agile / SCRUM epic design and user story refinement.',
@@ -336,6 +341,8 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
     company: 'DXC Technology',
     role: 'Fullstack Developer & Team Coordinator',
     period: 'February 2024 – August 2024',
+    startDate: '2024-02',
+    endDate: '2024-08',
     highlights: [
       'End-to-end fullstack application design and development.',
       'Team leadership, workflow tracking, and project milestone deliveries.',
@@ -352,6 +359,8 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
     company: 'Pareto',
     role: 'Fullstack Developer',
     period: 'April 2023 – July 2023',
+    startDate: '2023-04',
+    endDate: '2023-07',
     highlights: [
       'Fullstack solution development and feature enhancements.',
       'Project milestone tracking and cross-functional team coordination.',
@@ -368,6 +377,8 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
     company: 'Management Consulting and Account',
     role: 'Fullstack Developer',
     period: 'April 2022 – July 2022',
+    startDate: '2022-04',
+    endDate: '2022-07',
     highlights: [
       'Fullstack software engineering and internal web tooling integration.',
     ],
@@ -382,6 +393,8 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
     company: 'Alternative IT',
     role: 'Mobile Developer',
     period: 'June 2021 – July 2021',
+    startDate: '2021-06',
+    endDate: '2021-07',
     highlights: [
       'Mobile application design, cross-platform UI prototyping, and development.',
     ],
@@ -392,6 +405,52 @@ export const EXPERIENCE_ITEMS: ExperienceItem[] = [
     textColor: '#1c1b20',
   },
 ];
+
+/**
+ * Calculates cumulative total of years and months of experience compared with a reference date.
+ */
+export function calculateTotalExperience(
+  items: ExperienceItem[] = EXPERIENCE_ITEMS,
+  now: Date = new Date()
+): { years: number; months: number; text: string } {
+  let totalMonths = 0;
+
+  for (const item of items) {
+    if (!item.startDate) continue;
+    const [startYear, startMonth] = item.startDate.split('-').map(Number);
+    let endYear: number;
+    let endMonth: number;
+
+    if (item.endDate) {
+      [endYear, endMonth] = item.endDate.split('-').map(Number);
+    } else {
+      endYear = now.getFullYear();
+      endMonth = now.getMonth() + 1;
+    }
+
+    const months = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
+    if (months > 0) {
+      totalMonths += months;
+    }
+  }
+
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+
+  const parts: string[] = [];
+  if (years > 0) {
+    parts.push(`${years} ${years === 1 ? 'year' : 'years'}`);
+  }
+  if (months > 0 || parts.length === 0) {
+    parts.push(`${months} ${months === 1 ? 'month' : 'months'}`);
+  }
+
+  return {
+    years,
+    months,
+    text: parts.join(' and '),
+  };
+}
 
 export interface NavigationItem {
   key: string;
