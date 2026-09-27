@@ -29,11 +29,12 @@ export interface Skill {
 }
 
 export interface GameReview {
+  id: string;
   title: string;
+  subtitle: string;
   image: string;
-  emoji?: string;
-  rating: number;
   color: string;
+  accentGlow: string;
   opinion: string;
 }
 
@@ -223,52 +224,54 @@ export const SKILLS: Skill[] = [
 
 export const PLAYED_GAMES: GameReview[] = [
   {
-    title: 'Hollow Knight',
-    image: '/assets/games/hollow-knight.jpg',
-    rating: 5,
-    color: '#15cea9',
-    opinion:
-      'A masterpiece of metroidvania design. Haunting atmosphere, hand-drawn beauty, and one of the most satisfying exploration loops ever made.',
-  },
-  {
-    title: 'Cyberpunk 2077',
-    image: '/assets/games/cyberpunk-2077.jpg',
-    rating: 4,
-    color: '#ff779c',
-    opinion:
-      "After the 2.0 update: a breathtaking open world. Night City is one of gaming's greatest achievements in world-building and density.",
-  },
-  {
-    title: 'Hades',
-    image: '/assets/games/hades.jpg',
-    rating: 5,
+    id: 'botw',
+    title: 'The Legend of Zelda: Breath of the Wild',
+    subtitle: 'Reinventing Open-World Freedom',
+    image: '/assets/games/botw.jpg',
     color: '#2bbece',
+    accentGlow: 'rgba(43, 190, 206, 0.45)',
     opinion:
-      'The perfect roguelite. Every run feels fresh, the writing is razor-sharp, and the combat is endlessly satisfying.',
+      'The world design is not merely immersive, but engineered in a remarkably clever way that compels you to explore. It constantly keeps you on your toes, promising that there are always new secrets to uncover, NPCs to meet, and monsters to battle. Distributing the story across the world through memories and the Divine Beasts makes exploration and adventuring feel even more rewarding.',
   },
   {
-    title: 'Minecraft',
-    image: '/assets/games/minecraft.png',
-    rating: 5,
-    color: '#15cea9',
+    id: 'totk',
+    title: 'The Legend of Zelda: Tears of the Kingdom',
+    subtitle: 'Engineering Sandbox Marvel',
+    image: '/assets/games/totk.jpg',
+    color: '#10b981',
+    accentGlow: 'rgba(16, 185, 129, 0.45)',
     opinion:
-      'More of a creative platform than a game. The ultimate sandbox. Thousands of hours and still finding new ideas.',
+      'They expanded on the Hyrule we already knew by introducing two new layers to the world, encouraging vertical exploration across biomes that radically change how you play. The new abilities are pure genius, giving the player complete freedom over what weapons to craft and which tools to use in battle.',
   },
   {
-    title: 'Elden Ring',
-    image: '/assets/games/elden-ring.jpg',
-    rating: 4,
+    id: 'rdr2',
+    title: 'Red Dead Redemption 2',
+    subtitle: 'The Living Frontier',
+    image: '/assets/games/rdr2.jpg',
+    color: '#e11d48',
+    accentGlow: 'rgba(225, 29, 72, 0.45)',
+    opinion:
+      'The level of immersion in this game is truly next level, largely thanks to the living world and NPCs who remember your actions throughout the journey, giving every choice real weight. The narrative takes you through an emotional rollercoaster, offering ample time to genuinely connect with every character.',
+  },
+  {
+    id: 'silksong',
+    title: 'Hollow Knight: Silksong',
+    subtitle: 'Gothic Needle & Thread',
+    image: '/assets/games/silksong.jpg',
     color: '#ff779c',
+    accentGlow: 'rgba(255, 119, 156, 0.45)',
     opinion:
-      'Open-world Souls done right. Brutally hard but endlessly rewarding. The sense of discovery is unmatched.',
+      'The world-building delivers a grand adventure through sharp, thrilling challenge. The enemies and bosses push you to experiment with different moves and tools, while the multifaceted rewards make every path worth exploring with a curious mind. Rooted deeply in the world and encounters, the story invites you to live the journey yourself rather than just being told it.',
   },
   {
-    title: 'Portal 2',
-    image: '/assets/games/portal-2.jpg',
-    rating: 5,
-    color: '#2bbece',
+    id: 'mgsv',
+    title: 'Metal Gear Solid V: The Phantom Pain',
+    subtitle: 'The Ultimate Stealth Sandbox',
+    image: '/assets/games/mgsv.jpg',
+    color: '#f59e0b',
+    accentGlow: 'rgba(245, 158, 11, 0.45)',
     opinion:
-      'Perfectly designed puzzles wrapped in genuinely funny writing. A timeless classic and a game design benchmark.',
+      'The sheer freedom and variety in gameplay continues to impress me day after day. The enemy AI elevates this tremendously through how dynamically they respond to your actions in both the short and long term—adapting their equipment based on your tactics in previous missions. The story is gripping, and I enjoyed every cinematic cutscene in the game.',
   },
 ];
 
@@ -466,6 +469,6 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   { key: 'software', route: '/software', label: 'Software', icon: 'terminal', accent: '#2bbece' },
   { key: 'gamedev', route: '/gamedev', label: 'Game Dev', icon: 'sports_esports', accent: '#ff779c' },
   { key: '3d', route: '/3d-art', label: '3D Art', icon: 'view_in_ar', accent: '#a78bfa' },
-  { key: 'games', route: '/games', label: 'Games', icon: 'casino', accent: '#ff779c' },
+  { key: 'games', route: '/games', label: 'Favorite Games', icon: 'casino', accent: '#ff779c' },
   { key: 'connect', route: '/connect', label: 'Connect', icon: 'send', accent: '#15cea9' },
 ];

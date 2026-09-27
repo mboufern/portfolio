@@ -268,9 +268,9 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section }) => {
 
   return (
     <div
-      className="w-full h-full relative flex flex-col"
+      className="w-full h-full relative flex flex-col justify-center"
       style={{
-        padding: '80px 8vw 32px',
+        padding: '44px 8vw 28px',
         maxWidth: 1400,
         margin: '0 auto',
       }}

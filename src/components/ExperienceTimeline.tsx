@@ -271,7 +271,7 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
 };
 
 /* ─── Timeline Metric Heights ────────────────────────────────────── */
-const ITEM_H = 76; // px per timeline entry
+const ITEM_H = 92; // px per timeline entry (more spacious gap)
 
 /* ─── Experience Timeline Main Component ─────────────────────────── */
 export const ExperienceTimeline: React.FC = () => {
@@ -379,19 +379,28 @@ export const ExperienceTimeline: React.FC = () => {
         {/* ── Left: Connected Timeline Navigation ── */}
         <div
           className="experience-timeline-nav flex-shrink-0 relative"
-          style={{ width: 'clamp(220px, 25vw, 290px)' }}
+          style={{ width: 'clamp(230px, 26vw, 300px)' }}
         >
-          {/* Soft White Glow Backdrop */}
+          {/* Soft White Cloud Glow Backdrop */}
           <div
             aria-hidden="true"
-            className="absolute -inset-8 -z-10 rounded-[36px] pointer-events-none"
+            className="absolute -inset-16 -z-10 rounded-[60px] pointer-events-none"
             style={{
               background:
-                'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0) 80%)',
-              filter: 'blur(20px)',
+                'radial-gradient(ellipse 90% 85% at 50% 50%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.88) 35%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0.15) 80%, rgba(255, 255, 255, 0) 100%)',
+              filter: 'blur(32px)',
             }}
           />
-          <div style={{ position: 'relative', height: ITEM_H * 4.5 }}>
+          <div
+            style={{
+              position: 'relative',
+              height: Math.round(ITEM_H * 4.6),
+              maskImage:
+                'linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%)',
+              WebkitMaskImage:
+                'linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%)',
+            }}
+          >
             {/* Scrollable list */}
             <div
               ref={timelineRef}
@@ -399,8 +408,8 @@ export const ExperienceTimeline: React.FC = () => {
               style={{
                 height: '100%',
                 overflowY: 'scroll',
-                paddingTop: Math.round(ITEM_H * 0.4),
-                paddingBottom: Math.round(ITEM_H * 0.4),
+                paddingTop: Math.round(ITEM_H * 0.6),
+                paddingBottom: Math.round(ITEM_H * 0.6),
                 paddingLeft: 18,
                 paddingRight: 8,
                 boxSizing: 'border-box',
@@ -454,7 +463,7 @@ export const ExperienceTimeline: React.FC = () => {
                         <span
                           style={{
                             margin: 0,
-                            fontSize: '0.88rem',
+                            fontSize: '0.9rem',
                             lineHeight: 1.25,
                             color: isCurrent ? '#1c1b20' : '#6b6880',
                             fontFamily: '"Archivo Black", sans-serif',
@@ -487,19 +496,6 @@ export const ExperienceTimeline: React.FC = () => {
                 );
               })}
             </div>
-
-            {/* Gradient fade edge overlays */}
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                inset: 0,
-                pointerEvents: 'none',
-                zIndex: 10,
-                background:
-                  'linear-gradient(to bottom, rgba(248,247,252,1) 0%, transparent 20%, transparent 80%, rgba(248,247,252,1) 100%)',
-              }}
-            />
           </div>
         </div>
 

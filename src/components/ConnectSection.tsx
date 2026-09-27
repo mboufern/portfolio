@@ -48,7 +48,7 @@ export const ConnectSection: React.FC = () => {
     <div
       className="w-full h-full relative flex flex-col justify-center"
       style={{
-        padding: '80px 8vw 48px',
+        padding: '44px 8vw 36px',
         maxWidth: 1400,
         margin: '0 auto',
       }}
