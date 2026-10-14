@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { HiArrowUpRight, HiXMark } from 'react-icons/hi2';
 import { PLAYED_GAMES, type GameReview } from '../data/portfolioData';
-import { HiSparkles, HiXMark, HiArrowUpRight } from 'react-icons/hi2';
 
 interface CardLayout {
   id: string;
@@ -110,23 +110,12 @@ export const GamesSection: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-3 sm:mb-6 pointer-events-none">
           <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#ff779c] animate-pulse" />
-              <p className="text-[11px] font-black uppercase tracking-[0.25em] text-[#ff779c] m-0">
-                Hall of Fame
-              </p>
-            </div>
             <h2
               className="text-white text-3xl sm:text-4xl md:text-5xl font-black tracking-tight m-0 drop-shadow-md"
               style={{ fontFamily: 'Archivo Black, sans-serif' }}
             >
-              Favorite Games
+              My Favorite Games
             </h2>
-          </div>
-
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md text-xs font-bold text-zinc-300 shadow-lg">
-            <HiSparkles className="w-3.5 h-3.5 text-[#ff779c]" />
-            <span>Click any title to explore</span>
           </div>
         </div>
 
@@ -210,9 +199,8 @@ export const GamesSection: React.FC = () => {
                 key={`mobile-${game.id}`}
                 type="button"
                 onClick={() => setSelectedGame(game)}
-                className={`relative block text-left outline-none cursor-pointer rounded-2xl overflow-hidden bg-[#11101e]/90 border border-white/15 p-2.5 shadow-xl transition-all duration-200 active:scale-95 ${
-                  idx % 2 === 0 ? 'animate-[float-drift-1_4.5s_infinite_ease-in-out]' : 'animate-[float-drift-2_4.8s_infinite_ease-in-out]'
-                }`}
+                className={`relative block text-left outline-none cursor-pointer rounded-2xl overflow-hidden bg-[#11101e]/90 border border-white/15 p-2.5 shadow-xl transition-all duration-200 active:scale-95 ${idx % 2 === 0 ? 'animate-[float-drift-1_4.5s_infinite_ease-in-out]' : 'animate-[float-drift-2_4.8s_infinite_ease-in-out]'
+                  }`}
                 style={{ borderColor: `${game.color}55` }}
               >
                 <div className="flex items-center gap-3">

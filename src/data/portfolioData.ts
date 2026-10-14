@@ -9,6 +9,12 @@ export interface Project {
   year: string;
   status: string;
   statusColor: string;
+  period?: string;
+  teamRole?: string;
+  category?: string;
+  highlights?: string[];
+  demoUrl?: string;
+  githubUrl?: string;
 }
 
 export interface ProjectSection {
@@ -78,9 +84,19 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         label: 'MB Games Website',
         icon: 'language',
         imageLayout: 'landscape',
+        category: 'Creative Web & SPA',
+        period: 'Jan 2026 – Present',
+        teamRole: 'Solo Developer & Designer',
         description:
-          'A personal portfolio and game showcase website built with React, TypeScript, and Vite. Features a custom design system, animated drip navbar, per-game cinematic detail pages, a D3-powered skills hero, and scroll-snap portfolio sections.',
-        technologies: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'React Router', 'Framer Motion'],
+          'A personal portfolio and interactive showcase website built with React, TypeScript, and Vite. Features a bespoke design system, silk-smooth 60fps cubic scroll engine, interactive D3.js physics-driven skills hero, and Cloudflare Pages SPA deployment.',
+        technologies: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'React Router', 'Framer Motion', 'D3'],
+        highlights: [
+          'Silky smooth RAF scroll engine with cubic easing',
+          'Interactive D3 physics skill bubble simulation',
+          'Hardware-accelerated 3D layered project cards',
+        ],
+        githubUrl: 'https://github.com/mboufern',
+        demoUrl: 'https://mboufernana.com',
         images: [],
         year: '2026',
         status: 'In Progress',
@@ -91,9 +107,18 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         label: 'REST API Platform',
         icon: 'api',
         imageLayout: 'landscape',
+        category: 'Cloud Backend & Microservices',
+        period: 'Oct 2024 – Feb 2025 (5 mos)',
+        teamRole: 'Lead Architect · Team of 3',
         description:
-          'A production-grade REST API built with Spring Boot featuring JWT authentication, role-based access control, PostgreSQL persistence, Docker deployment, and automated CI/CD pipelines via GitHub Actions.',
-        technologies: ['Java', 'Spring Boot', '.Net', 'PostgreSQL', 'Docker', 'Terraform'],
+          'A production-grade REST API built with Spring Boot featuring stateless JWT authentication with token rotation, fine-grained role-based access control, PostgreSQL persistence with HikariCP pooling, Docker containerization, and automated GitHub Actions CI/CD.',
+        technologies: ['Java', 'Spring Boot', '.Net', 'PostgreSQL', 'Docker', 'Terraform', 'GitHub Actions'],
+        highlights: [
+          'JWT authentication with refresh token rotation',
+          'PostgreSQL migrations & connection pooling',
+          'Automated CI/CD with Docker multi-stage builds',
+        ],
+        githubUrl: 'https://github.com/mboufern',
         images: [],
         year: '2025',
         status: 'Released',
@@ -104,9 +129,18 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         label: 'Laravel Web App',
         icon: 'web',
         imageLayout: 'landscape',
+        category: 'Fullstack Web Application',
+        period: 'Apr 2024 – Aug 2024 (5 mos)',
+        teamRole: 'Fullstack Developer · Team of 2',
         description:
-          'A full-stack Laravel + Vue application with server-side rendering, Eloquent ORM, Redis queues for background jobs, and Stripe payment integration.',
+          'A full-stack Laravel + Vue application with server-side rendering, Eloquent ORM, asynchronous Redis queues for distributed background jobs, and complete Stripe payment checkout with webhook verification.',
         technologies: ['PHP', 'Laravel', 'Vue', 'MySQL', 'Redis', 'Stripe'],
+        highlights: [
+          'Asynchronous queue processing with Redis',
+          'Stripe checkout & webhook event reconciliation',
+          'Eloquent ORM query optimization & caching',
+        ],
+        githubUrl: 'https://github.com/mboufern',
         images: [],
         year: '2024',
         status: 'Released',
@@ -127,22 +161,39 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         label: 'Walls & Tower Party',
         icon: 'casino',
         imageLayout: 'landscape',
+        category: 'Online Multiplayer Game',
+        period: 'May 2024 – Dec 2024 (8 mos)',
+        teamRole: 'Solo Game Developer & Artist',
         description:
-          'An online multiplayer board game built in Unity featuring real-time synchronisation via Netcode for GameObjects, a full lobby system, animated dice rolls with particle effects, wall-building strategy mechanics, and cross-platform Android/PC/iOS support.',
-        technologies: ['Unity', 'C#', 'Netcode for GameObjects', 'Firebase', 'Android', 'iOS'],
+          'An online multiplayer board strategy game built in Unity featuring authoritative real-time network synchronisation via Netcode for GameObjects, room lobby matchmaking, particle dice rolling physics, wall-building strategy mechanics, and cross-platform Android/PC/iOS builds.',
+        technologies: ['Unity', 'C#', 'Netcode for GameObjects', 'Firebase', 'Android', 'iOS', 'Blender'],
+        highlights: [
+          'Real-time sync via Netcode for GameObjects',
+          'Cross-platform play across Android, PC & iOS',
+          'Custom physics dice and animated board interactions',
+        ],
         images: ['/assets/wnt/full.gif'],
+        demoUrl: 'https://itch.io',
         year: '2025',
         status: 'Released',
         statusColor: '#ff779c',
       },
       {
         id: 'game-2',
-        label: 'Prototype — TBA',
+        label: 'Chrono Rift (Prototype)',
         icon: 'sports_esports',
         imageLayout: 'landscape',
+        category: 'Action Game Prototype',
+        period: 'Jan 2026 – Present',
+        teamRole: 'Solo Game Developer',
         description:
-          'A new game prototype currently in early development. Details coming soon — stay tuned.',
-        technologies: ['Unity', 'C#', 'Game Design'],
+          'A high-octane 3D action prototype currently in active development. Features a custom state-machine character controller, dynamic hitboxes, custom HLSL shaders via Shader Graph, and procedural arena room layouts.',
+        technologies: ['Unity', 'C#', 'Game Design', 'Shader Graph', 'Blender'],
+        highlights: [
+          'Hierarchical state-machine combat controller',
+          'Procedural arena room layout generator',
+          'Custom Shader Graph stylized visual effects',
+        ],
         images: [],
         year: '2026',
         status: 'In Development',
@@ -163,9 +214,17 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         label: 'Environment Art',
         icon: 'landscape',
         imageLayout: 'landscape',
+        category: 'Real-Time Game Environments',
+        period: 'Jun 2024 – Nov 2024 (6 mos)',
+        teamRole: 'Solo 3D Artist',
         description:
-          'A collection of hand-crafted environment assets including terrain, vegetation, and architectural elements. Full pipeline from blockout to final textured export for real-time engines.',
-        technologies: ['Blender', 'Texturing', 'Rigging', 'Level Design'],
+          'A collection of hand-crafted game-ready environment assets including modular architectural structures, stylized terrain biomes, and optimized foliage. Full pipeline from initial blockout to Substance Painter texturing and Unity engine export.',
+        technologies: ['Blender', 'Texturing', 'Rigging', 'Level Design', 'Unity'],
+        highlights: [
+          'Modular kitbash kit for rapid level design',
+          'PBR trim sheet & tileable material workflows',
+          'Optimized draw-calls and custom collision hulls',
+        ],
         images: [],
         year: '2025',
         status: 'Portfolio',
@@ -176,9 +235,17 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         label: 'Character Models',
         icon: 'accessibility_new',
         imageLayout: 'portrait',
+        category: 'PBR Rigged Characters',
+        period: 'Nov 2024 – Apr 2025 (6 mos)',
+        teamRole: 'Solo 3D Character Artist',
         description:
-          'Stylised and realistic character models with full UV unwrap, PBR texture sets, and game-ready rigged skeletons. Animations created in Blender and exported for Unity.',
-        technologies: ['Blender', 'Animation', 'Rigging', 'Texturing'],
+          'Stylized and realistic character models featuring clean anatomical edge loops for natural joint deformation, non-overlapping 4K UV unwraps, PBR texture sets, and game-ready Humanoid FK/IK skeletal rigs tested in Unity Mecanim.',
+        technologies: ['Blender', 'Animation', 'Rigging', 'Texturing', 'Substance'],
+        highlights: [
+          'Deformation-friendly topology for limbs & joints',
+          'Complete Humanoid FK/IK skeleton setup',
+          'Substance 4K PBR material maps export',
+        ],
         images: [],
         year: '2025',
         status: 'Portfolio',

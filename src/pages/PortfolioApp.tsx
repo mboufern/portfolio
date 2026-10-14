@@ -308,7 +308,7 @@ export const PortfolioApp: React.FC = () => {
         </section>
 
         {/* Sections 2–4: Project Sections (Software, GameDev, 3D Art) */}
-        {PROJECT_SECTIONS.map((sec) => (
+        {PROJECT_SECTIONS.map((sec, idx) => (
           <section
             key={sec.key}
             className="w-full h-screen relative flex flex-col justify-center flex-shrink-0"
@@ -316,7 +316,7 @@ export const PortfolioApp: React.FC = () => {
               background: sec.bg,
             }}
           >
-            <ProjectSection section={sec} />
+            <ProjectSection section={sec} isSectionActive={activeSection === idx + 2} />
           </section>
         ))}
 

@@ -31,9 +31,10 @@ import {
   SiLinear,
   SiJira,
   SiNotion,
+  SiD3,
 } from 'react-icons/si';
 import { FaJava } from 'react-icons/fa6';
-import { TbBrandCSharp, TbCode, TbCube, TbPalette, TbVector } from 'react-icons/tb';
+import { TbBrandCSharp, TbCode, TbCube, TbPalette, TbVector, TbSparkles, TbDeviceGamepad2 } from 'react-icons/tb';
 
 interface TechIconProps {
   name: string;
@@ -120,6 +121,16 @@ export const TechIcon: React.FC<TechIconProps> = ({ name, className = 'w-3.5 h-3
     case 'adobe illustrator':
     case 'illustrator':
       return <TbVector className={className} style={style} />;
+    case 'd3':
+    case 'd3.js':
+      return <SiD3 className={className} style={style} />;
+    case 'shader graph':
+      return <TbSparkles className={className} style={style} />;
+    case 'game design':
+      return <TbDeviceGamepad2 className={className} style={style} />;
+    case 'substance':
+    case 'substance painter':
+      return <TbPalette className={className} style={style} />;
     case '3d':
     case 'rigging':
     case 'animation':

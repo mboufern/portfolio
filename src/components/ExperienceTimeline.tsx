@@ -105,14 +105,14 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
             : hexToRgba(bgColor, isDark ? 0.95 : 0.96),
           backdropFilter: isActive ? 'blur(160px)' : 'none',
           WebkitBackdropFilter: isActive ? 'blur(160px)' : 'none',
-          padding: 'clamp(24px, 3.5vw, 40px)',
+          padding: 'clamp(14px, 3.5vw, 36px)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          gap: 14,
+          gap: 12,
           boxSizing: 'border-box',
           transition: 'background 0.4s ease',
-          overflow: 'hidden',
+          overflowY: 'auto',
         }}
       >
         {isActive ? (
@@ -121,21 +121,21 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.06 }}
-            style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
           >
             {/* Header: Company, Logo & Badges */}
             <div
-              className="flex flex-wrap items-center justify-between gap-3 pb-3"
+              className="flex flex-wrap items-center justify-between gap-2.5 pb-2.5"
               style={{
                 borderBottom: isDark
                   ? '1px solid rgba(255, 255, 255, 0.16)'
                   : '1px solid rgba(0, 0, 0, 0.08)',
               }}
             >
-              <div className="flex items-center gap-3.5 min-w-0">
+              <div className="flex items-center gap-3 min-w-0">
                 {item.logo && (
                   <div
-                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 ${
+                    className={`w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 ${
                       isValinnov ? 'p-0 overflow-hidden' : 'p-2 sm:p-2.5'
                     }`}
                     style={{
@@ -161,18 +161,20 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
                   <span
                     style={{
                       color: isDark ? glowColor : color,
-                      fontFamily: '"Archivo Black", sans-serif',
-                      fontSize: '0.76rem',
-                      letterSpacing: '0.08em',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      fontSize: 'clamp(0.68rem, 2.6vw, 0.74rem)',
+                      fontWeight: 600,
+                      letterSpacing: '0.04em',
                       textTransform: 'uppercase',
+                      display: 'block',
                     }}
                   >
                     {item.period}
                   </span>
                   <h3
                     style={{
-                      margin: '3px 0 0',
-                      fontSize: 'clamp(1.25rem, 2.3vw, 1.8rem)',
+                      margin: '2px 0 0',
+                      fontSize: 'clamp(1.15rem, 3.6vw, 1.75rem)',
                       color: textColor,
                       fontFamily: '"Archivo Black", sans-serif',
                       lineHeight: 1.15,
@@ -184,19 +186,19 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
               </div>
 
               {/* Badges: Employment Type & Role */}
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 {item.isInternship ? (
                   <span
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase backdrop-blur-md transition-all duration-300 shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold tracking-wide uppercase backdrop-blur-md transition-all duration-300 shadow-sm"
                     style={{
                       backgroundColor: isDark
                         ? 'rgba(255, 255, 255, 0.12)'
-                        : 'rgba(100, 116, 139, 0.09)',
+                        : 'rgba(100, 116, 139, 0.08)',
                       color: isDark ? '#ffffff' : '#475569',
                       border: isDark
-                        ? '1px solid rgba(255, 255, 255, 0.28)'
-                        : '1px solid rgba(148, 163, 184, 0.35)',
-                      fontFamily: '"Archivo Black", sans-serif',
+                        ? '1px solid rgba(255, 255, 255, 0.22)'
+                        : '1px solid rgba(148, 163, 184, 0.25)',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
                       boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.03)',
                     }}
                   >
@@ -205,14 +207,14 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
                   </span>
                 ) : (
                   <span
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase backdrop-blur-md transition-all duration-300 shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold tracking-wide uppercase backdrop-blur-md transition-all duration-300 shadow-sm"
                     style={{
                       backgroundColor: isDark ? 'rgba(153, 255, 102, 0.16)' : 'rgba(21, 206, 169, 0.14)',
                       color: isDark ? '#99ff66' : '#0d9488',
                       border: isDark
-                        ? '1px solid rgba(153, 255, 102, 0.45)'
-                        : '1px solid rgba(21, 206, 169, 0.45)',
-                      fontFamily: '"Archivo Black", sans-serif',
+                        ? '1px solid rgba(153, 255, 102, 0.35)'
+                        : '1px solid rgba(21, 206, 169, 0.35)',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
                       boxShadow: isDark ? '0 0 12px rgba(153, 255, 102, 0.25)' : '0 0 12px rgba(21, 206, 169, 0.2)',
                     }}
                   >
@@ -226,15 +228,15 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
                   const RoleIcon = getRoleIcon(item.role);
                   return (
                     <span
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-semibold transition-all duration-300 shadow-sm"
                       style={{
                         background: isDark
-                          ? `linear-gradient(135deg, ${glowColor}2e, ${glowColor}10)`
-                          : `linear-gradient(135deg, ${color}20, ${color}0a)`,
+                          ? `linear-gradient(135deg, ${glowColor}25, ${glowColor}0d)`
+                          : `linear-gradient(135deg, ${color}1c, ${color}08)`,
                         color: isDark ? glowColor : color,
-                        border: isDark ? `1.5px solid ${glowColor}77` : `1.5px solid ${color}55`,
-                        boxShadow: isDark ? `0 0 16px ${glowColor}25` : `0 0 14px ${color}16`,
-                        fontFamily: '"Archivo Black", sans-serif',
+                        border: isDark ? `1px solid ${glowColor}66` : `1px solid ${color}45`,
+                        boxShadow: isDark ? `0 0 12px ${glowColor}20` : `0 0 10px ${color}14`,
+                        fontFamily: 'system-ui, -apple-system, sans-serif',
                       }}
                     >
                       <RoleIcon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -246,15 +248,15 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
             </div>
 
             {/* Bullet Highlights */}
-            <ul className="space-y-2.5 my-2">
+            <ul className="space-y-1.5 sm:space-y-2.5 my-1 sm:my-2">
               {item.highlights.map((highlight, idx) => (
                 <li
                   key={idx}
-                  className="flex items-start gap-2.5 text-xs sm:text-sm leading-relaxed font-sans"
+                  className="flex items-start gap-2.5 text-[11.5px] sm:text-sm leading-relaxed font-sans"
                   style={{ color: subtextColor }}
                 >
                   <span
-                    className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
+                    className="w-1.5 h-1.5 rounded-full mt-1.5 sm:mt-2 flex-shrink-0"
                     style={{ backgroundColor: isDark ? glowColor : color }}
                   />
                   <span>{highlight}</span>
@@ -373,6 +375,30 @@ export const ExperienceTimeline: React.FC = () => {
         >
           Work Experience
         </h2>
+      </div>
+
+      {/* Mobile Company Switcher Tabs */}
+      <div className="flex md:hidden items-center justify-center gap-1.5 mb-3 flex-wrap relative z-30 w-full px-2">
+        {EXPERIENCE_ITEMS.map((item, idx) => {
+          const isCur = active === idx;
+          const accentColor = item.accent ?? '#15cea9';
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActive(idx)}
+              className="px-2.5 py-1 rounded-full text-[11px] font-sans font-semibold transition-all duration-300 border-none cursor-pointer"
+              style={{
+                backgroundColor: isCur ? accentColor : 'rgba(255, 255, 255, 0.85)',
+                color: isCur ? '#ffffff' : '#475569',
+                boxShadow: isCur
+                  ? `0 2px 10px ${accentColor}55`
+                  : '0 1px 4px rgba(0,0,0,0.06)',
+              }}
+            >
+              {item.company}
+            </button>
+          );
+        })}
       </div>
 
       <div className="w-full flex flex-row items-center justify-center gap-8 md:gap-14 relative z-20">
@@ -506,7 +532,7 @@ export const ExperienceTimeline: React.FC = () => {
             flex: '1 1 380px',
             maxWidth: 620,
             position: 'relative',
-            height: 'clamp(460px, 58vh, 560px)',
+            height: 'clamp(400px, 54vh, 560px)',
             overflow: 'visible',
             display: 'flex',
             alignItems: 'center',
