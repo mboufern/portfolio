@@ -65,7 +65,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore }) => {
       />
 
       {/* Main Content Hero Lockup */}
-      <div className="relative z-10 flex flex-col-reverse md:flex-row items-center justify-center gap-2 md:gap-16 lg:gap-24 px-6 md:px-12 w-full max-w-6xl my-auto">
+      <div className="relative z-10 flex flex-col-reverse md:flex-row items-center justify-center gap-2 md:gap-10 lg:gap-18 px-6 md:px-12 w-full max-w-6xl my-auto">
         {/* Bio / Heading & Cycling Triad */}
         <div className="text-center md:text-left max-w-xl animate-[fade-in-up_0.6s_ease_forwards]">
           <h1
