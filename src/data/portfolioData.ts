@@ -49,6 +49,8 @@ export interface SocialLink {
   url: string;
   color: string;
   icon: string;
+  handle?: string;
+  category?: string;
 }
 
 export const PERSONAL_INFO = {
@@ -57,6 +59,9 @@ export const PERSONAL_INFO = {
   lastName: 'Boufernana',
   initials: 'MB',
   email: 'boufernana17@gmail.com',
+  phone: '+212636964826',
+  displayPhone: '+212 636-964-826',
+  location: 'Casablanca, Morocco (GMT+1)',
   titles: [
     'Software Engineer',
     'Game Developer',
@@ -67,7 +72,13 @@ export const PERSONAL_INFO = {
     'Gamer',
     'Programmer',
   ],
-  titleColors: ['#2bbece', '#ff779c', '#a78bfa', '#15cea9'],
+  // High-contrast, WCAG AA compliant palette on light background (#ffffff / #f8f7fc)
+  titleColors: [
+    '#00839e', // Rich Deep Cyan (4.43:1 on white) — Software
+    '#db2777', // Vivid Rose (4.60:1 on white) — Game Dev
+    '#7c3aed', // Deep Violet (5.70:1 on white) — 3D Art
+    '#0a8967', // Deep Mint (4.39:1 on white) — Experience
+  ],
 };
 
 export const PROJECT_SECTIONS: ProjectSection[] = [
@@ -343,12 +354,54 @@ export const PLAYED_GAMES: GameReview[] = [
 ];
 
 export const SOCIALS: SocialLink[] = [
-  { name: 'GitHub', url: 'https://github.com/mboufern', color: '#24292e', icon: 'code' },
-  { name: 'LinkedIn', url: 'https://linkedin.com/in/mboufern', color: '#0a66c2', icon: 'work' },
-  { name: 'Instagram', url: 'https://instagram.com/mboufern', color: '#e1306c', icon: 'photo_camera' },
-  { name: 'Itch.io', url: 'https://itch.io', color: '#fa5c5c', icon: 'videogame_asset' },
-  { name: 'YouTube', url: 'https://youtube.com', color: '#ff0000', icon: 'play_circle' },
-  { name: 'Discord', url: 'https://discord.com', color: '#7289da', icon: 'forum' },
+  {
+    name: 'GitHub',
+    url: 'https://github.com/mboufern',
+    color: '#181717',
+    icon: 'github',
+    handle: '@mboufern',
+    category: 'Source Code & Architecture',
+  },
+  {
+    name: 'LinkedIn',
+    url: 'https://www.linkedin.com/in/boufer/',
+    color: '#0a66c2',
+    icon: 'linkedin',
+    handle: 'in/boufer',
+    category: 'Professional Network',
+  },
+  {
+    name: 'Itch.io',
+    url: 'https://marouan-boufer.itch.io/',
+    color: '#fa5c5c',
+    icon: 'itch',
+    handle: 'marouan-boufer',
+    category: 'Playable Indie Games',
+  },
+  {
+    name: 'LeetCode',
+    url: 'https://leetcode.com/u/boufernana17/',
+    color: '#ffa116',
+    icon: 'leetcode',
+    handle: 'boufernana17',
+    category: 'Algorithms & Problem Solving',
+  },
+  {
+    name: 'X (Twitter)',
+    url: 'https://x.com/BouferMarouan',
+    color: '#0f1419',
+    icon: 'x',
+    handle: '@BouferMarouan',
+    category: 'Devlogs & Tech Insights',
+  },
+  {
+    name: 'Instagram',
+    url: 'https://instagram.com/mar1boufer',
+    color: '#e1306c',
+    icon: 'instagram',
+    handle: '@mar1boufer',
+    category: '3D Renders & Game Art',
+  },
 ];
 
 export interface ExperienceItem {

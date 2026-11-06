@@ -1,11 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 
-export const CyclingTitle: React.FC = () => {
+interface CyclingTitleProps {
+  onColorChange?: (color: string) => void;
+}
+
+export const CyclingTitle: React.FC<CyclingTitleProps> = ({ onColorChange }) => {
   const [idx, setIdx] = useState(0);
   const [visible, setVisible] = useState(true);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false
+  );
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  const color = PERSONAL_INFO.titleColors[idx % PERSONAL_INFO.titleColors.length];
+
+  useEffect(() => {
+    if (onColorChange) {
+      onColorChange(color);
+    }
+  }, [color, onColorChange]);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+
     const interval = setInterval(() => {
       setVisible(false);
       setTimeout(() => {
@@ -13,24 +37,37 @@ export const CyclingTitle: React.FC = () => {
         setVisible(true);
       }, 350);
     }, 2600);
-    return () => clearInterval(interval);
-  }, []);
 
-  const color = PERSONAL_INFO.titleColors[idx % PERSONAL_INFO.titleColors.length];
+    return () => clearInterval(interval);
+  }, [prefersReducedMotion]);
 
   return (
-    <span
-      style={{
-        display: 'inline-block',
-        fontSize: 'clamp(1.2rem, 2.5vw, 1.8rem)',
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(8px)',
-        transition: 'opacity 0.35s ease, transform 0.35s ease',
-        color,
-        textShadow: '0 0 12px rgba(0, 0, 0, 0.1)',
-      }}
+    <div
+      className="inline-flex items-center min-h-[2.4em]"
+      aria-live="polite"
+      aria-atomic="true"
     >
-      {PERSONAL_INFO.titles[idx]}
-    </span>
+      <span
+        style={{
+          display: 'inline-block',
+          fontSize: 'clamp(1.25rem, 2.6vw, 1.85rem)',
+          fontWeight: 600,
+          letterSpacing: '-0.02em',
+          opacity: visible ? 1 : 0,
+          transform: prefersReducedMotion
+            ? 'none'
+            : visible
+              ? 'translateY(0)'
+              : 'translateY(8px)',
+          transition: prefersReducedMotion
+            ? 'none'
+            : 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+          color,
+          WebkitFontSmoothing: 'antialiased',
+        }}
+      >
+        {PERSONAL_INFO.titles[idx]}
+      </span>
+    </div>
   );
 };

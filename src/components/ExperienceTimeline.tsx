@@ -278,6 +278,10 @@ const ITEM_H = 92; // px per timeline entry (more spacious gap)
 /* ─── Experience Timeline Main Component ─────────────────────────── */
 export const ExperienceTimeline: React.FC = () => {
   const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
   const cardAreaRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const cooldown = useRef(false);
@@ -307,10 +311,15 @@ export const ExperienceTimeline: React.FC = () => {
     };
 
     const onWheel = (e: WheelEvent) => {
-      // Prevent propagating vertical snap scroll when interacting with card stack
+      if (Math.abs(e.deltaY) < 15) return;
+      const dir = e.deltaY > 0 ? 1 : -1;
+      const current = activeRef.current;
+      if ((dir > 0 && current >= EXPERIENCE_ITEMS.length - 1) || (dir < 0 && current <= 0)) {
+        return;
+      }
       e.stopPropagation();
       e.preventDefault();
-      step(e.deltaY > 0 ? 1 : -1);
+      step(dir);
     };
 
     const onTouchStart = (e: TouchEvent) => {
@@ -321,10 +330,15 @@ export const ExperienceTimeline: React.FC = () => {
       if (touchStartY.current === null) return;
       const dy = touchStartY.current - e.touches[0].clientY;
       if (Math.abs(dy) < 26) return;
+      const dir = dy > 0 ? 1 : -1;
+      const current = activeRef.current;
+      if ((dir > 0 && current >= EXPERIENCE_ITEMS.length - 1) || (dir < 0 && current <= 0)) {
+        return;
+      }
       e.preventDefault();
       e.stopPropagation();
       touchStartY.current = null;
-      step(dy > 0 ? 1 : -1);
+      step(dir);
     };
 
     const onTouchEnd = () => {

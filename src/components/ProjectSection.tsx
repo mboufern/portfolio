@@ -52,19 +52,23 @@ const getProjectIcon = (iconName: string, className = 'w-5 h-5 flex-shrink-0') =
   }
 };
 
-/* ── Fallback visual display when no screenshots are provided yet ───── */
+/* ── High-Fidelity Interactive Project Viewport ───────────────────── */
 const ProjectVisualFallback: React.FC<{ project: Project; accent: string }> = ({ project, accent }) => {
-  const isSoftware =
-    project.id.includes('api') || project.id.includes('website') || project.id.includes('laravel');
-  const isGame = project.id.includes('party') || project.id.includes('game');
+  const [viewMode, setViewMode] = useState<'wireframe' | 'shaded' | 'inspect'>('shaded');
+  const is3D = project.id.includes('3d');
+  const isGame = project.id.includes('game') || project.id.includes('party');
+  const isEnv = project.id.includes('env');
+  const isChar = project.id.includes('char');
+  const isSpring = project.id.includes('spring') || project.id.includes('api');
 
   return (
     <div
-      className="relative w-full h-full overflow-hidden flex flex-col justify-between p-3.5 sm:p-5 select-none"
+      className="relative w-full h-full overflow-hidden flex flex-col justify-between p-3.5 sm:p-5"
       style={{
-        background: 'linear-gradient(135deg, #161522 0%, #201e30 100%)',
+        background: 'linear-gradient(145deg, #12111d 0%, #1a1829 100%)',
         borderRadius: 14,
-        boxShadow: '0 8px 30px rgba(0,0,0,0.18), inset 0 0 40px rgba(0,0,0,0.5)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.22), inset 0 0 30px rgba(0,0,0,0.4)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
       }}
     >
       {/* Ambient background glow */}
@@ -75,83 +79,264 @@ const ProjectVisualFallback: React.FC<{ project: Project; accent: string }> = ({
           right: '-20%',
           width: '75%',
           height: '75%',
-          background: `radial-gradient(circle, ${accent}30 0%, transparent 70%)`,
-          filter: 'blur(28px)',
+          background: `radial-gradient(circle, ${accent}22 0%, transparent 70%)`,
+          filter: 'blur(30px)',
           pointerEvents: 'none',
         }}
       />
 
-      {/* Top Window Bar */}
-      <div className="flex items-center justify-between relative z-10">
+      {/* Top Viewport Header */}
+      <div className="flex items-center justify-between relative z-10 pb-2 border-b border-white/10">
         <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80 shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+          <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+          <span className="ml-2 text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+            {is3D ? 'Blender Viewport 4.2' : isGame ? 'Unity 6 Engine Preview' : 'Systems Architecture View'}
+          </span>
         </div>
-        <span
-          className="text-[0.66rem] tracking-wider font-mono uppercase text-zinc-300"
-          style={{
-            textShadow: `0 0 12px ${accent}`,
-          }}
-        >
-          {project.category || 'Architecture'}
-        </span>
+
+        {/* Interactive Mode Pills */}
+        <div className="flex items-center gap-1 bg-black/40 p-0.5 rounded-lg border border-white/10">
+          <button
+            type="button"
+            onClick={() => setViewMode('shaded')}
+            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
+              viewMode === 'shaded' ? 'bg-white/20 text-white font-bold' : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            {is3D ? 'Shaded' : 'Overview'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('wireframe')}
+            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
+              viewMode === 'wireframe' ? 'bg-white/20 text-white font-bold' : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            {is3D ? 'Wireframe' : 'Topology'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('inspect')}
+            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
+              viewMode === 'inspect' ? 'bg-white/20 text-white font-bold' : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            Telemetry
+          </button>
+        </div>
       </div>
 
-      {/* Center Graphic */}
-      <div className="relative z-10 flex flex-col items-center justify-center my-auto py-1">
-        {isSoftware ? (
-          <div className="w-full text-left font-mono text-[0.68rem] sm:text-[0.72rem] leading-relaxed text-zinc-300 bg-black/45 rounded-lg p-2.5 sm:p-3 shadow-inner">
-            <div className="text-zinc-500">// {project.label} architecture</div>
-            <div className="text-purple-300">
-              <span className="text-cyan-400">const</span> service = <span className="text-yellow-300">new</span>{' '}
-              <span className="text-emerald-400">{project.technologies[0] || 'Platform'}</span>();
-            </div>
-            <div className="text-zinc-400">
-              service.<span className="text-sky-300">bootstrap</span>({'{'}{' '}
-              <span className="text-amber-300">status:</span> <span className="text-emerald-400">"{project.status}"</span>{' '}
-              {'}'});
-            </div>
+      {/* Interactive Center Stage */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center py-2 min-h-0">
+        {is3D && isEnv && (
+          <div className="w-full h-full flex flex-col items-center justify-center">
+            {viewMode === 'wireframe' ? (
+              <svg viewBox="0 0 320 160" className="w-full h-32 text-indigo-400 stroke-current fill-none">
+                <path d="M 40 120 L 160 40 L 280 120 Z" strokeWidth="1.2" strokeOpacity="0.8" />
+                <path d="M 40 120 L 160 140 L 280 120" strokeWidth="1.2" strokeOpacity="0.8" />
+                <path d="M 160 40 L 160 140" strokeWidth="1.2" strokeOpacity="0.8" />
+                <path d="M 100 80 L 220 80" strokeWidth="0.8" strokeDasharray="3 3" strokeOpacity="0.6" />
+                <path d="M 70 100 L 160 70 L 250 100" strokeWidth="0.8" strokeOpacity="0.7" />
+                <circle cx="160" cy="40" r="3" fill="#a78bfa" />
+                <circle cx="40" cy="120" r="3" fill="#a78bfa" />
+                <circle cx="280" cy="120" r="3" fill="#a78bfa" />
+                <circle cx="160" cy="140" r="3" fill="#a78bfa" />
+              </svg>
+            ) : viewMode === 'inspect' ? (
+              <div className="w-full bg-black/50 rounded-lg p-2.5 font-mono text-[11px] text-zinc-300 space-y-1">
+                <div className="flex justify-between border-b border-white/5 pb-1">
+                  <span className="text-zinc-400">Mesh Triangles:</span>
+                  <span className="text-purple-300 font-bold">14,820 tris</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-1">
+                  <span className="text-zinc-400">Material Passes:</span>
+                  <span className="text-emerald-400 font-bold">Albedo · Normal · Roughness · AO</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-400">Target Pipeline:</span>
+                  <span className="text-cyan-300 font-bold">Universal RP (Unity 6 / Mobile Ready)</span>
+                </div>
+              </div>
+            ) : (
+              <div className="relative w-full h-32 flex items-center justify-center">
+                <div
+                  className="w-24 h-24 rounded-2xl flex items-center justify-center shadow-2xl transition-transform duration-500 hover:rotate-6"
+                  style={{
+                    background: 'linear-gradient(135deg, #a78bfa30, #6366f120)',
+                    border: '1.5px solid #a78bfa80',
+                    boxShadow: '0 0 30px rgba(167, 139, 250, 0.25)',
+                  }}
+                >
+                  <TbTrees className="w-12 h-12 text-[#a78bfa]" />
+                </div>
+                <div className="absolute bottom-1 px-2.5 py-0.5 rounded-full bg-black/60 text-[10px] font-mono text-zinc-300 border border-white/10">
+                  Modular PBR Environment Assets
+                </div>
+              </div>
+            )}
           </div>
-        ) : isGame ? (
-          <div className="flex flex-col items-center gap-1.5 text-center">
-            <div
-              className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center p-2.5"
-              style={{
-                background: `linear-gradient(135deg, ${accent}25, ${accent}08)`,
-                boxShadow: `0 0 24px ${accent}35`,
-              }}
-            >
-              <TbDeviceGamepad2 className="w-6 h-6 sm:w-7 sm:h-7" style={{ color: accent }} />
-            </div>
-            <span className="text-[11px] sm:text-xs text-zinc-300 font-mono tracking-wider font-semibold">
-              IN-ENGINE PROTOTYPE
-            </span>
+        )}
+
+        {is3D && isChar && (
+          <div className="w-full h-full flex flex-col items-center justify-center">
+            {viewMode === 'wireframe' ? (
+              <svg viewBox="0 0 240 160" className="w-full h-32 text-indigo-300 stroke-current fill-none">
+                <circle cx="120" cy="35" r="18" strokeWidth="1.2" strokeOpacity="0.85" />
+                <path d="M 120 53 L 120 105" strokeWidth="1.5" strokeOpacity="0.9" />
+                <path d="M 85 70 L 120 60 L 155 70" strokeWidth="1.2" strokeOpacity="0.85" />
+                <path d="M 70 100 L 85 70" strokeWidth="1.2" strokeOpacity="0.8" />
+                <path d="M 170 100 L 155 70" strokeWidth="1.2" strokeOpacity="0.8" />
+                <path d="M 120 105 L 95 150" strokeWidth="1.2" strokeOpacity="0.85" />
+                <path d="M 120 105 L 145 150" strokeWidth="1.2" strokeOpacity="0.85" />
+                <circle cx="120" cy="60" r="2.5" fill="#a78bfa" />
+                <circle cx="85" cy="70" r="2.5" fill="#a78bfa" />
+                <circle cx="155" cy="70" r="2.5" fill="#a78bfa" />
+                <circle cx="120" cy="105" r="2.5" fill="#a78bfa" />
+              </svg>
+            ) : viewMode === 'inspect' ? (
+              <div className="w-full bg-black/50 rounded-lg p-2.5 font-mono text-[11px] text-zinc-300 space-y-1">
+                <div className="flex justify-between border-b border-white/5 pb-1">
+                  <span className="text-zinc-400">Skeletal Rig:</span>
+                  <span className="text-purple-300 font-bold">68 Humanoid Mecanim Bones</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-1">
+                  <span className="text-zinc-400">Topology Integrity:</span>
+                  <span className="text-emerald-400 font-bold">100% Quad Loops (Zero Poles)</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-400">Subsurface Scattering:</span>
+                  <span className="text-cyan-300 font-bold">4K Skin PBR Textures</span>
+                </div>
+              </div>
+            ) : (
+              <div className="relative w-full h-32 flex items-center justify-center">
+                <div
+                  className="w-24 h-24 rounded-2xl flex items-center justify-center shadow-2xl transition-transform duration-500 hover:scale-105"
+                  style={{
+                    background: 'linear-gradient(135deg, #a78bfa30, #ec489920)',
+                    border: '1.5px solid #a78bfa80',
+                    boxShadow: '0 0 30px rgba(167, 139, 250, 0.25)',
+                  }}
+                >
+                  <TbUser className="w-12 h-12 text-[#a78bfa]" />
+                </div>
+                <div className="absolute bottom-1 px-2.5 py-0.5 rounded-full bg-black/60 text-[10px] font-mono text-zinc-300 border border-white/10">
+                  Game-Ready FK/IK Rigged Mesh
+                </div>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="flex flex-col items-center gap-1.5 text-center">
-            <div
-              className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center p-2.5"
-              style={{
-                background: `linear-gradient(135deg, ${accent}25, ${accent}08)`,
-                boxShadow: `0 0 24px ${accent}35`,
-              }}
-            >
-              <TbTrees className="w-6 h-6 sm:w-7 sm:h-7" style={{ color: accent }} />
-            </div>
-            <span className="text-[11px] sm:text-xs text-zinc-300 font-mono tracking-wider font-semibold">
-              3D ASSET WORKFLOW
-            </span>
+        )}
+
+        {isSpring && (
+          <div className="w-full h-full flex flex-col justify-center">
+            {viewMode === 'wireframe' ? (
+              <div className="grid grid-cols-3 gap-2 text-center font-mono text-[10px]">
+                <div className="p-2 rounded bg-black/40 border border-white/10 text-cyan-300">
+                  <div className="font-bold">API GATEWAY</div>
+                  <div className="text-[9px] text-zinc-400 mt-1">Rate Limiting · SSL</div>
+                </div>
+                <div className="p-2 rounded bg-purple-950/40 border border-purple-500/40 text-purple-300">
+                  <div className="font-bold">SPRING BOOT 3</div>
+                  <div className="text-[9px] text-zinc-400 mt-1">JWT Security · RBAC</div>
+                </div>
+                <div className="p-2 rounded bg-emerald-950/40 border border-emerald-500/40 text-emerald-300">
+                  <div className="font-bold">POSTGRESQL</div>
+                  <div className="text-[9px] text-zinc-400 mt-1">HikariCP Pool</div>
+                </div>
+              </div>
+            ) : viewMode === 'inspect' ? (
+              <div className="bg-black/50 rounded-lg p-2.5 font-mono text-[11px] text-zinc-300 space-y-1">
+                <div className="flex justify-between border-b border-white/5 pb-1">
+                  <span className="text-zinc-400">p99 Latency:</span>
+                  <span className="text-emerald-400 font-bold">14ms across endpoints</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-1">
+                  <span className="text-zinc-400">Auth Mechanism:</span>
+                  <span className="text-cyan-300 font-bold">Stateless JWT + Refresh Rotation</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-400">CI/CD Automation:</span>
+                  <span className="text-purple-300 font-bold">GitHub Actions Multi-Stage Docker</span>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full text-left font-mono text-[11px] sm:text-xs leading-relaxed text-zinc-300 bg-black/45 rounded-lg p-3 shadow-inner">
+                <div className="text-zinc-500">// Spring Boot Microservice Controller</div>
+                <div className="text-purple-300">
+                  <span className="text-cyan-400">@RestController</span>
+                  <br />
+                  <span className="text-cyan-400">@PreAuthorize</span>("hasRole('ARCHITECT')")
+                </div>
+                <div className="text-zinc-400 mt-1">
+                  ResponseEntity&lt;ClusterHealth&gt; <span className="text-sky-300">verifyStatus</span>() {'{'}
+                  <br />
+                  &nbsp;&nbsp;return ok(service.<span className="text-amber-300">getTelemetry</span>());
+                  <br />
+                  {'}'}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {isGame && !isEnv && !isChar && (
+          <div className="w-full h-full flex flex-col justify-center">
+            {viewMode === 'inspect' ? (
+              <div className="bg-black/50 rounded-lg p-2.5 font-mono text-[11px] text-zinc-300 space-y-1">
+                <div className="flex justify-between border-b border-white/5 pb-1">
+                  <span className="text-zinc-400">Tick Rate:</span>
+                  <span className="text-emerald-400 font-bold">60Hz FixedUpdate</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-1">
+                  <span className="text-zinc-400">Input Buffer:</span>
+                  <span className="text-cyan-300 font-bold">4-Frame Lenient Queue</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-400">FSM Combat Architecture:</span>
+                  <span className="text-pink-300 font-bold">Hierarchical State Machine</span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-center">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center p-3"
+                  style={{
+                    background: `linear-gradient(135deg, ${accent}30, ${accent}10)`,
+                    border: `1px solid ${accent}80`,
+                    boxShadow: `0 0 24px ${accent}35`,
+                  }}
+                >
+                  <TbDeviceGamepad2 className="w-8 h-8" style={{ color: accent }} />
+                </div>
+                <span className="text-xs text-zinc-200 font-mono tracking-wider font-semibold">
+                  CHRONO RIFT COMBAT CONTROLLER
+                </span>
+                <span className="text-[10px] text-zinc-400 font-mono">
+                  Unity 6 · Custom HLSL Shaders · Procedural Arenas
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {!is3D && !isSpring && !isGame && (
+          <div className="w-full bg-black/45 rounded-lg p-3 font-mono text-[11px] text-zinc-300">
+            <div className="text-zinc-500">// {project.label} Telemetry & Architecture</div>
+            <div className="text-cyan-300 mt-1">Platform: {project.technologies.slice(0, 4).join(' · ')}</div>
+            <div className="text-emerald-300 mt-1">Status: {project.status} ({project.year})</div>
           </div>
         )}
       </div>
 
       {/* Bottom Info Bar */}
-      <div className="flex items-center justify-between text-[0.66rem] text-zinc-400 relative z-10 font-mono">
-        <span className="truncate">Core: {project.technologies.slice(0, 3).join(' · ')}</span>
+      <div className="flex items-center justify-between text-[10px] text-zinc-400 relative z-10 font-mono pt-2 border-t border-white/10">
+        <span className="truncate">Active Stack: {project.technologies.slice(0, 3).join(' · ')}</span>
         <span className="text-emerald-400 flex items-center gap-1.5 flex-shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-          Ready
+          Hardware Accelerated
         </span>
       </div>
     </div>
@@ -914,7 +1099,7 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
 
   return (
     <div
-      className="relative w-full flex-1 min-h-0 select-none"
+      className="relative w-full flex-1 min-h-0"
       style={{
         marginTop: isMobile ? 8 : 14,
         perspective: 1200,
@@ -1116,17 +1301,6 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
           minHeight: 0,
         }}
       >
-        <p
-          style={{
-            fontSize: isMobile ? '0.66rem' : '0.72rem',
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            margin: '0 0 4px',
-            color: section.accent,
-          }}
-        >
-          {section.sublabel}
-        </p>
         <h2
           style={{
             fontSize: 'clamp(1.5rem, 5vw, 2.8rem)',

@@ -11,50 +11,20 @@ import { ProjectSection } from '../components/ProjectSection';
 import { GamesSection } from '../components/GamesSection';
 import { ConnectSection } from '../components/ConnectSection';
 
-// Silky smooth cubic easing: accelerates smoothly and gently decelerates
-const easeInOutCubic = (t: number): number => {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-};
-
-// Check if an event target is inside an element that can scroll vertically in the given direction
-const canScrollChild = (target: HTMLElement | null, deltaY: number, container: HTMLElement | null): boolean => {
-  let el: HTMLElement | null = target;
-  while (el && el !== container && el !== document.body) {
-    const style = window.getComputedStyle(el);
-    const overflowY = style.overflowY;
-    if (overflowY === 'auto' || overflowY === 'scroll') {
-      if (el.scrollHeight > el.clientHeight) {
-        if (deltaY > 0 && el.scrollTop + el.clientHeight < el.scrollHeight - 2) {
-          return true; // child can still scroll downward
-        }
-        if (deltaY < 0 && el.scrollTop > 2) {
-          return true; // child can still scroll upward
-        }
-      }
-    }
-    el = el.parentElement;
-  }
-  return false;
-};
-
 export const PortfolioApp: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const sectionRefs = useRef<(HTMLElement | null)[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
 
   const [activeSection, setActiveSection] = useState(0);
   const activeSectionRef = useRef(0);
+  const isNavigating = useRef(false);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
     activeSectionRef.current = activeSection;
   }, [activeSection]);
-
-  const isProgrammaticScroll = useRef(false);
-  const isCooldown = useRef(false);
-  const animFrameRef = useRef<number | null>(null);
-  const isInitialMount = useRef(true);
-  const touchStartY = useRef<number | null>(null);
-  const touchStartX = useRef<number | null>(null);
 
   // Map route to section index
   const routeToIndex = useCallback((pathname: string) => {
@@ -64,195 +34,89 @@ export const PortfolioApp: React.FC = () => {
     return idx >= 0 ? idx : 0;
   }, []);
 
-  // Smooth scroll using requestAnimationFrame with dynamic duration & easeInOutCubic
-  const animateScrollTo = useCallback(
-    (targetIdx: number, onComplete?: () => void) => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      if (animFrameRef.current) {
-        cancelAnimationFrame(animFrameRef.current);
-        animFrameRef.current = null;
-      }
-
-      isProgrammaticScroll.current = true;
-      setActiveSection(targetIdx);
-
-      const startY = container.scrollTop;
-      const targetY = targetIdx * window.innerHeight;
-      const diff = targetY - startY;
-
-      if (Math.abs(diff) < 2) {
-        container.scrollTop = targetY;
-        isProgrammaticScroll.current = false;
-        onComplete?.();
-        return;
-      }
-
-      // Dynamic duration: ~500ms for 1 section, up to ~850ms for long jumps (e.g. 0 to 6)
-      const distanceSections = Math.abs(targetIdx - activeSectionRef.current);
-      const duration = Math.min(850, Math.max(500, distanceSections * 70 + 440));
-      const startTime = performance.now();
-
-      const step = (now: number) => {
-        if (!containerRef.current) {
-          isProgrammaticScroll.current = false;
-          return;
-        }
-
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = easeInOutCubic(progress);
-
-        containerRef.current.scrollTop = startY + diff * eased;
-
-        if (progress < 1) {
-          animFrameRef.current = requestAnimationFrame(step);
-        } else {
-          containerRef.current.scrollTop = targetY;
-          animFrameRef.current = null;
-          isProgrammaticScroll.current = false;
-          onComplete?.();
-        }
-      };
-
-      animFrameRef.current = requestAnimationFrame(step);
-    },
-    []
-  );
-
-  // Navigate to section index and synchronize URL route
+  // Navigate to section and sync URL route
   const navigateToSection = useCallback(
     (targetIdx: number) => {
       if (targetIdx < 0 || targetIdx >= NAVIGATION_ITEMS.length) return;
-      if (targetIdx === activeSectionRef.current && !isProgrammaticScroll.current) return;
+      isNavigating.current = true;
+      setActiveSection(targetIdx);
 
-      animateScrollTo(targetIdx, () => {
-        const targetRoute = NAVIGATION_ITEMS[targetIdx].route;
-        if (location.pathname !== targetRoute) {
-          navigate(targetRoute, { replace: true });
-        }
-      });
+      const targetEl = sectionRefs.current[targetIdx];
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth' });
+      } else if (containerRef.current) {
+        containerRef.current.scrollTo({
+          top: targetIdx * window.innerHeight,
+          behavior: 'smooth',
+        });
+      }
+
+      const targetRoute = NAVIGATION_ITEMS[targetIdx].route;
+      if (location.pathname !== targetRoute) {
+        navigate(targetRoute, { replace: true });
+      }
+
+      // Reset navigating flag after smooth scroll completes
+      setTimeout(() => {
+        isNavigating.current = false;
+      }, 650);
     },
-    [animateScrollTo, location.pathname, navigate]
+    [location.pathname, navigate]
   );
 
-  // Sync scroll position with browser route (initial load and back/forward browser buttons)
+  // Sync section with route on initial mount or back/forward browser navigation
   useEffect(() => {
     const targetIdx = routeToIndex(location.pathname);
-    const container = containerRef.current;
-
     if (isInitialMount.current) {
       isInitialMount.current = false;
       setActiveSection(targetIdx);
-      if (container) {
-        container.scrollTop = targetIdx * window.innerHeight;
+      if (targetIdx > 0 && containerRef.current) {
+        // Immediate positioning on cold page load
+        containerRef.current.scrollTop = targetIdx * window.innerHeight;
       }
       return;
     }
 
-    if (!isProgrammaticScroll.current && targetIdx !== activeSectionRef.current) {
-      navigateToSection(targetIdx);
+    if (targetIdx !== activeSectionRef.current && !isNavigating.current) {
+      setActiveSection(targetIdx);
+      sectionRefs.current[targetIdx]?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [location.pathname, routeToIndex, navigateToSection]);
+  }, [location.pathname, routeToIndex]);
 
-  // Window resize handler: keep current section centered
-  useEffect(() => {
-    const handleResize = () => {
-      if (containerRef.current && !isProgrammaticScroll.current) {
-        containerRef.current.scrollTop = activeSectionRef.current * window.innerHeight;
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Wheel event listener: smooth section snapping without mechanical browser resistance
+  // Native IntersectionObserver to track active section from organic scrolling & update URL
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const handleWheel = (e: WheelEvent) => {
-      // Check if scrolling inside a scrollable child element
-      if (canScrollChild(e.target as HTMLElement, e.deltaY, container)) {
-        return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isNavigating.current) return;
+
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = sectionRefs.current.findIndex((el) => el === entry.target);
+            if (index !== -1 && index !== activeSectionRef.current) {
+              setActiveSection(index);
+              const targetRoute = NAVIGATION_ITEMS[index].route;
+              if (location.pathname !== targetRoute) {
+                navigate(targetRoute, { replace: true });
+              }
+            }
+          }
+        });
+      },
+      {
+        root: container,
+        threshold: 0.55,
       }
+    );
 
-      e.preventDefault();
+    sectionRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
 
-      if (isProgrammaticScroll.current || isCooldown.current) {
-        return;
-      }
-
-      if (Math.abs(e.deltaY) < 22) {
-        return;
-      }
-
-      const current = activeSectionRef.current;
-      if (e.deltaY > 0 && current < NAVIGATION_ITEMS.length - 1) {
-        isCooldown.current = true;
-        navigateToSection(current + 1);
-        setTimeout(() => {
-          isCooldown.current = false;
-        }, 700);
-      } else if (e.deltaY < 0 && current > 0) {
-        isCooldown.current = true;
-        navigateToSection(current - 1);
-        setTimeout(() => {
-          isCooldown.current = false;
-        }, 700);
-      }
-    };
-
-    container.addEventListener('wheel', handleWheel, { passive: false });
-    return () => {
-      container.removeEventListener('wheel', handleWheel);
-    };
-  }, [navigateToSection]);
-
-  // Touch swipe support for mobile and trackpad gestures
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY.current = e.touches[0].clientY;
-      touchStartX.current = e.touches[0].clientX;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (touchStartY.current === null || touchStartX.current === null) return;
-      const endY = e.changedTouches[0].clientY;
-      const endX = e.changedTouches[0].clientX;
-      const diffY = touchStartY.current - endY;
-      const diffX = touchStartX.current - endX;
-
-      touchStartY.current = null;
-      touchStartX.current = null;
-
-      // Ensure vertical swipe is predominant
-      if (Math.abs(diffY) > 50 && Math.abs(diffY) > Math.abs(diffX) * 1.5) {
-        if (canScrollChild(e.target as HTMLElement, diffY, container)) {
-          return;
-        }
-
-        const current = activeSectionRef.current;
-        if (diffY > 0 && current < NAVIGATION_ITEMS.length - 1) {
-          navigateToSection(current + 1);
-        } else if (diffY < 0 && current > 0) {
-          navigateToSection(current - 1);
-        }
-      }
-    };
-
-    container.addEventListener('touchstart', handleTouchStart, { passive: true });
-    container.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-    return () => {
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [navigateToSection]);
+    return () => observer.disconnect();
+  }, [location.pathname, navigate]);
 
   // Keyboard navigation support: ArrowUp, ArrowDown, PageUp, PageDown, Home, End
   useEffect(() => {
@@ -285,25 +149,37 @@ export const PortfolioApp: React.FC = () => {
   }, [navigateToSection]);
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#f8f7fc] select-none">
+    <div className="relative w-screen h-screen overflow-hidden bg-[#f8f7fc]">
       {/* Right Side Navigation Dots */}
       <Navigation activeSectionIdx={activeSection} onNavigate={navigateToSection} />
 
-      {/* Main Fullpage Viewport Container */}
+      {/* Main Fullpage Viewport Container with Native CSS Scroll Snapping */}
       <main
         ref={containerRef}
-        className="w-full h-full overflow-hidden"
+        className="w-full h-full overflow-y-auto overflow-x-hidden snap-y snap-mandatory focus:outline-none"
         style={{
-          scrollBehavior: 'auto', // Managed smoothly by our RAF animation engine
+          scrollBehavior: 'smooth',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
         }}
       >
         {/* Section 0: Hero / Intro */}
-        <section className="w-full h-screen relative flex flex-col justify-center bg-white flex-shrink-0">
-          <HeroSection />
+        <section
+          ref={(el) => {
+            sectionRefs.current[0] = el;
+          }}
+          className="w-full h-screen relative flex flex-col justify-center bg-[#f8f7fc] flex-shrink-0 snap-start snap-always"
+        >
+          <HeroSection onExplore={() => navigateToSection(1)} />
         </section>
 
         {/* Section 1: Experience */}
-        <section className="w-full h-screen relative flex flex-col justify-center flex-shrink-0">
+        <section
+          ref={(el) => {
+            sectionRefs.current[1] = el;
+          }}
+          className="w-full h-screen relative flex flex-col justify-center flex-shrink-0 snap-start snap-always"
+        >
           <ExperienceSection isActive={activeSection === 1} />
         </section>
 
@@ -311,7 +187,10 @@ export const PortfolioApp: React.FC = () => {
         {PROJECT_SECTIONS.map((sec, idx) => (
           <section
             key={sec.key}
-            className="w-full h-screen relative flex flex-col justify-center flex-shrink-0"
+            ref={(el) => {
+              sectionRefs.current[idx + 2] = el;
+            }}
+            className="w-full h-screen relative flex flex-col justify-center flex-shrink-0 snap-start snap-always"
             style={{
               background: sec.bg,
             }}
@@ -321,16 +200,25 @@ export const PortfolioApp: React.FC = () => {
         ))}
 
         {/* Section 5: Favorite Games */}
-        <section className="w-full h-screen relative flex flex-col justify-center bg-[#080711] flex-shrink-0">
+        <section
+          ref={(el) => {
+            sectionRefs.current[5] = el;
+          }}
+          className="w-full h-screen relative flex flex-col justify-center bg-[#0d0c15] flex-shrink-0 snap-start snap-always"
+        >
           <GamesSection />
         </section>
 
         {/* Section 6: Connect */}
-        <section className="w-full h-screen relative flex flex-col justify-center bg-white flex-shrink-0">
+        <section
+          ref={(el) => {
+            sectionRefs.current[6] = el;
+          }}
+          className="w-full h-screen relative flex flex-col justify-center bg-white flex-shrink-0 snap-start snap-always"
+        >
           <ConnectSection />
         </section>
       </main>
     </div>
   );
 };
-

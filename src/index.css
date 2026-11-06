@@ -11,12 +11,21 @@
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Archivo Black', sans-serif;
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
     background-color: #f8f7fc;
     color: #1c1b20;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow: hidden;
+  }
+
+  ::selection {
+    background-color: #15cea9;
+    color: #ffffff;
+  }
+  ::-moz-selection {
+    background-color: #15cea9;
+    color: #ffffff;
   }
 }
 
@@ -268,7 +277,7 @@
 }
 
 /* ── Experience card blob animation ─────────────────────────────────── */
-@keyframes blob-bounce {
+@keyframes blob-drift-quad {
   0% {
     transform: translate(-100%, -100%) translate3d(0, 0, 0);
   }
@@ -286,7 +295,7 @@
   }
 }
 
-@keyframes blob-bounce-reverse {
+@keyframes blob-drift-reverse {
   0% {
     transform: translate(-100%, -100%) translate3d(100%, 100%, 0);
   }
@@ -317,12 +326,12 @@
 }
 
 .news-blob--1 {
-  animation: blob-bounce 10s infinite ease-in-out;
+  animation: blob-drift-quad 10s infinite ease-in-out;
 }
 
 .news-blob--2 {
   opacity: 0.55;
   filter: blur(28px);
-  animation: blob-bounce-reverse 7s infinite ease;
+  animation: blob-drift-reverse 7s infinite ease;
 }
 

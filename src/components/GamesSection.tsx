@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
-import { HiArrowUpRight, HiXMark } from 'react-icons/hi2';
+import { HiXMark } from 'react-icons/hi2';
 import { PLAYED_GAMES, type GameReview } from '../data/portfolioData';
 
 interface CardLayout {
@@ -58,39 +58,39 @@ export const GamesSection: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-full relative flex flex-col justify-center overflow-hidden bg-[#080711] select-none text-white">
-      {/* ── Background: Cybernetic Neon Glowing Blobs ── */}
+    <div className="w-full h-full relative flex flex-col justify-center overflow-hidden bg-[#0d0c15] text-white">
+      {/* ── Background: Refined Atmospheric Glowing Orbs ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Blob 1: Magenta / Pink Neon */}
+        {/* Blob 1: Rose / Pink Subtle Atmosphere */}
         <div
-          className="absolute -top-32 -right-24 w-[520px] h-[520px] rounded-full filter blur-[100px]"
+          className="absolute -top-32 -right-24 w-[520px] h-[520px] rounded-full filter blur-[110px]"
           style={{
-            background: 'radial-gradient(circle, #ff2a85 0%, #ff779c 40%, transparent 70%)',
-            animation: 'neon-blob-1 12s infinite ease-in-out',
+            background: 'radial-gradient(circle, rgba(255, 119, 156, 0.16) 0%, rgba(255, 119, 156, 0.04) 50%, transparent 70%)',
+            animation: 'neon-blob-1 14s infinite ease-in-out',
           }}
         />
 
-        {/* Blob 2: Cyan / Electric Blue Neon */}
+        {/* Blob 2: Cyan / Electric Teal */}
         <div
-          className="absolute -bottom-36 -left-28 w-[500px] h-[500px] rounded-full filter blur-[110px]"
+          className="absolute -bottom-36 -left-28 w-[500px] h-[500px] rounded-full filter blur-[120px]"
           style={{
-            background: 'radial-gradient(circle, #00f0ff 0%, #2bbece 40%, transparent 70%)',
-            animation: 'neon-blob-2 14s infinite ease-in-out',
+            background: 'radial-gradient(circle, rgba(33, 190, 206, 0.14) 0%, rgba(33, 190, 206, 0.03) 50%, transparent 70%)',
+            animation: 'neon-blob-2 16s infinite ease-in-out',
           }}
         />
 
         {/* Blob 3: Deep Violet Aurora Center */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full filter blur-[130px]"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full filter blur-[140px]"
           style={{
-            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.28) 0%, rgba(88, 28, 135, 0.15) 50%, transparent 70%)',
-            animation: 'neon-blob-3 16s infinite ease-in-out',
+            background: 'radial-gradient(circle, rgba(167, 139, 250, 0.18) 0%, rgba(139, 92, 246, 0.05) 50%, transparent 70%)',
+            animation: 'neon-blob-3 18s infinite ease-in-out',
           }}
         />
 
         {/* Subtle Tech Grid Texture */}
         <div
-          className="absolute inset-0 opacity-[0.035]"
+          className="absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.8) 1px, transparent 1px)`,
             backgroundSize: '36px 36px',
@@ -108,14 +108,17 @@ export const GamesSection: React.FC = () => {
         }}
       >
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-3 sm:mb-6 pointer-events-none">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-3 sm:mb-6">
           <div>
             <h2
               className="text-white text-3xl sm:text-4xl md:text-5xl font-black tracking-tight m-0 drop-shadow-md"
               style={{ fontFamily: 'Archivo Black, sans-serif' }}
             >
-              My Favorite Games
+              Design Influences & Game Studies
             </h2>
+            <p className="text-zinc-400 text-xs sm:text-sm mt-1.5 max-w-2xl font-normal leading-relaxed m-0">
+              Deconstructing world architecture, kinetic physics, and player agency in the titles that shape my game development and systems engineering.
+            </p>
           </div>
         </div>
 
@@ -136,7 +139,7 @@ export const GamesSection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setSelectedGame(game)}
-                    className="group relative block text-left outline-none cursor-pointer select-none transition-all duration-300"
+                    className="group relative block text-left outline-none cursor-pointer transition-all duration-300"
                     style={{
                       width: 'clamp(240px, 20vw, 290px)',
                     }}
@@ -177,14 +180,15 @@ export const GamesSection: React.FC = () => {
                         <p className="text-zinc-400 text-xs truncate m-0">
                           {game.subtitle}
                         </p>
-
-                        <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px] font-bold"
-                          style={{ color: game.color }}
-                        >
-                          <span>Explore Review</span>
-                          <HiArrowUpRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
-                        </div>
                       </div>
+
+                      {/* Accent glow line at bottom */}
+                      <div
+                        className="h-1 w-full"
+                        style={{
+                          background: `linear-gradient(90deg, transparent, ${game.color}, transparent)`,
+                        }}
+                      />
                     </div>
                   </button>
                 </div>
@@ -192,15 +196,14 @@ export const GamesSection: React.FC = () => {
             })}
           </div>
 
-          {/* Mobile / Tablet Responsive Floating Grid */}
-          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-3.5 overflow-y-auto max-h-[62vh] p-1">
-            {PLAYED_GAMES.map((game, idx) => (
+          {/* Mobile Grid Layout (< 1024px) */}
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-3 h-full overflow-y-auto py-2">
+            {PLAYED_GAMES.map((game) => (
               <button
-                key={`mobile-${game.id}`}
+                key={game.id}
                 type="button"
                 onClick={() => setSelectedGame(game)}
-                className={`relative block text-left outline-none cursor-pointer rounded-2xl overflow-hidden bg-[#11101e]/90 border border-white/15 p-2.5 shadow-xl transition-all duration-200 active:scale-95 ${idx % 2 === 0 ? 'animate-[float-drift-1_4.5s_infinite_ease-in-out]' : 'animate-[float-drift-2_4.8s_infinite_ease-in-out]'
-                  }`}
+                className="text-left p-3 rounded-2xl bg-[#11101e]/90 border transition-all active:scale-95"
                 style={{ borderColor: `${game.color}55` }}
               >
                 <div className="flex items-center gap-3">
@@ -248,66 +251,67 @@ export const GamesSection: React.FC = () => {
               initial={{ scale: 0.92, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.94, opacity: 0, y: 15 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl bg-[#0f0e1c] rounded-3xl overflow-hidden shadow-2xl relative flex flex-col max-h-[88vh]"
+              className="relative w-full max-w-lg rounded-3xl overflow-hidden bg-[#11101e] border border-white/15 shadow-2xl p-6"
               style={{
-                border: `2px solid ${selectedGame.color}77`,
-                boxShadow: `0 30px 80px -15px ${selectedGame.accentGlow}, 0 0 60px rgba(0, 0, 0, 0.7)`,
+                boxShadow: `0 0 80px ${selectedGame.color}35`,
               }}
             >
-              {/* Cinematic Header Background Darkened with Atmospheric Filter */}
-              <div className="relative w-full h-56 sm:h-64 overflow-hidden flex flex-col justify-end p-6 sm:p-8 flex-shrink-0">
-                {/* Full-width Game Wallpaper */}
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setSelectedGame(null)}
+                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white transition-colors"
+                aria-label="Close modal"
+              >
+                <HiXMark className="w-5 h-5" />
+              </button>
+
+              {/* Banner with glow */}
+              <div className="relative h-44 -mx-6 -mt-6 mb-5 overflow-hidden">
                 <img
                   src={selectedGame.image}
                   alt={selectedGame.title}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="w-full h-full object-cover"
                 />
-
-                {/* Darkened filter overlay: makes title extremely legible on top */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#11101e] via-[#11101e]/40 to-transparent" />
                 <div
-                  className="absolute inset-0"
+                  className="absolute bottom-3 left-6 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase text-white/90 backdrop-blur-md"
                   style={{
-                    background:
-                      'linear-gradient(to top, rgba(15, 14, 28, 0.98) 0%, rgba(15, 14, 28, 0.70) 50%, rgba(5, 4, 10, 0.45) 100%)',
-                    backdropFilter: 'brightness(0.75) contrast(1.15)',
+                    backgroundColor: `${selectedGame.color}40`,
+                    border: `1px solid ${selectedGame.color}80`,
                   }}
-                />
-
-                {/* Close Button */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedGame(null)}
-                  className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center text-white/80 hover:text-white bg-black/50 hover:bg-black/80 border border-white/25 backdrop-blur-md transition-all duration-200 cursor-pointer shadow-lg z-20 outline-none"
-                  aria-label="Close review"
                 >
-                  <HiXMark className="w-5 h-5" />
-                </button>
-
-                {/* Title & Header Metadata on top of darkened background */}
-                <div className="relative z-10">
-                  <p className="text-white/80 text-xs font-bold tracking-wider uppercase mb-1.5"
-                    style={{ color: selectedGame.color }}
-                  >
-                    {selectedGame.subtitle}
-                  </p>
-
-                  {/* Title in bold high-contrast Archivo Black */}
-                  <h3
-                    className="text-white font-black leading-tight tracking-tight text-xl sm:text-2xl md:text-3xl drop-shadow-lg m-0"
-                    style={{ fontFamily: 'Archivo Black, sans-serif' }}
-                  >
-                    {selectedGame.title}
-                  </h3>
+                  {selectedGame.subtitle}
                 </div>
               </div>
 
-              {/* Modal Body / Review Quote placed directly inside the card */}
-              <div className="p-6 sm:p-8 flex flex-col overflow-y-auto bg-[#0f0e1c] text-white">
-                <p className="text-zinc-200 text-sm sm:text-base md:text-[1.05rem] leading-relaxed font-normal m-0 tracking-wide">
-                  "{selectedGame.opinion}"
-                </p>
+              {/* Game Title */}
+              <h2
+                className="text-white text-2xl font-black mb-3"
+                style={{ fontFamily: 'Archivo Black, sans-serif' }}
+              >
+                {selectedGame.title}
+              </h2>
+
+              {/* Opinion */}
+              <p className="text-zinc-300 text-sm leading-relaxed mb-6">
+                {selectedGame.opinion}
+              </p>
+
+              {/* Action buttons */}
+              <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                <span className="text-xs text-zinc-400">
+                  Press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">ESC</kbd> to close
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedGame(null)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-white/10 hover:bg-white/20 transition-colors"
+                >
+                  Done Reading
+                </button>
               </div>
             </motion.div>
           </motion.div>
@@ -316,5 +320,3 @@ export const GamesSection: React.FC = () => {
     </div>
   );
 };
-
-
