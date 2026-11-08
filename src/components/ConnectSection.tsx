@@ -134,8 +134,8 @@ export const ConnectSection: React.FC = () => {
                 type="button"
                 onClick={copyEmail}
                 className={`py-2 px-3.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all border ${copiedEmail
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                    : 'bg-white hover:bg-zinc-50 text-zinc-700 border-zinc-200'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                  : 'bg-white hover:bg-zinc-50 text-zinc-700 border-zinc-200'
                   }`}
                 aria-label="Copy email address"
               >
@@ -187,8 +187,8 @@ export const ConnectSection: React.FC = () => {
                 type="button"
                 onClick={copyPhone}
                 className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 transition-all border ${copiedPhone
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                    : 'bg-white hover:bg-zinc-50 text-zinc-700 border-zinc-200'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                  : 'bg-white hover:bg-zinc-50 text-zinc-700 border-zinc-200'
                   }`}
                 aria-label="Copy phone number"
               >
@@ -200,7 +200,7 @@ export const ConnectSection: React.FC = () => {
         </div>
 
         {/* Channels Grid (6 Verified Links) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-3">
           {SOCIALS.map((social: SocialLink) => (
             <a
               key={social.name}

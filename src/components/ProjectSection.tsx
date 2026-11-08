@@ -928,6 +928,174 @@ const ArchitectureBlueprint: React.FC<{ project: Project; accent: string; isMobi
   );
 };
 
+/* ── Fullscreen Video Project Showcase (Special Exception for 3D Reel) ─ */
+const FullVideoProjectCard: React.FC<{
+  project: Project;
+  accent: string;
+  isMobile: boolean;
+  isDark: boolean;
+}> = ({ project, accent, isMobile, isDark }) => {
+  const [isMuted, setIsMuted] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const togglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+      setIsPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    videoRef.current.muted = !videoRef.current.muted;
+    setIsMuted(videoRef.current.muted);
+  };
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsLightboxOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen]);
+
+  const videoSrc = project.video || (project.images && project.images[0]) || '';
+
+  return (
+    <>
+      <div
+        className="relative w-full h-full overflow-hidden select-none group flex items-center justify-center cursor-pointer"
+        style={{
+          background: '#08070e',
+          borderRadius: isMobile ? 18 : 22,
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.04)',
+          boxShadow: isDark
+            ? `0 24px 60px rgba(0,0,0,0.7), 0 0 1px ${accent}40`
+            : `0 16px 48px rgba(0,0,0,0.07), 0 2px 8px rgba(0,0,0,0.04), 0 0 1px ${accent}33`,
+        }}
+        onClick={() => setIsLightboxOpen(true)}
+      >
+        {/* Ambient blurred glow from the video */}
+        <video
+          src={videoSrc}
+          autoPlay
+          loop
+          muted
+          playsInline
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-110 pointer-events-none"
+        />
+
+        {/* Main Full-Size Video Element */}
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          autoPlay
+          loop
+          muted={isMuted}
+          playsInline
+          className="relative z-10 w-full h-full object-contain"
+        />
+
+        {/* Center Pause Indicator if paused */}
+        {!isPlaying && (
+          <div className="absolute inset-0 z-20 bg-black/40 flex items-center justify-center pointer-events-none">
+            <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+              <TbPlayerPlay className="w-7 h-7 ml-0.5" />
+            </div>
+          </div>
+        )}
+
+        {/* Bottom-left micro controls: Play/Pause & Mute/Unmute */}
+        <div className="absolute bottom-3 left-3 z-30 flex items-center gap-2">
+          <button
+            onClick={togglePlay}
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-white/90 bg-black/65 hover:bg-black/90 backdrop-blur-md transition-all border border-white/10 hover:scale-105 shadow-md cursor-pointer"
+            title={isPlaying ? 'Pause Video' : 'Play Video'}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying ? <TbPlayerPause className="w-4 h-4" /> : <TbPlayerPlay className="w-4 h-4 ml-0.5" />}
+          </button>
+          <button
+            onClick={toggleMute}
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-white/90 bg-black/65 hover:bg-black/90 backdrop-blur-md transition-all border border-white/10 hover:scale-105 shadow-md cursor-pointer"
+            title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
+            aria-label={isMuted ? 'Unmute' : 'Mute'}
+          >
+            {isMuted ? <TbVolumeOff className="w-4 h-4" /> : <TbVolume className="w-4 h-4" />}
+          </button>
+        </div>
+
+        {/* Top-Right Expand Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsLightboxOpen(true);
+          }}
+          className="absolute top-3 right-3 z-30 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-white/90 bg-black/65 hover:bg-black/90 backdrop-blur-md transition-all opacity-85 hover:opacity-100 hover:scale-105 border border-white/10 shadow-md cursor-pointer"
+          title="Fullscreen Expand (Lightbox)"
+          aria-label="Expand video"
+        >
+          <TbMaximize className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Lightbox Modal */}
+      {isLightboxOpen && (
+        <div
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-between p-4 sm:p-7"
+          style={{
+            background: 'rgba(8, 7, 14, 0.95)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            animation: 'fade-in 0.22s ease forwards',
+          }}
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          <div
+            className="w-full max-w-5xl flex items-center justify-between text-white z-10 pb-3 border-b border-white/10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="font-bold text-base sm:text-lg tracking-tight" style={{ fontFamily: 'Archivo Black, sans-serif' }}>
+              {project.label}
+            </span>
+            <button
+              onClick={() => setIsLightboxOpen(false)}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer shadow-md"
+              aria-label="Close video preview"
+            >
+              <TbX className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div
+            className="relative max-w-5xl flex-1 w-full flex items-center justify-center py-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <video
+              src={videoSrc}
+              controls
+              autoPlay
+              loop
+              playsInline
+              className="max-w-full max-h-[80vh] rounded-xl object-contain shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
 /* ── Active Foreground Project Card (Polished 2-Column Desktop Grid) ─── */
 const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolean; isDark: boolean }> = ({
   project,
@@ -935,6 +1103,11 @@ const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolea
   isMobile,
   isDark,
 }) => {
+  // Special exception: 3D Mechanical Animation Reel displays full-sized video container only
+  if (project.id === '3d-animations-reel') {
+    return <FullVideoProjectCard project={project} accent={accent} isMobile={isMobile} isDark={isDark} />;
+  }
+
   const isMedia = (url?: string) => Boolean(url && url.trim().length > 0);
   const hasMedia = Boolean(
     (project.images && project.images.length > 0) || isMedia(project.video) || isMedia(project.lottie)

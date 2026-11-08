@@ -469,12 +469,7 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         period: '2024',
         teamRole: 'Solo 3D Artist',
         video: '/assets/projects/3d-art/animations.mp4',
-        images: [
-          '/assets/projects/3d-art/animations.mp4',
-          '/assets/projects/animations-3d/ss1.png',
-          '/assets/projects/animations-3d/ss2.png',
-          '/assets/projects/animations-3d/ss3.png',
-        ],
+        images: ['/assets/projects/3d-art/animations.mp4'],
         description:
           'Showcase reel of mechanical prop animations created in Blender: physics balance scale dynamics, articulated drafting compass, and firearm cylinder mechanics.',
         technologies: ['Blender', 'Keyframe Animation', 'Rigging', 'Physics', 'Lighting'],
