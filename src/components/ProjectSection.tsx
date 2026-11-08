@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import type { Project, ProjectSection as IProjectSection } from '../data/portfolioData';
+import type { Project, ProjectLink, ProjectSection as IProjectSection } from '../data/portfolioData';
 import { TechIcon } from './TechIcon';
+import { SiItchdotio } from 'react-icons/si';
 import {
   TbWorld,
   TbApi,
@@ -15,6 +16,8 @@ import {
   TbCalendar,
   TbExternalLink,
   TbBrandGithub,
+  TbBrandSteam,
+  TbBrandGooglePlay,
   TbMaximize,
   TbX,
   TbChevronLeft,
@@ -607,13 +610,72 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
   );
 };
 
+const getLinkIcon = (icon?: string, className = 'w-3.5 h-3.5 flex-shrink-0') => {
+  switch (icon) {
+    case 'steam':
+      return <TbBrandSteam className={className} />;
+    case 'google-play':
+      return <TbBrandGooglePlay className={className} />;
+    case 'itch':
+      return <SiItchdotio className={className} />;
+    case 'github':
+      return <TbBrandGithub className={className} />;
+    case 'web':
+      return <TbWorld className={className} />;
+    default:
+      return <TbExternalLink className={className} />;
+  }
+};
+
+export const resolveProjectLinks = (project: Project): ProjectLink[] => {
+  if (project.links && project.links.length > 0) {
+    return project.links;
+  }
+  const resolved: ProjectLink[] = [];
+  if (project.demoUrl) {
+    const url = project.demoUrl;
+    let label = 'Open Project';
+    let icon: ProjectLink['icon'] = 'external';
+
+    if (url.includes('store.steampowered.com')) {
+      label = 'Steam Store';
+      icon = 'steam';
+    } else if (url.includes('play.google.com')) {
+      label = 'Google Play';
+      icon = 'google-play';
+    } else if (url.includes('itch.io')) {
+      label = 'Play on Itch.io';
+      icon = 'itch';
+    } else if (url.includes('moraja3ati.ma')) {
+      label = 'Visit Website';
+      icon = 'web';
+    } else if (url.includes('run.app') || url.includes('github.io')) {
+      label = 'Play Online';
+      icon = 'web';
+    }
+    resolved.push({ label, url, icon, primary: true });
+  }
+  if (project.githubUrl) {
+    resolved.push({
+      label: 'Source Code',
+      url: project.githubUrl,
+      icon: 'github',
+      primary: resolved.length === 0,
+    });
+  }
+  return resolved;
+};
+
 /* ── Rich Card Body Content (Polished Typography, Rhythm & Spacing) ──── */
 const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean; isDark: boolean }> = ({
   project,
   accent,
   isMobile,
   isDark,
-}) => (
+}) => {
+  const actionLinks = resolveProjectLinks(project);
+
+  return (
   <div className="flex flex-col h-full justify-between">
     <div>
       {/* Title & Glowing Status Header */}
@@ -757,44 +819,46 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean; 
     </div>
 
     {/* Action CTA Links */}
-    {(project.demoUrl || project.githubUrl) && (
-      <div className={`flex items-center gap-2.5 pt-2.5 border-t flex-wrap mt-auto ${
-        isDark ? 'border-white/10' : 'border-slate-100'
-      }`}>
-        {project.demoUrl && (
-          <a
-            href={project.demoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              backgroundColor: accent,
-              boxShadow: `0 4px 14px ${accent}40`,
-            }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-[12.5px] font-semibold no-underline hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 transition-all cursor-pointer"
-          >
-            <span>Live Demo / Play</span>
-            <TbExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
-        {project.githubUrl && (
-          <a
-            href={project.githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-[12.5px] font-semibold border shadow-sm no-underline hover:-translate-y-0.5 hover:shadow transition-all cursor-pointer ${
-              isDark
-                ? 'bg-white/10 text-white border-white/15 hover:bg-white/15 hover:border-white/25'
-                : 'bg-white text-slate-800 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
-            }`}
-          >
-            <TbBrandGithub className="w-3.5 h-3.5" />
-            <span>Source Code</span>
-          </a>
-        )}
+    {actionLinks.length > 0 && (
+      <div
+        className={`flex items-center gap-2 sm:gap-2.5 pt-2.5 border-t flex-wrap mt-auto ${
+          isDark ? 'border-white/10' : 'border-slate-100'
+        }`}
+      >
+        {actionLinks.map((link, lIdx) => {
+          const isPrimary = link.primary ?? lIdx === 0;
+          return (
+            <a
+              key={link.url + lIdx}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={
+                isPrimary
+                  ? {
+                      backgroundColor: accent,
+                      boxShadow: `0 4px 14px ${accent}40`,
+                    }
+                  : undefined
+              }
+              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-[12px] sm:text-[12.5px] font-semibold no-underline transition-all cursor-pointer ${
+                isPrimary
+                  ? 'text-white hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0'
+                  : isDark
+                    ? 'bg-white/10 text-white border border-white/15 hover:bg-white/15 hover:border-white/25 hover:-translate-y-0.5'
+                    : 'bg-white text-slate-800 border border-slate-200 shadow-sm hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-0.5 hover:shadow'
+              }`}
+            >
+              {getLinkIcon(link.icon)}
+              <span>{link.label}</span>
+            </a>
+          );
+        })}
       </div>
     )}
   </div>
-);
+  );
+};
 
 /* ── Rich Architecture Blueprint (For projects without media) ────────── */
 const ArchitectureBlueprint: React.FC<{ project: Project; accent: string; isMobile: boolean; isDark: boolean }> = ({

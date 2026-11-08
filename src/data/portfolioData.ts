@@ -1,3 +1,10 @@
+export interface ProjectLink {
+  label: string;
+  url: string;
+  icon?: 'steam' | 'google-play' | 'itch' | 'github' | 'web' | 'external';
+  primary?: boolean;
+}
+
 export interface Project {
   id: string;
   label: string;
@@ -17,6 +24,7 @@ export interface Project {
   githubUrl?: string;
   video?: string;
   lottie?: string;
+  links?: ProjectLink[];
 }
 
 export interface ProjectSection {
@@ -114,6 +122,14 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
           '/assets/projects/moraja3ati/hero-app-screenshot-old.png',
         ],
         demoUrl: 'https://moraja3ati.ma/',
+        links: [
+          {
+            label: 'Visit Website',
+            url: 'https://moraja3ati.ma/',
+            icon: 'web',
+            primary: true,
+          },
+        ],
         year: '2026',
         status: 'Live / Production',
         statusColor: '#10b981',
@@ -136,6 +152,20 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         ],
         demoUrl: 'https://mboufern.github.io/InterViewPoint/',
         githubUrl: 'https://github.com/mboufern/InterViewPoint',
+        links: [
+          {
+            label: 'Open App',
+            url: 'https://mboufern.github.io/InterViewPoint/',
+            icon: 'web',
+            primary: true,
+          },
+          {
+            label: 'Source Code',
+            url: 'https://github.com/mboufern/InterViewPoint',
+            icon: 'github',
+            primary: false,
+          },
+        ],
         images: [],
         year: '2026',
         status: 'Released',
@@ -159,6 +189,20 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         ],
         demoUrl: 'https://tak-game-201860504161.us-west1.run.app/',
         githubUrl: 'https://github.com/mboufern/Tak-Game',
+        links: [
+          {
+            label: 'Play Online',
+            url: 'https://tak-game-201860504161.us-west1.run.app/',
+            icon: 'web',
+            primary: true,
+          },
+          {
+            label: 'Source Code',
+            url: 'https://github.com/mboufern/Tak-Game',
+            icon: 'github',
+            primary: false,
+          },
+        ],
         images: [],
         year: '2024',
         status: 'Live',
@@ -181,6 +225,14 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
           'Responsive gallery layouts and collection browsing',
         ],
         githubUrl: 'https://github.com/mboufern/DjangoWebsite',
+        links: [
+          {
+            label: 'Source Code',
+            url: 'https://github.com/mboufern/DjangoWebsite',
+            icon: 'github',
+            primary: false,
+          },
+        ],
         images: [],
         year: '2024',
         status: 'Completed',
@@ -218,6 +270,20 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
           '/assets/projects/wnt/alpha_1.png',
         ],
         demoUrl: 'https://store.steampowered.com/app/3868960/Walls_And_Tower_Party',
+        links: [
+          {
+            label: 'Steam Store',
+            url: 'https://store.steampowered.com/app/3868960/Walls_And_Tower_Party',
+            icon: 'steam',
+            primary: true,
+          },
+          {
+            label: 'Google Play',
+            url: 'https://play.google.com/store/apps/details?id=com.MBGames.WTParty',
+            icon: 'google-play',
+            primary: false,
+          },
+        ],
         year: '2025',
         status: 'Released',
         statusColor: '#ff779c',
@@ -245,6 +311,14 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
           '/assets/projects/scrap-vanguard/gameplay_2.png',
         ],
         demoUrl: 'https://store.steampowered.com/app/4743800/Scrap_Vanguard',
+        links: [
+          {
+            label: 'Steam Store',
+            url: 'https://store.steampowered.com/app/4743800/Scrap_Vanguard',
+            icon: 'steam',
+            primary: true,
+          },
+        ],
         year: '2026',
         status: 'Demo Available',
         statusColor: '#ffb347',
@@ -271,6 +345,14 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
           '/assets/projects/under-under/ss3.png',
         ],
         demoUrl: 'https://marouan-boufer.itch.io/under-under',
+        links: [
+          {
+            label: 'Play on Itch.io',
+            url: 'https://marouan-boufer.itch.io/under-under',
+            icon: 'itch',
+            primary: true,
+          },
+        ],
         year: '2025',
         status: 'Released',
         statusColor: '#15cea9',
@@ -297,6 +379,14 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
           '/assets/projects/cursed-demons/ss3.png',
         ],
         demoUrl: 'https://marouan-boufer.itch.io/cursed-demons',
+        links: [
+          {
+            label: 'Play on Itch.io',
+            url: 'https://marouan-boufer.itch.io/cursed-demons',
+            icon: 'itch',
+            primary: true,
+          },
+        ],
         year: '2020',
         status: 'Released',
         statusColor: '#e11d48',
@@ -323,6 +413,14 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
           '/assets/projects/agent-diplegia/ss3.png',
         ],
         demoUrl: 'https://marouan-boufer.itch.io/agent-dip',
+        links: [
+          {
+            label: 'Play on Itch.io',
+            url: 'https://marouan-boufer.itch.io/agent-dip',
+            icon: 'itch',
+            primary: true,
+          },
+        ],
         year: '2020',
         status: 'Released',
         statusColor: '#8b5cf6',
