@@ -133,11 +133,10 @@ export const ConnectSection: React.FC = () => {
               <button
                 type="button"
                 onClick={copyEmail}
-                className={`py-2 px-3.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all border ${
-                  copiedEmail
+                className={`py-2 px-3.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all border ${copiedEmail
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
                     : 'bg-white hover:bg-zinc-50 text-zinc-700 border-zinc-200'
-                }`}
+                  }`}
                 aria-label="Copy email address"
               >
                 {copiedEmail ? <TbCheck className="w-4 h-4 text-emerald-600" /> : <TbCopy className="w-4 h-4 text-zinc-500" />}
@@ -187,11 +186,10 @@ export const ConnectSection: React.FC = () => {
               <button
                 type="button"
                 onClick={copyPhone}
-                className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 transition-all border ${
-                  copiedPhone
+                className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 transition-all border ${copiedPhone
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
                     : 'bg-white hover:bg-zinc-50 text-zinc-700 border-zinc-200'
-                }`}
+                  }`}
                 aria-label="Copy phone number"
               >
                 {copiedPhone ? <TbCheck className="w-4 h-4 text-emerald-600" /> : <TbCopy className="w-4 h-4 text-zinc-500" />}
@@ -231,11 +229,11 @@ export const ConnectSection: React.FC = () => {
                 <div className="text-[11px] text-zinc-500 font-mono truncate">
                   {social.handle || social.name}
                 </div>
-                {social.category && (
+                {/* {social.category && (
                   <div className="text-[10px] text-zinc-400 truncate mt-0.5 font-medium">
                     {social.category}
                   </div>
-                )}
+                )} */}
               </div>
             </a>
           ))}
