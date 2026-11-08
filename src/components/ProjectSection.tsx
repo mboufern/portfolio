@@ -19,17 +19,32 @@ import {
   TbX,
   TbChevronLeft,
   TbChevronRight,
+  TbVolume,
+  TbVolumeOff,
+  TbPlayerPlay,
+  TbPlayerPause,
+  TbSparkles,
+  TbCode,
+  TbCheck,
+  TbPhoto,
+  TbMovie,
+  TbLayersIntersect,
 } from 'react-icons/tb';
 
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false);
+const useScreenSize = () => {
+  const [screen, setScreen] = useState({ isMobile: false, isTablet: false });
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
+    const check = () => {
+      setScreen({
+        isMobile: window.innerWidth < 768,
+        isTablet: window.innerWidth >= 768 && window.innerWidth < 1024,
+      });
+    };
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
-  return isMobile;
+  return screen;
 };
 
 const getProjectIcon = (iconName: string, className = 'w-5 h-5 flex-shrink-0') => {
@@ -90,7 +105,9 @@ const ProjectVisualFallback: React.FC<{ project: Project; accent: string }> = ({
       </div>
 
       <div className="flex items-center justify-between text-[10px] text-zinc-400 font-mono pt-2 border-t border-white/10">
-        <span className="truncate">Status: <span style={{ color: project.statusColor }}>{project.status}</span></span>
+        <span className="truncate">
+          Status: <span style={{ color: project.statusColor }}>{project.status}</span>
+        </span>
         <span className="text-emerald-400 flex items-center gap-1 flex-shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Ready
@@ -104,45 +121,71 @@ const ProjectVisualFallback: React.FC<{ project: Project; accent: string }> = ({
 interface ImageShowcaseProps {
   project: Project;
   accent: string;
+  isMobile: boolean;
 }
 
 interface MediaItem {
   type: 'video' | 'lottie' | 'image';
   src: string;
+  label: string;
 }
 
 const isVideoUrl = (url: string) => /\.(mp4|webm|mov|mkv)(\?.*)?$/i.test(url);
 const isLottieUrl = (url: string) => /\.lottie(\?.*)?$/i.test(url);
 
-const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
+const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile }) => {
   const mediaItems: MediaItem[] = [];
 
   if (project.video) {
-    mediaItems.push({ type: 'video', src: project.video });
+    mediaItems.push({ type: 'video', src: project.video, label: 'Showcase Reel' });
   }
   if (project.lottie) {
-    mediaItems.push({ type: 'lottie', src: project.lottie });
+    mediaItems.push({ type: 'lottie', src: project.lottie, label: 'Lottie Animation' });
   }
   if (project.images && project.images.length > 0) {
-    for (const img of project.images) {
+    project.images.forEach((img, i) => {
       if (isVideoUrl(img)) {
         if (!mediaItems.some((m) => m.src === img)) {
-          mediaItems.push({ type: 'video', src: img });
+          mediaItems.push({ type: 'video', src: img, label: `Video Clip ${i + 1}` });
         }
       } else if (isLottieUrl(img)) {
         if (!mediaItems.some((m) => m.src === img)) {
-          mediaItems.push({ type: 'lottie', src: img });
+          mediaItems.push({ type: 'lottie', src: img, label: `Animation ${i + 1}` });
         }
       } else {
-        mediaItems.push({ type: 'image', src: img });
+        mediaItems.push({ type: 'image', src: img, label: `Render ${i + 1}` });
       }
-    }
+    });
   }
 
   const n = mediaItems.length;
   const [idx, setIdx] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Toggle video playback on click
+  const togglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+      setIsPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  // Toggle video audio
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    videoRef.current.muted = !videoRef.current.muted;
+    setIsMuted(videoRef.current.muted);
+  };
 
   useEffect(() => {
     if (!isLightboxOpen) return;
@@ -166,45 +209,88 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
   }
 
   const currentItem = mediaItems[idx];
+  const isPortrait = project.imageLayout === 'portrait';
 
   return (
-    <>
+    <div className="flex flex-col h-full w-full justify-between gap-2.5">
+      {/* Main Active Viewport Box */}
       <div
-        className="relative overflow-hidden w-full h-full select-none group"
+        className="relative overflow-hidden w-full flex-1 min-h-0 select-none group rounded-xl sm:rounded-2xl flex items-center justify-center"
         style={{
-          borderRadius: 14,
-          background: '#1a1924',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 15px rgba(0,0,0,0.1)',
+          background: 'linear-gradient(160deg, #0e0d16 0%, #151421 100%)',
+          boxShadow: '0 8px 28px rgba(0,0,0,0.22), inset 0 0 1px rgba(255,255,255,0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
-        {/* Shimmer skeleton before image loads (only for images) */}
+        {/* Ambient blurred glow backdrop behind letterboxed media */}
+        {currentItem.type === 'image' && (
+          <img
+            src={currentItem.src}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-25 scale-125 pointer-events-none"
+          />
+        )}
+
+        {/* Shimmer skeleton before image loads */}
         {currentItem.type === 'image' && !isLoaded && (
           <div
             className="absolute inset-0 animate-pulse"
             style={{
-              background: 'linear-gradient(90deg, #242232 0%, #2f2c42 50%, #242232 100%)',
+              background: 'linear-gradient(90deg, #1b1928 0%, #29263c 50%, #1b1928 100%)',
             }}
           />
         )}
 
-        {/* Media rendering based on type */}
+        {/* Media rendering based on active item type */}
         {currentItem.type === 'video' ? (
-          <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden rounded-[14px]">
+          <div
+            className="relative w-full h-full flex items-center justify-center overflow-hidden cursor-pointer"
+            onClick={() => setIsLightboxOpen(true)}
+          >
             <video
+              ref={videoRef}
               key={currentItem.src}
               src={currentItem.src}
               autoPlay
               loop
-              muted
+              muted={isMuted}
               playsInline
-              controls
-              className="w-full h-full object-cover"
-              style={{ borderRadius: 14 }}
+              className={`w-full h-full ${isPortrait ? 'object-contain' : 'object-contain sm:object-cover'} transition-transform duration-500 group-hover:scale-[1.01]`}
             />
+
+            {/* Video center pause indicator if paused */}
+            {!isPlaying && (
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+                  <TbPlayerPlay className="w-6 h-6 ml-0.5" />
+                </div>
+              </div>
+            )}
+
+            {/* Bottom-left audio mute & play/pause toggles for inline video */}
+            <div className="absolute bottom-2.5 left-2.5 z-20 flex items-center gap-1.5">
+              <button
+                onClick={togglePlay}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white/90 bg-black/60 hover:bg-black/90 backdrop-blur-md transition-all border border-white/10 hover:scale-105 shadow-md cursor-pointer"
+                title={isPlaying ? 'Pause Video' : 'Play Video'}
+                aria-label={isPlaying ? 'Pause' : 'Play'}
+              >
+                {isPlaying ? <TbPlayerPause className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <TbPlayerPlay className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-0.5" />}
+              </button>
+              <button
+                onClick={toggleMute}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white/90 bg-black/60 hover:bg-black/90 backdrop-blur-md transition-all border border-white/10 hover:scale-105 shadow-md cursor-pointer"
+                title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
+                aria-label={isMuted ? 'Unmute' : 'Mute'}
+              >
+                {isMuted ? <TbVolumeOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <TbVolume className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+              </button>
+            </div>
           </div>
         ) : currentItem.type === 'lottie' ? (
           <div
-            className="relative w-full h-full bg-zinc-950 flex items-center justify-center p-3 overflow-hidden rounded-[14px] cursor-zoom-in"
+            className="relative w-full h-full flex items-center justify-center p-4 overflow-hidden cursor-zoom-in"
             onClick={() => setIsLightboxOpen(true)}
           >
             <DotLottieReact
@@ -219,7 +305,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
           <img
             key={currentItem.src}
             src={currentItem.src}
-            alt={`${project.label} visual preview`}
+            alt={`${project.label} high fidelity showcase`}
             loading={idx === 0 ? 'eager' : 'lazy'}
             decoding="async"
             onLoad={() => setIsLoaded(true)}
@@ -227,32 +313,50 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
             style={{
               width: '100%',
               height: '100%',
-              objectFit: project.imageLayout === 'portrait' ? 'contain' : 'cover',
+              objectFit: isPortrait ? 'contain' : 'contain',
               display: 'block',
               cursor: 'zoom-in',
               opacity: isLoaded ? 1 : 0,
               transition: 'opacity 0.3s ease, transform 0.4s ease',
             }}
-            className="group-hover:scale-[1.02]"
+            className="relative z-10 group-hover:scale-[1.02]"
           />
         )}
 
-        {/* Expand / Lightbox Zoom Button */}
-        {currentItem.type !== 'video' && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsLightboxOpen(true);
-            }}
-            className="absolute top-2.5 right-2.5 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white/90 bg-black/55 hover:bg-black/80 backdrop-blur-md transition-all opacity-85 hover:opacity-100 hover:scale-105 shadow-md"
-            title="Click to expand (Lightbox)"
-            aria-label="Expand image"
-          >
-            <TbMaximize className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </button>
-        )}
+        {/* Top-Left Media Type Badge */}
+        <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-[10.5px] font-mono tracking-wider uppercase text-zinc-300 border border-white/10 shadow-sm pointer-events-none">
+          {currentItem.type === 'video' ? (
+            <>
+              <TbMovie className="w-3.5 h-3.5 text-amber-400" />
+              <span>Video Reel</span>
+            </>
+          ) : currentItem.type === 'lottie' ? (
+            <>
+              <TbSparkles className="w-3.5 h-3.5 text-purple-400" />
+              <span>Live Vector</span>
+            </>
+          ) : (
+            <>
+              <TbPhoto className="w-3.5 h-3.5" style={{ color: accent }} />
+              <span>{currentItem.label}</span>
+            </>
+          )}
+        </div>
 
-        {/* Multi-media carousel controls */}
+        {/* Top-Right Lightbox Zoom Button (Always available for all media types) */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsLightboxOpen(true);
+          }}
+          className="absolute top-2.5 right-2.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white/90 bg-black/60 hover:bg-black/90 backdrop-blur-md transition-all opacity-90 hover:opacity-100 hover:scale-105 border border-white/10 shadow-md cursor-pointer"
+          title="Click to expand (Lightbox)"
+          aria-label="Expand media"
+        >
+          <TbMaximize className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        </button>
+
+        {/* Multi-media carousel arrow buttons */}
         {n > 1 && (
           <>
             <button
@@ -261,10 +365,10 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
                 setIsLoaded(false);
                 setIdx((i) => (i - 1 + n) % n);
               }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-zinc-900 bg-white/90 hover:bg-white backdrop-blur-md shadow-lg transition-all hover:scale-110 active:scale-95"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full flex items-center justify-center text-white bg-black/60 hover:bg-black/85 backdrop-blur-md border border-white/15 shadow-lg transition-all hover:scale-110 active:scale-95 cursor-pointer opacity-80 group-hover:opacity-100"
               aria-label="Previous media"
             >
-              <TbChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <TbChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={(e) => {
@@ -272,64 +376,97 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
                 setIsLoaded(false);
                 setIdx((i) => (i + 1) % n);
               }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-zinc-900 bg-white/90 hover:bg-white backdrop-blur-md shadow-lg transition-all hover:scale-110 active:scale-95"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full flex items-center justify-center text-white bg-black/60 hover:bg-black/85 backdrop-blur-md border border-white/15 shadow-lg transition-all hover:scale-110 active:scale-95 cursor-pointer opacity-80 group-hover:opacity-100"
               aria-label="Next media"
             >
-              <TbChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <TbChevronRight className="w-4 h-4" />
             </button>
-
-            {/* Slide Dots */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md shadow-md">
-              {mediaItems.map((_, dotIdx) => (
-                <button
-                  key={dotIdx}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (dotIdx !== idx) {
-                      setIsLoaded(false);
-                      setIdx(dotIdx);
-                    }
-                  }}
-                  className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all"
-                  style={{
-                    background: dotIdx === idx ? accent : 'rgba(255,255,255,0.4)',
-                    boxShadow: dotIdx === idx ? `0 0 6px ${accent}` : 'none',
-                    transform: dotIdx === idx ? 'scale(1.25)' : 'scale(1)',
-                  }}
-                  aria-label={`Jump to media ${dotIdx + 1}`}
-                />
-              ))}
-            </div>
           </>
         )}
       </div>
 
+      {/* Multi-Media Gallery Thumbnail Selector Strip (When 2+ items exist) */}
+      {n > 1 && (
+        <div
+          className="w-full flex items-center gap-1.5 sm:gap-2 px-1 py-1 overflow-x-auto no-scrollbar flex-shrink-0"
+          style={{ maxHeight: 54 }}
+        >
+          {mediaItems.map((item, mIdx) => {
+            const isSelected = mIdx === idx;
+            return (
+              <button
+                key={mIdx}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (mIdx !== idx) {
+                    setIsLoaded(false);
+                    setIdx(mIdx);
+                  }
+                }}
+                className={`relative flex-shrink-0 ${isMobile ? 'h-8 w-12' : 'h-9 sm:h-11 w-14 sm:w-16'} rounded-md overflow-hidden transition-all cursor-pointer border ${
+                  isSelected
+                    ? 'ring-2 ring-offset-1 ring-offset-zinc-950 scale-105'
+                    : 'opacity-65 hover:opacity-100 hover:scale-[1.02] border-white/10'
+                }`}
+                style={{
+                  borderColor: isSelected ? accent : 'rgba(255,255,255,0.12)',
+                  ['--tw-ring-color' as any]: accent,
+                  background: '#151421',
+                }}
+                title={item.label}
+              >
+                {item.type === 'video' ? (
+                  <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-amber-400">
+                    <TbMovie className="w-4 h-4" />
+                  </div>
+                ) : item.type === 'lottie' ? (
+                  <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-purple-400">
+                    <TbSparkles className="w-4 h-4" />
+                  </div>
+                ) : (
+                  <img src={item.src} alt="" className="w-full h-full object-cover" />
+                )}
+
+                {/* Selected active pip */}
+                {isSelected && (
+                  <span
+                    className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: accent }}
+                  />
+                )}
+              </button>
+            );
+          })}
+          <div className="ml-auto text-[10.5px] font-mono text-zinc-400 pl-2 pr-1 flex-shrink-0">
+            {idx + 1} / {n}
+          </div>
+        </div>
+      )}
+
       {/* Fullscreen Lightbox Modal */}
       {isLightboxOpen && (
         <div
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-4 sm:p-8"
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-between p-4 sm:p-7"
           style={{
-            background: 'rgba(10, 9, 18, 0.94)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
+            background: 'rgba(8, 7, 14, 0.95)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
             animation: 'fade-in 0.22s ease forwards',
           }}
           onClick={() => setIsLightboxOpen(false)}
         >
           {/* Header Bar */}
           <div
-            className="w-full max-w-5xl flex items-center justify-between mb-3 text-white z-10"
+            className="w-full max-w-5xl flex items-center justify-between text-white z-10 pb-3 border-b border-white/10"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3">
-              <span className="font-bold text-base sm:text-lg" style={{ fontFamily: 'Archivo Black, sans-serif' }}>
+              <span className="font-bold text-base sm:text-lg tracking-tight" style={{ fontFamily: 'Archivo Black, sans-serif' }}>
                 {project.label}
               </span>
-              {n > 1 && (
-                <span className="text-xs px-2.5 py-1 rounded-full bg-white/15 text-zinc-200 font-mono shadow-sm">
-                  {idx + 1} of {n}
-                </span>
-              )}
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-zinc-300 font-mono">
+                {idx + 1} of {n}
+              </span>
             </div>
             <button
               onClick={() => setIsLightboxOpen(false)}
@@ -340,9 +477,9 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
             </button>
           </div>
 
-          {/* Centered Media with smooth scale */}
+          {/* Centered Media Stage with smooth scale */}
           <div
-            className="relative max-w-5xl max-h-[82vh] w-full flex items-center justify-center"
+            className="relative max-w-5xl flex-1 w-full flex items-center justify-center py-3"
             onClick={(e) => e.stopPropagation()}
           >
             {currentItem.type === 'video' ? (
@@ -352,10 +489,10 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
                 autoPlay
                 loop
                 playsInline
-                className="max-w-full max-h-[82vh] rounded-xl object-contain shadow-2xl"
+                className="max-w-full max-h-[76vh] rounded-xl object-contain shadow-2xl"
               />
             ) : currentItem.type === 'lottie' ? (
-              <div className="w-[85vw] max-w-3xl h-[65vh] flex items-center justify-center bg-zinc-950/80 rounded-2xl p-6">
+              <div className="w-[85vw] max-w-3xl h-[65vh] flex items-center justify-center bg-zinc-950/80 rounded-2xl p-6 border border-white/10">
                 <DotLottieReact
                   src={currentItem.src}
                   loop
@@ -367,7 +504,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
               <img
                 src={currentItem.src}
                 alt={`${project.label} high resolution preview`}
-                className="max-w-full max-h-[82vh] rounded-xl object-contain shadow-2xl"
+                className="max-w-full max-h-[76vh] rounded-xl object-contain shadow-2xl"
                 decoding="async"
               />
             )}
@@ -397,241 +534,188 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
               </>
             )}
           </div>
+
+          {/* Lightbox Footer Thumbnail Bar */}
+          {n > 1 && (
+            <div
+              className="flex items-center gap-2 max-w-5xl overflow-x-auto no-scrollbar py-1 z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {mediaItems.map((item, mIdx) => (
+                <button
+                  key={mIdx}
+                  onClick={() => {
+                    setIsLoaded(false);
+                    setIdx(mIdx);
+                  }}
+                  className={`w-12 h-9 sm:w-14 sm:h-10 rounded-md overflow-hidden border transition-all cursor-pointer ${
+                    mIdx === idx ? 'ring-2 ring-white scale-105' : 'opacity-50 hover:opacity-85 border-white/20'
+                  }`}
+                  style={{
+                    ['--tw-ring-color' as any]: accent,
+                    borderColor: mIdx === idx ? accent : 'rgba(255,255,255,0.2)',
+                  }}
+                >
+                  {item.type === 'video' ? (
+                    <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-amber-400">
+                      <TbMovie className="w-3.5 h-3.5" />
+                    </div>
+                  ) : item.type === 'lottie' ? (
+                    <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-purple-400">
+                      <TbSparkles className="w-3.5 h-3.5" />
+                    </div>
+                  ) : (
+                    <img src={item.src} alt="" className="w-full h-full object-cover" />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
-    </>
+    </div>
   );
 };
 
-/* ── Rich Card Body Content (Responsive Spacing, Shadows & Highlights) ─ */
+/* ── Rich Card Body Content (Polished Typography, Rhythm & Spacing) ──── */
 const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }> = ({
   project,
   accent,
   isMobile,
 }) => (
-  <div className="flex flex-col h-full">
-    {/* Title & Glowing Status Header */}
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: isMobile ? 8 : 12,
-        marginBottom: isMobile ? 12 : 16,
-        flexWrap: 'wrap',
-      }}
-    >
-      <h3
-        style={{
-          margin: 0,
-          color: '#1c1b20',
-          fontSize: 'clamp(1.15rem, 4vw, 1.65rem)',
-          lineHeight: 1.15,
-        }}
-      >
-        {project.label}
-      </h3>
-
-      {/* Glowing Status Dot & Label */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-        <span
+  <div className="flex flex-col h-full justify-between">
+    <div>
+      {/* Title & Glowing Status Header */}
+      <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-2.5 sm:gap-3'} flex-wrap mb-2 sm:mb-2.5`}>
+        <h3
+          className="m-0 text-slate-900 tracking-tight leading-tight"
           style={{
-            width: 7,
-            height: 7,
-            borderRadius: '50%',
-            background: project.statusColor,
-            boxShadow: `0 0 10px ${project.statusColor}ee, 0 0 4px ${project.statusColor}`,
-          }}
-        />
-        <span
-          style={{
-            fontSize: '0.68rem',
-            letterSpacing: '0.07em',
-            textTransform: 'uppercase',
-            color: project.statusColor,
             fontFamily: 'Archivo Black, sans-serif',
+            fontSize: isMobile ? 'clamp(1.1rem, 4vw, 1.35rem)' : 'clamp(1.15rem, 2.5vw, 1.55rem)',
           }}
         >
-          {project.status}
-        </span>
-      </div>
+          {project.label}
+        </h3>
 
-      {/* Category Text Separator */}
-      {project.category && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          <span style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>·</span>
+        {/* Live Glowing Status Micro-Badge */}
+        <div
+          className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border flex-shrink-0"
+          style={{
+            background: `${project.statusColor}12`,
+            borderColor: `${project.statusColor}30`,
+          }}
+        >
           <span
+            className="w-1.5 h-1.5 rounded-full"
             style={{
-              fontSize: '0.72rem',
-              color: '#64748b',
-              fontWeight: 600,
-              letterSpacing: '0.02em',
+              backgroundColor: project.statusColor,
+              boxShadow: `0 0 8px ${project.statusColor}`,
             }}
+          />
+          <span
+            className="text-[10px] font-semibold tracking-wider uppercase font-mono"
+            style={{ color: project.statusColor }}
           >
-            {project.category}
+            {project.status}
           </span>
         </div>
-      )}
-    </div>
 
-    {/* Project Metadata row (Creation Period, Team Size/Solo, Year) */}
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: isMobile ? 10 : 16,
-        marginBottom: isMobile ? 20 : 32,
-        flexWrap: 'wrap',
-        color: '#475569',
-        fontSize: isMobile ? '0.74rem' : '0.78rem',
-      }}
-    >
-      {project.period && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <TbClock className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: accent }} />
-          <span style={{ fontWeight: 600, color: '#334155' }}>{project.period}</span>
-        </div>
-      )}
-
-      {project.teamRole && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          {project.teamRole.toLowerCase().includes('solo') ? (
-            <TbUser className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: accent }} />
-          ) : (
-            <TbUsers className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: accent }} />
-          )}
-          <span style={{ fontWeight: 600, color: '#334155' }}>{project.teamRole}</span>
-        </div>
-      )}
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#94a3b8' }}>
-        <TbCalendar className="w-3.5 h-3.5" />
-        <span>{project.year}</span>
+        {/* Category Badge */}
+        {project.category && (
+          <span className="text-[11px] font-medium text-slate-500 bg-slate-100/90 border border-slate-200/60 px-2.5 py-0.5 rounded-full flex-shrink-0">
+            {project.category}
+          </span>
+        )}
       </div>
-    </div>
 
-    {/* Description */}
-    <p
-      style={{
-        color: '#525066',
-        fontSize: isMobile ? '0.84rem' : '0.92rem',
-        lineHeight: isMobile ? 1.6 : 1.75,
-        marginBottom: isMobile ? 22 : 36,
-        marginTop: 0,
-      }}
-    >
-      {project.description}
-    </p>
+      {/* Project Metadata row (Period, Role, Year) */}
+      <div className="flex items-center gap-3 sm:gap-4 flex-wrap text-slate-500 text-[11.5px] sm:text-xs mb-3 sm:mb-4 pb-2.5 border-b border-slate-100">
+        {project.period && (
+          <div className="flex items-center gap-1.5 font-medium text-slate-700">
+            <TbClock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
+            <span>{project.period}</span>
+          </div>
+        )}
 
-    {/* Technical Highlights */}
-    {project.highlights && project.highlights.length > 0 && (
-      <div style={{ marginBottom: isMobile ? 22 : 36 }}>
-        <div
-          style={{
-            fontSize: '0.66rem',
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: '#94a3b8',
-            marginBottom: isMobile ? 8 : 12,
-            fontFamily: 'Archivo Black, sans-serif',
-          }}
-        >
-          Technical Highlights
-        </div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(230px, 1fr))',
-            gap: isMobile ? 8 : 12,
-          }}
-        >
-          {project.highlights.map((h, i) => (
-            <div
-              key={i}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                fontSize: isMobile ? '0.74rem' : '0.78rem',
-                color: '#334155',
-                padding: '1px 0',
-              }}
-            >
-              <span
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: '50%',
-                  background: accent,
-                  boxShadow: `0 0 6px ${accent}aa`,
-                  flexShrink: 0,
-                }}
-              />
-              <span style={{ lineHeight: 1.45 }}>{h}</span>
-            </div>
-          ))}
+        {project.teamRole && (
+          <div className="flex items-center gap-1.5 font-medium text-slate-700">
+            {project.teamRole.toLowerCase().includes('solo') ? (
+              <TbUser className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
+            ) : (
+              <TbUsers className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
+            )}
+            <span>{project.teamRole}</span>
+          </div>
+        )}
+
+        <div className="flex items-center gap-1 text-slate-400 font-mono text-[11px] ml-auto">
+          <TbCalendar className="w-3 h-3" />
+          <span>{project.year}</span>
         </div>
       </div>
-    )}
 
-    {/* Technologies Badges */}
-    <div style={{ display: 'flex', gap: isMobile ? 6 : 8, flexWrap: 'wrap', marginBottom: isMobile ? 22 : 32 }}>
-      {project.technologies.map((t) => (
-        <span
-          key={t}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            padding: isMobile ? '5px 10px' : '6px 13px',
-            borderRadius: 8,
-            background: '#ffffff',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03)',
-            color: '#1e293b',
-            fontSize: isMobile ? '0.68rem' : '0.72rem',
-            letterSpacing: '0.02em',
-            fontFamily: 'Archivo Black, sans-serif',
-            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-          }}
-          className="hover:-translate-y-0.5 hover:shadow-md"
-        >
-          <TechIcon name={t} className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
-          <span>{t}</span>
-        </span>
-      ))}
+      {/* Narrative Description */}
+      <p
+        className="text-slate-600 text-[13px] sm:text-[13.5px] leading-relaxed mb-3.5 sm:mb-4.5 m-0"
+        style={{ maxWidth: '65ch' }}
+      >
+        {project.description}
+      </p>
+
+      {/* Technical Highlights with Card Rhythm */}
+      {project.highlights && project.highlights.length > 0 && (
+        <div className="mb-3.5 sm:mb-4">
+          <div className="text-[10.5px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1.5 mb-2">
+            <TbCheck className="w-3.5 h-3.5" style={{ color: accent }} />
+            <span>Key Engineering Highlights</span>
+          </div>
+          <div className="grid grid-cols-1 gap-1.5">
+            {project.highlights.map((h, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-2.5 text-[12px] sm:text-[12.5px] text-slate-700 bg-slate-50/70 border border-slate-100 rounded-lg px-2.5 py-1.5 hover:bg-white hover:border-slate-200 transition-colors"
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
+                  style={{
+                    backgroundColor: accent,
+                    boxShadow: `0 0 6px ${accent}88`,
+                  }}
+                />
+                <span className="leading-snug">{h}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Technologies Badges */}
+      <div className="flex gap-1.5 sm:gap-2 flex-wrap mb-4">
+        {project.technologies.map((t) => (
+          <span
+            key={t}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-slate-200/80 text-slate-800 text-[11.5px] font-medium shadow-sm hover:border-slate-300 hover:shadow hover:-translate-y-0.5 transition-all"
+          >
+            <TechIcon name={t} className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
+            <span>{t}</span>
+          </span>
+        ))}
+      </div>
     </div>
 
     {/* Action CTA Links */}
     {(project.demoUrl || project.githubUrl) && (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          marginTop: 'auto',
-          paddingTop: isMobile ? 16 : 24,
-          flexWrap: 'wrap',
-        }}
-      >
+      <div className="flex items-center gap-2.5 pt-2.5 border-t border-slate-100 flex-wrap mt-auto">
         {project.demoUrl && (
           <a
             href={project.demoUrl}
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: isMobile ? '7px 14px' : '9px 18px',
-              borderRadius: 10,
-              background: accent,
-              color: '#ffffff',
-              fontSize: isMobile ? '0.70rem' : '0.74rem',
-              fontFamily: 'Archivo Black, sans-serif',
-              textDecoration: 'none',
-              boxShadow: `0 4px 18px ${accent}45`,
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              backgroundColor: accent,
+              boxShadow: `0 4px 14px ${accent}40`,
             }}
-            className="hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-[12.5px] font-semibold no-underline hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 transition-all cursor-pointer"
           >
             <span>Live Demo / Play</span>
             <TbExternalLink className="w-3.5 h-3.5" />
@@ -642,21 +726,7 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
             href={project.githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: isMobile ? '7px 13px' : '9px 17px',
-              borderRadius: 10,
-              background: '#ffffff',
-              color: '#1e293b',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)',
-              fontSize: isMobile ? '0.70rem' : '0.74rem',
-              fontFamily: 'Archivo Black, sans-serif',
-              textDecoration: 'none',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-            }}
-            className="hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white text-slate-800 text-[12.5px] font-semibold border border-slate-200 shadow-sm hover:bg-slate-50 hover:border-slate-300 no-underline hover:-translate-y-0.5 hover:shadow transition-all cursor-pointer"
           >
             <TbBrandGithub className="w-3.5 h-3.5" />
             <span>Source Code</span>
@@ -667,94 +737,127 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
   </div>
 );
 
-/* ── Active Foreground Card ─────────────────────────────────────────── */
+/* ── Rich Architecture Blueprint (For projects without media) ────────── */
+const ArchitectureBlueprint: React.FC<{ project: Project; accent: string; isMobile: boolean }> = ({
+  project,
+  accent,
+  isMobile,
+}) => {
+  return (
+    <div className={`w-full h-full flex ${isMobile ? 'flex-col gap-4' : 'flex-row gap-8'} p-5 sm:p-8`}>
+      {/* Left Column: Narrative Details & CTAs */}
+      <div className="flex-1 flex flex-col justify-between overflow-y-auto pr-1">
+        <CardBody project={project} accent={accent} isMobile={isMobile} />
+      </div>
+
+      {/* Right Column: Architectural Schematic Card */}
+      <div
+        className={`${isMobile ? 'w-full' : 'w-[42%] max-w-[420px]'} flex-shrink-0 flex flex-col justify-between p-5 rounded-2xl border text-zinc-300 select-none shadow-xl`}
+        style={{
+          background: 'linear-gradient(150deg, #100f1c 0%, #171526 100%)',
+          borderColor: 'rgba(255,255,255,0.08)',
+        }}
+      >
+        <div>
+          {/* Blueprint Header */}
+          <div className="flex items-center justify-between pb-3 border-b border-white/10 text-xs font-mono">
+            <span className="flex items-center gap-2 font-bold tracking-wider uppercase text-zinc-200">
+              <TbCode className="w-4 h-4" style={{ color: accent }} />
+              System Anatomy
+            </span>
+            <span className="text-[11px] text-zinc-500">{project.year}</span>
+          </div>
+
+          {/* Module Stack Breakdown */}
+          <div className="mt-4 space-y-2.5">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Core Architecture</div>
+            <div className="grid grid-cols-1 gap-2">
+              {project.technologies.map((tech, i) => (
+                <div
+                  key={tech}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-mono"
+                >
+                  <span className="flex items-center gap-2 text-zinc-200">
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accent }} />
+                    {tech}
+                  </span>
+                  <span className="text-[10px] text-zinc-400">Module {i + 1}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Blueprint Footer Specs */}
+        <div className="pt-4 border-t border-white/10 mt-4 flex items-center justify-between text-[11px] font-mono text-zinc-400">
+          <span className="flex items-center gap-1.5">
+            <TbLayersIntersect className="w-3.5 h-3.5" style={{ color: accent }} />
+            <span>Target: Web / Cloud</span>
+          </span>
+          <span className="text-emerald-400 font-semibold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Verified
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ── Active Foreground Project Card (Polished 2-Column Desktop Grid) ─── */
 const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolean }> = ({
   project,
   accent,
   isMobile,
 }) => {
-  const isPortrait = project.imageLayout === 'portrait';
   const isMedia = (url?: string) => Boolean(url && url.trim().length > 0);
   const hasMedia = Boolean(
     (project.images && project.images.length > 0) || isMedia(project.video) || isMedia(project.lottie)
   );
-  // On mobile screens, always use vertical column to prevent squishing the layout
-  const useRowLayout = isPortrait && !isMobile && hasMedia;
 
   return (
     <div
+      className="w-full h-full bg-white overflow-hidden flex"
       style={{
-        width: '100%',
-        height: '100%',
-        background: '#ffffff',
         borderRadius: isMobile ? 18 : 22,
         boxShadow: `0 16px 48px rgba(0,0,0,0.07), 0 2px 8px rgba(0,0,0,0.04), 0 0 1px ${accent}33`,
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: useRowLayout ? 'row' : 'column',
+        flexDirection: isMobile ? 'column' : 'row',
       }}
     >
       {!hasMedia ? (
-        <div
-          style={{
-            flex: 1,
-            minHeight: 0,
-            padding: isMobile ? '20px 20px' : '32px 42px',
-            display: 'flex',
-            flexDirection: 'column',
-            overflowY: 'auto',
-          }}
-        >
-          <CardBody project={project} accent={accent} isMobile={isMobile} />
-        </div>
-      ) : useRowLayout ? (
+        <ArchitectureBlueprint project={project} accent={accent} isMobile={isMobile} />
+      ) : isMobile ? (
+        /* Mobile Vertical Layout: Media on top, content below */
         <>
-          <div
-            style={{
-              flex: 1,
-              minWidth: 0,
-              padding: '28px 34px',
-              display: 'flex',
-              flexDirection: 'column',
-              overflowY: 'auto',
-            }}
-          >
-            <CardBody project={project} accent={accent} isMobile={isMobile} />
+          <div className="h-[190px] flex-shrink-0 p-2.5 bg-[#12111d]">
+            <ImageShowcase key={project.id} project={project} accent={accent} isMobile={isMobile} />
           </div>
-          <div
-            style={{
-              width: 'clamp(260px, 25vw, 340px)',
-              flexShrink: 0,
-              padding: '16px 16px 16px 0',
-              background: '#f8f7fc',
-            }}
-          >
-            <ImageShowcase key={project.id} project={project} accent={accent} />
+          <div className="flex-1 min-h-0 p-4 sm:p-5 overflow-y-auto">
+            <CardBody project={project} accent={accent} isMobile={isMobile} />
           </div>
         </>
       ) : (
+        /* Desktop Two-Column Split Layout */
         <>
+          {/* Left Column: Narrative Content & Technical Highlights */}
           <div
+            className="flex-1 min-w-0 p-7 sm:p-8 flex flex-col justify-between overflow-y-auto"
             style={{
-              height: isMobile ? 'clamp(140px, 22vh, 185px)' : 'clamp(185px, 25vh, 250px)',
-              flexShrink: 0,
-              padding: isMobile ? 8 : 12,
-              background: '#f8f7fc',
-            }}
-          >
-            <ImageShowcase key={project.id} project={project} accent={accent} />
-          </div>
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              padding: isMobile ? '16px 18px' : '24px 34px',
-              display: 'flex',
-              flexDirection: 'column',
-              overflowY: 'auto',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#cbd5e1 transparent',
             }}
           >
             <CardBody project={project} accent={accent} isMobile={isMobile} />
+          </div>
+
+          {/* Right Column: Visual Media Showcase with Gallery Strip */}
+          <div
+            className="w-[45%] max-w-[490px] min-w-[340px] flex-shrink-0 p-4 sm:p-5 flex flex-col justify-between border-l border-slate-100"
+            style={{
+              background: 'linear-gradient(175deg, #fbfaff 0%, #f3f1fb 100%)',
+            }}
+          >
+            <ImageShowcase key={project.id} project={project} accent={accent} isMobile={isMobile} />
           </div>
         </>
       )}
@@ -762,7 +865,6 @@ const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolea
   );
 };
 
-/* ── Background Card Shell (Pure Card Silhouette, No Content/Icons) ── */
 /* ── Background Card Shell (Distinct Silhouette with Peeking Spine & Icon) ── */
 const BackgroundCard: React.FC<{
   project: Project;
@@ -949,20 +1051,18 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
     }
   };
 
-  // Step spacing:
-  // Desktop: peeking to the right
-  // Mobile: peeking to the bottom
-  const stepX = 54;
-  const rightReserve = (n - 1) * stepX + 20;
+  // Dynamically calibrated step offset to maximize active card viewport space
+  const stepX = isMobile ? 0 : n > 5 ? 44 : 52;
+  const rightReserve = isMobile ? 0 : (n - 1) * stepX + 16;
 
-  const stepY = 24;
-  const bottomReserve = (n - 1) * stepY + 12;
+  const stepY = 22;
+  const bottomReserve = isMobile ? (n - 1) * stepY + 10 : 0;
 
   return (
     <div
       className="relative w-full flex-1 min-h-0"
       style={{
-        marginTop: isMobile ? 8 : 14,
+        marginTop: isMobile ? 8 : 12,
         perspective: 1200,
       }}
       onTouchStart={handleTouchStart}
@@ -1004,7 +1104,7 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
         // Refined optical depth blur and scale
         const scale = isMobile
           ? (isActive ? 1 : Math.max(0.92, 1 - depth * 0.035))
-          : (isActive ? 1 : Math.max(0.89, 1 - depth * 0.045));
+          : (isActive ? 1 : Math.max(0.90, 1 - depth * 0.04));
         const transformOrigin = isMobile ? 'center bottom' : 'right center';
         const blurPx = isActive ? 0 : isHovered ? 0 : depth === 1 ? 1 : 2.5;
         const zIndex = isActive ? 20 : 20 - depth;
@@ -1098,7 +1198,7 @@ interface ProjectSectionProps {
 
 export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSectionActive = false }) => {
   const [activeIdx, setActiveIdx] = useState(0);
-  const isMobile = useIsMobile();
+  const { isMobile } = useScreenSize();
 
   // Keyboard navigation for switching projects horizontally when this section is active
   useEffect(() => {
@@ -1131,8 +1231,8 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
     <div
       className="w-full h-full relative flex flex-col justify-center"
       style={{
-        padding: isMobile ? '18px 14px 62px' : '40px 8vw 28px',
-        maxWidth: 1400,
+        padding: isMobile ? '16px 14px 60px' : '36px 7vw 24px',
+        maxWidth: 1440,
         margin: '0 auto',
       }}
     >
@@ -1164,9 +1264,9 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
       >
         <h2
           style={{
-            fontSize: 'clamp(1.5rem, 5vw, 2.8rem)',
+            fontSize: 'clamp(1.5rem, 4.5vw, 2.6rem)',
             color: '#1c1b20',
-            margin: isMobile ? '0 0 10px' : '0 0 16px',
+            margin: isMobile ? '0 0 10px' : '0 0 14px',
             lineHeight: 1.1,
           }}
         >
@@ -1177,7 +1277,7 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
         <div
           style={{
             display: 'flex',
-            gap: isMobile ? 8 : 10,
+            gap: isMobile ? 7 : 9,
             marginBottom: isMobile ? 4 : 6,
             flexWrap: isMobile ? 'nowrap' : 'wrap',
             overflowX: isMobile ? 'auto' : 'visible',
@@ -1198,9 +1298,9 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
                   display: 'flex',
                   alignItems: 'center',
                   gap: isActive ? (isMobile ? 6 : 8) : 0,
-                  height: isMobile ? 38 : 44,
-                  width: isActive ? 'auto' : isMobile ? 38 : 44,
-                  maxWidth: isActive ? 240 : isMobile ? 38 : 44,
+                  height: isMobile ? 36 : 42,
+                  width: isActive ? 'auto' : isMobile ? 36 : 42,
+                  maxWidth: isActive ? 240 : isMobile ? 36 : 42,
                   overflow: 'hidden',
                   padding: isActive ? (isMobile ? '0 14px 0 10px' : '0 18px 0 12px') : '0',
                   justifyContent: 'center',
@@ -1229,7 +1329,7 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
                     userSelect: 'none',
                   }}
                 >
-                  {getProjectIcon(p.icon, isMobile ? 'w-4 h-4 flex-shrink-0' : 'w-5 h-5 flex-shrink-0')}
+                  {getProjectIcon(p.icon, isMobile ? 'w-4 h-4 flex-shrink-0' : 'w-4.5 h-4.5 flex-shrink-0')}
                 </span>
                 <span
                   style={{
