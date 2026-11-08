@@ -11,13 +11,14 @@ import {
   TbDeviceGamepad2,
   TbTrees,
   TbUser,
-  TbUsers,
-  TbClock,
   TbCalendar,
   TbExternalLink,
   TbBrandGithub,
   TbBrandSteam,
   TbBrandGooglePlay,
+  TbCircleCheck,
+  TbCircleCheckFilled,
+  TbRocket,
   TbMaximize,
   TbX,
   TbChevronLeft,
@@ -666,6 +667,40 @@ export const resolveProjectLinks = (project: Project): ProjectLink[] => {
   return resolved;
 };
 
+const getStatusIcon = (status: string, statusColor: string) => {
+  const s = (status || '').toLowerCase();
+  if (s.includes('live') || s.includes('released')) {
+    return (
+      <TbCircleCheckFilled
+        className="w-4 h-4 sm:w-4.5 sm:h-4.5 flex-shrink-0"
+        style={{ color: statusColor || '#10b981' }}
+      />
+    );
+  }
+  if (s.includes('demo') || s.includes('development')) {
+    return (
+      <TbRocket
+        className="w-4 h-4 sm:w-4.5 sm:h-4.5 flex-shrink-0"
+        style={{ color: statusColor || '#f59e0b' }}
+      />
+    );
+  }
+  if (s.includes('completed')) {
+    return (
+      <TbCircleCheck
+        className="w-4 h-4 sm:w-4.5 sm:h-4.5 flex-shrink-0"
+        style={{ color: statusColor || '#3b82f6' }}
+      />
+    );
+  }
+  return (
+    <TbSparkles
+      className="w-4 h-4 sm:w-4.5 sm:h-4.5 flex-shrink-0"
+      style={{ color: statusColor || '#a78bfa' }}
+    />
+  );
+};
+
 /* ── Rich Card Body Content (Polished Typography, Rhythm & Spacing) ──── */
 const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean; isDark: boolean }> = ({
   project,
@@ -678,82 +713,45 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean; 
   return (
   <div className="flex flex-col h-full justify-between">
     <div>
-      {/* Title & Glowing Status Header */}
-      <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-2.5 sm:gap-3'} flex-wrap mb-2 sm:mb-2.5`}>
+      {/* Streamlined Header: Title + Status Icon + Category/Year */}
+      <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-2.5'} flex-wrap mb-3 sm:mb-3.5 pb-2.5 border-b ${
+        isDark ? 'border-white/10' : 'border-slate-100'
+      }`}>
         <h3
           className={`m-0 tracking-tight leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}
           style={{
             fontFamily: 'Archivo Black, sans-serif',
-            fontSize: isMobile ? 'clamp(1.1rem, 4vw, 1.35rem)' : 'clamp(1.15rem, 2.5vw, 1.55rem)',
+            fontSize: isMobile ? 'clamp(1.15rem, 4vw, 1.4rem)' : 'clamp(1.2rem, 2.5vw, 1.6rem)',
           }}
         >
           {project.label}
         </h3>
 
-        {/* Live Glowing Status Micro-Badge */}
-        <div
-          className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border flex-shrink-0"
-          style={{
-            background: `${project.statusColor}18`,
-            borderColor: `${project.statusColor}35`,
-          }}
+        {/* Simple Release Status Icon with Tooltip */}
+        <span
+          title={`Status: ${project.status}`}
+          className="flex items-center justify-center flex-shrink-0 cursor-help"
         >
-          <span
-            className="w-1.5 h-1.5 rounded-full"
-            style={{
-              backgroundColor: project.statusColor,
-              boxShadow: `0 0 8px ${project.statusColor}`,
-            }}
-          />
-          <span
-            className="text-[10px] font-semibold tracking-wider uppercase font-mono"
-            style={{ color: project.statusColor }}
-          >
-            {project.status}
+          {getStatusIcon(project.status, project.statusColor)}
+        </span>
+
+        {/* Clean Category Badge & Release Year (No redundant duration or repeated roles) */}
+        <div className="flex items-center gap-2 ml-auto flex-shrink-0">
+          <span className={`text-[11.5px] font-mono flex items-center gap-1 ${isDark ? 'text-zinc-400' : 'text-slate-400'}`}>
+            <TbCalendar className="w-3.5 h-3.5" />
+            <span>{project.year}</span>
           </span>
-        </div>
-
-        {/* Category Badge */}
-        {project.category && (
-          <span
-            className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full flex-shrink-0 border ${
-              isDark
-                ? 'bg-white/10 text-zinc-300 border-white/10'
-                : 'bg-slate-100/90 text-slate-500 border-slate-200/60'
-            }`}
-          >
-            {project.category}
-          </span>
-        )}
-      </div>
-
-      {/* Project Metadata row (Period, Role, Year) */}
-      <div
-        className={`flex items-center gap-3 sm:gap-4 flex-wrap text-[11.5px] sm:text-xs mb-3 sm:mb-4 pb-2.5 border-b ${
-          isDark ? 'text-zinc-400 border-white/10' : 'text-slate-500 border-slate-100'
-        }`}
-      >
-        {project.period && (
-          <div className={`flex items-center gap-1.5 font-medium ${isDark ? 'text-zinc-200' : 'text-slate-700'}`}>
-            <TbClock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
-            <span>{project.period}</span>
-          </div>
-        )}
-
-        {project.teamRole && (
-          <div className={`flex items-center gap-1.5 font-medium ${isDark ? 'text-zinc-200' : 'text-slate-700'}`}>
-            {project.teamRole.toLowerCase().includes('solo') ? (
-              <TbUser className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
-            ) : (
-              <TbUsers className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
-            )}
-            <span>{project.teamRole}</span>
-          </div>
-        )}
-
-        <div className={`flex items-center gap-1 font-mono text-[11px] ml-auto ${isDark ? 'text-zinc-500' : 'text-slate-400'}`}>
-          <TbCalendar className="w-3 h-3" />
-          <span>{project.year}</span>
+          {project.category && (
+            <span
+              className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${
+                isDark
+                  ? 'bg-white/10 text-zinc-300 border-white/10'
+                  : 'bg-slate-100 text-slate-600 border-slate-200/60'
+              }`}
+            >
+              {project.category}
+            </span>
+          )}
         </div>
       </div>
 
@@ -818,10 +816,10 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean; 
       </div>
     </div>
 
-    {/* Action CTA Links */}
+    {/* Action CTA Links - Inviting, prominent & bold */}
     {actionLinks.length > 0 && (
       <div
-        className={`flex items-center gap-2 sm:gap-2.5 pt-2.5 border-t flex-wrap mt-auto ${
+        className={`flex items-center gap-2.5 sm:gap-3 pt-3 border-t flex-wrap mt-auto ${
           isDark ? 'border-white/10' : 'border-slate-100'
         }`}
       >
@@ -837,19 +835,19 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean; 
                 isPrimary
                   ? {
                       backgroundColor: accent,
-                      boxShadow: `0 4px 14px ${accent}40`,
+                      boxShadow: `0 6px 20px ${accent}55`,
                     }
                   : undefined
               }
-              className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-[12px] sm:text-[12.5px] font-semibold no-underline transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-[12.5px] sm:text-[13px] font-bold tracking-wide no-underline transition-all duration-200 cursor-pointer ${
                 isPrimary
-                  ? 'text-white hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0'
+                  ? 'text-white hover:-translate-y-0.5 hover:shadow-xl hover:brightness-105 active:translate-y-0 active:scale-[0.98]'
                   : isDark
-                    ? 'bg-white/10 text-white border border-white/15 hover:bg-white/15 hover:border-white/25 hover:-translate-y-0.5'
-                    : 'bg-white text-slate-800 border border-slate-200 shadow-sm hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-0.5 hover:shadow'
+                    ? 'bg-white/10 text-white border-2 border-white/20 hover:bg-white/20 hover:border-white/35 hover:-translate-y-0.5 shadow-sm hover:shadow active:translate-y-0'
+                    : 'bg-white text-slate-900 border-2 border-slate-300 hover:border-slate-800 hover:bg-slate-50 hover:-translate-y-0.5 shadow-sm hover:shadow active:translate-y-0'
               }`}
             >
-              {getLinkIcon(link.icon)}
+              {getLinkIcon(link.icon, 'w-4 h-4 flex-shrink-0')}
               <span>{link.label}</span>
             </a>
           );

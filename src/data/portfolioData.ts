@@ -294,8 +294,7 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         icon: 'sports_esports',
         imageLayout: 'landscape',
         category: 'Action Survival',
-        period: '2024 – 2026',
-        teamRole: 'Solo Developer & Artist',
+        video: '/assets/projects/scrap-vanguard/preview.mp4',
         description:
           'Sci-fi top-down survival action game featuring customizable mech combat rigs, wave survival dynamics, weapon crafting, and stylized post-processing shaders.',
         technologies: ['Unity', 'C#', 'Shader Graph', 'Blender', 'Steamworks'],
@@ -305,6 +304,7 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
           'Custom stylized shaders and lighting',
         ],
         images: [
+          '/assets/projects/scrap-vanguard/preview.mp4',
           '/assets/projects/scrap-vanguard/trailer_1.png',
           '/assets/projects/scrap-vanguard/gameplay_1.png',
           '/assets/projects/scrap-vanguard/trailer_2.png',
