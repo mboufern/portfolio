@@ -69,12 +69,12 @@ const getProjectIcon = (iconName: string, className = 'w-5 h-5 flex-shrink-0') =
 };
 
 /* ── High-Fidelity Clean Project Visual Fallback ───────────────────── */
-const ProjectVisualFallback: React.FC<{ project: Project; accent: string }> = ({ project, accent }) => {
+const ProjectVisualFallback: React.FC<{ project: Project; accent: string; isDark: boolean }> = ({ project, accent, isDark }) => {
   return (
     <div
       className="relative w-full h-full overflow-hidden flex flex-col justify-between p-4 sm:p-5 select-none"
       style={{
-        background: 'linear-gradient(145deg, #12111d 0%, #1a1829 100%)',
+        background: isDark ? 'linear-gradient(145deg, #0b0a12 0%, #12101e 100%)' : 'linear-gradient(145deg, #12111d 0%, #1a1829 100%)',
         borderRadius: 14,
         boxShadow: '0 8px 32px rgba(0,0,0,0.22), inset 0 0 30px rgba(0,0,0,0.4)',
         border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -122,6 +122,7 @@ interface ImageShowcaseProps {
   project: Project;
   accent: string;
   isMobile: boolean;
+  isDark: boolean;
 }
 
 interface MediaItem {
@@ -133,7 +134,7 @@ interface MediaItem {
 const isVideoUrl = (url: string) => /\.(mp4|webm|mov|mkv)(\?.*)?$/i.test(url);
 const isLottieUrl = (url: string) => /\.lottie(\?.*)?$/i.test(url);
 
-const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile }) => {
+const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile, isDark }) => {
   const mediaItems: MediaItem[] = [];
 
   if (project.video) {
@@ -165,6 +166,8 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const isMaisonBurger = project.id === 'maison-du-burger';
 
   // Toggle video playback on click
   const togglePlay = (e: React.MouseEvent) => {
@@ -205,7 +208,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
   }, [isLightboxOpen, n]);
 
   if (n === 0) {
-    return <ProjectVisualFallback project={project} accent={accent} />;
+    return <ProjectVisualFallback project={project} accent={accent} isDark={isDark} />;
   }
 
   const currentItem = mediaItems[idx];
@@ -217,13 +220,19 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
       <div
         className="relative overflow-hidden w-full flex-1 min-h-0 select-none group rounded-xl sm:rounded-2xl flex items-center justify-center"
         style={{
-          background: 'linear-gradient(160deg, #0e0d16 0%, #151421 100%)',
-          boxShadow: '0 8px 28px rgba(0,0,0,0.22), inset 0 0 1px rgba(255,255,255,0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: isMaisonBurger
+            ? '#ffffff'
+            : isDark
+              ? 'linear-gradient(160deg, #090812 0%, #121020 100%)'
+              : 'linear-gradient(160deg, #0e0d16 0%, #151421 100%)',
+          boxShadow: isMaisonBurger
+            ? '0 4px 20px rgba(0,0,0,0.06), inset 0 0 1px rgba(0,0,0,0.08)'
+            : '0 8px 28px rgba(0,0,0,0.22), inset 0 0 1px rgba(255,255,255,0.1)',
+          border: isMaisonBurger ? '1px solid rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
-        {/* Ambient blurred glow backdrop behind letterboxed media */}
-        {currentItem.type === 'image' && (
+        {/* Ambient blurred glow backdrop behind letterboxed media (excluded for white burger) */}
+        {!isMaisonBurger && currentItem.type === 'image' && (
           <img
             src={currentItem.src}
             alt=""
@@ -237,7 +246,9 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
           <div
             className="absolute inset-0 animate-pulse"
             style={{
-              background: 'linear-gradient(90deg, #1b1928 0%, #29263c 50%, #1b1928 100%)',
+              background: isMaisonBurger
+                ? 'linear-gradient(90deg, #f1f0f5 0%, #e8e6ee 50%, #f1f0f5 100%)'
+                : 'linear-gradient(90deg, #1b1928 0%, #29263c 50%, #1b1928 100%)',
             }}
           />
         )}
@@ -290,7 +301,9 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
           </div>
         ) : currentItem.type === 'lottie' ? (
           <div
-            className="relative w-full h-full flex items-center justify-center p-4 overflow-hidden cursor-zoom-in"
+            className={`relative w-full h-full flex items-center justify-center p-4 overflow-hidden cursor-zoom-in ${
+              isMaisonBurger ? 'bg-white' : ''
+            }`}
             onClick={() => setIsLightboxOpen(true)}
           >
             <DotLottieReact
@@ -324,7 +337,13 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
         )}
 
         {/* Top-Left Media Type Badge */}
-        <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-[10.5px] font-mono tracking-wider uppercase text-zinc-300 border border-white/10 shadow-sm pointer-events-none">
+        <div
+          className={`absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-mono tracking-wider uppercase border shadow-sm pointer-events-none ${
+            isMaisonBurger
+              ? 'bg-black/75 text-white backdrop-blur-md border-black/10'
+              : 'bg-black/60 backdrop-blur-md text-zinc-300 border-white/10'
+          }`}
+        >
           {currentItem.type === 'video' ? (
             <>
               <TbMovie className="w-3.5 h-3.5 text-amber-400" />
@@ -343,13 +362,17 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
           )}
         </div>
 
-        {/* Top-Right Lightbox Zoom Button (Always available for all media types) */}
+        {/* Top-Right Lightbox Zoom Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             setIsLightboxOpen(true);
           }}
-          className="absolute top-2.5 right-2.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white/90 bg-black/60 hover:bg-black/90 backdrop-blur-md transition-all opacity-90 hover:opacity-100 hover:scale-105 border border-white/10 shadow-md cursor-pointer"
+          className={`absolute top-2.5 right-2.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all opacity-90 hover:opacity-100 hover:scale-105 border shadow-md cursor-pointer ${
+            isMaisonBurger
+              ? 'text-zinc-800 bg-white/90 hover:bg-white border-zinc-200'
+              : 'text-white/90 bg-black/60 hover:bg-black/90 backdrop-blur-md border-white/10'
+          }`}
           title="Click to expand (Lightbox)"
           aria-label="Expand media"
         >
@@ -385,7 +408,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
         )}
       </div>
 
-      {/* Multi-Media Gallery Thumbnail Selector Strip (When 2+ items exist) */}
+      {/* Multi-Media Gallery Thumbnail Selector Strip */}
       {n > 1 && (
         <div
           className="w-full flex items-center gap-1.5 sm:gap-2 px-1 py-1 overflow-x-auto no-scrollbar flex-shrink-0"
@@ -409,9 +432,9 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
                     : 'opacity-65 hover:opacity-100 hover:scale-[1.02] border-white/10'
                 }`}
                 style={{
-                  borderColor: isSelected ? accent : 'rgba(255,255,255,0.12)',
+                  borderColor: isSelected ? accent : isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.12)',
                   ['--tw-ring-color' as any]: accent,
-                  background: '#151421',
+                  background: isMaisonBurger && item.type === 'lottie' ? '#ffffff' : '#151421',
                 }}
                 title={item.label}
               >
@@ -420,7 +443,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
                     <TbMovie className="w-4 h-4" />
                   </div>
                 ) : item.type === 'lottie' ? (
-                  <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-purple-400">
+                  <div className={`w-full h-full flex items-center justify-center ${isMaisonBurger ? 'bg-white text-amber-500' : 'bg-zinc-900 text-purple-400'}`}>
                     <TbSparkles className="w-4 h-4" />
                   </div>
                 ) : (
@@ -492,7 +515,13 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
                 className="max-w-full max-h-[76vh] rounded-xl object-contain shadow-2xl"
               />
             ) : currentItem.type === 'lottie' ? (
-              <div className="w-[85vw] max-w-3xl h-[65vh] flex items-center justify-center bg-zinc-950/80 rounded-2xl p-6 border border-white/10">
+              <div
+                className={`w-[85vw] max-w-3xl h-[65vh] flex items-center justify-center rounded-2xl p-6 border ${
+                  isMaisonBurger
+                    ? 'bg-white border-zinc-200 shadow-2xl'
+                    : 'bg-zinc-950/80 border-white/10'
+                }`}
+              >
                 <DotLottieReact
                   src={currentItem.src}
                   loop
@@ -554,6 +583,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
                   style={{
                     ['--tw-ring-color' as any]: accent,
                     borderColor: mIdx === idx ? accent : 'rgba(255,255,255,0.2)',
+                    background: isMaisonBurger && item.type === 'lottie' ? '#ffffff' : '#151421',
                   }}
                 >
                   {item.type === 'video' ? (
@@ -561,7 +591,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
                       <TbMovie className="w-3.5 h-3.5" />
                     </div>
                   ) : item.type === 'lottie' ? (
-                    <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-purple-400">
+                    <div className={`w-full h-full flex items-center justify-center ${isMaisonBurger ? 'bg-white text-amber-500' : 'bg-zinc-900 text-purple-400'}`}>
                       <TbSparkles className="w-3.5 h-3.5" />
                     </div>
                   ) : (
@@ -578,17 +608,18 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
 };
 
 /* ── Rich Card Body Content (Polished Typography, Rhythm & Spacing) ──── */
-const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }> = ({
+const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean; isDark: boolean }> = ({
   project,
   accent,
   isMobile,
+  isDark,
 }) => (
   <div className="flex flex-col h-full justify-between">
     <div>
       {/* Title & Glowing Status Header */}
       <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-2.5 sm:gap-3'} flex-wrap mb-2 sm:mb-2.5`}>
         <h3
-          className="m-0 text-slate-900 tracking-tight leading-tight"
+          className={`m-0 tracking-tight leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}
           style={{
             fontFamily: 'Archivo Black, sans-serif',
             fontSize: isMobile ? 'clamp(1.1rem, 4vw, 1.35rem)' : 'clamp(1.15rem, 2.5vw, 1.55rem)',
@@ -601,8 +632,8 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
         <div
           className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border flex-shrink-0"
           style={{
-            background: `${project.statusColor}12`,
-            borderColor: `${project.statusColor}30`,
+            background: `${project.statusColor}18`,
+            borderColor: `${project.statusColor}35`,
           }}
         >
           <span
@@ -622,23 +653,33 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
 
         {/* Category Badge */}
         {project.category && (
-          <span className="text-[11px] font-medium text-slate-500 bg-slate-100/90 border border-slate-200/60 px-2.5 py-0.5 rounded-full flex-shrink-0">
+          <span
+            className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full flex-shrink-0 border ${
+              isDark
+                ? 'bg-white/10 text-zinc-300 border-white/10'
+                : 'bg-slate-100/90 text-slate-500 border-slate-200/60'
+            }`}
+          >
             {project.category}
           </span>
         )}
       </div>
 
       {/* Project Metadata row (Period, Role, Year) */}
-      <div className="flex items-center gap-3 sm:gap-4 flex-wrap text-slate-500 text-[11.5px] sm:text-xs mb-3 sm:mb-4 pb-2.5 border-b border-slate-100">
+      <div
+        className={`flex items-center gap-3 sm:gap-4 flex-wrap text-[11.5px] sm:text-xs mb-3 sm:mb-4 pb-2.5 border-b ${
+          isDark ? 'text-zinc-400 border-white/10' : 'text-slate-500 border-slate-100'
+        }`}
+      >
         {project.period && (
-          <div className="flex items-center gap-1.5 font-medium text-slate-700">
+          <div className={`flex items-center gap-1.5 font-medium ${isDark ? 'text-zinc-200' : 'text-slate-700'}`}>
             <TbClock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
             <span>{project.period}</span>
           </div>
         )}
 
         {project.teamRole && (
-          <div className="flex items-center gap-1.5 font-medium text-slate-700">
+          <div className={`flex items-center gap-1.5 font-medium ${isDark ? 'text-zinc-200' : 'text-slate-700'}`}>
             {project.teamRole.toLowerCase().includes('solo') ? (
               <TbUser className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
             ) : (
@@ -648,7 +689,7 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
           </div>
         )}
 
-        <div className="flex items-center gap-1 text-slate-400 font-mono text-[11px] ml-auto">
+        <div className={`flex items-center gap-1 font-mono text-[11px] ml-auto ${isDark ? 'text-zinc-500' : 'text-slate-400'}`}>
           <TbCalendar className="w-3 h-3" />
           <span>{project.year}</span>
         </div>
@@ -656,7 +697,9 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
 
       {/* Narrative Description */}
       <p
-        className="text-slate-600 text-[13px] sm:text-[13.5px] leading-relaxed mb-3.5 sm:mb-4.5 m-0"
+        className={`text-[13px] sm:text-[13.5px] leading-relaxed mb-3.5 sm:mb-4.5 m-0 ${
+          isDark ? 'text-zinc-300' : 'text-slate-600'
+        }`}
         style={{ maxWidth: '65ch' }}
       >
         {project.description}
@@ -665,7 +708,9 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
       {/* Technical Highlights with Card Rhythm */}
       {project.highlights && project.highlights.length > 0 && (
         <div className="mb-3.5 sm:mb-4">
-          <div className="text-[10.5px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1.5 mb-2">
+          <div className={`text-[10.5px] font-bold tracking-wider uppercase flex items-center gap-1.5 mb-2 ${
+            isDark ? 'text-zinc-400' : 'text-slate-400'
+          }`}>
             <TbCheck className="w-3.5 h-3.5" style={{ color: accent }} />
             <span>Key Engineering Highlights</span>
           </div>
@@ -673,7 +718,11 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
             {project.highlights.map((h, i) => (
               <div
                 key={i}
-                className="flex items-start gap-2.5 text-[12px] sm:text-[12.5px] text-slate-700 bg-slate-50/70 border border-slate-100 rounded-lg px-2.5 py-1.5 hover:bg-white hover:border-slate-200 transition-colors"
+                className={`flex items-start gap-2.5 text-[12px] sm:text-[12.5px] rounded-lg px-2.5 py-1.5 transition-colors border ${
+                  isDark
+                    ? 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10 hover:border-white/15'
+                    : 'bg-slate-50/70 border-slate-100 text-slate-700 hover:bg-white hover:border-slate-200'
+                }`}
               >
                 <span
                   className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
@@ -694,7 +743,11 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
         {project.technologies.map((t) => (
           <span
             key={t}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-slate-200/80 text-slate-800 text-[11.5px] font-medium shadow-sm hover:border-slate-300 hover:shadow hover:-translate-y-0.5 transition-all"
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11.5px] font-medium shadow-sm transition-all border ${
+              isDark
+                ? 'bg-white/5 border-white/10 text-zinc-200 hover:border-white/20 hover:bg-white/10 hover:-translate-y-0.5'
+                : 'bg-white border-slate-200/80 text-slate-800 hover:border-slate-300 hover:shadow hover:-translate-y-0.5'
+            }`}
           >
             <TechIcon name={t} className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
             <span>{t}</span>
@@ -705,7 +758,9 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
 
     {/* Action CTA Links */}
     {(project.demoUrl || project.githubUrl) && (
-      <div className="flex items-center gap-2.5 pt-2.5 border-t border-slate-100 flex-wrap mt-auto">
+      <div className={`flex items-center gap-2.5 pt-2.5 border-t flex-wrap mt-auto ${
+        isDark ? 'border-white/10' : 'border-slate-100'
+      }`}>
         {project.demoUrl && (
           <a
             href={project.demoUrl}
@@ -726,7 +781,11 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
             href={project.githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white text-slate-800 text-[12.5px] font-semibold border border-slate-200 shadow-sm hover:bg-slate-50 hover:border-slate-300 no-underline hover:-translate-y-0.5 hover:shadow transition-all cursor-pointer"
+            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-[12.5px] font-semibold border shadow-sm no-underline hover:-translate-y-0.5 hover:shadow transition-all cursor-pointer ${
+              isDark
+                ? 'bg-white/10 text-white border-white/15 hover:bg-white/15 hover:border-white/25'
+                : 'bg-white text-slate-800 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+            }`}
           >
             <TbBrandGithub className="w-3.5 h-3.5" />
             <span>Source Code</span>
@@ -738,24 +797,25 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean }
 );
 
 /* ── Rich Architecture Blueprint (For projects without media) ────────── */
-const ArchitectureBlueprint: React.FC<{ project: Project; accent: string; isMobile: boolean }> = ({
+const ArchitectureBlueprint: React.FC<{ project: Project; accent: string; isMobile: boolean; isDark: boolean }> = ({
   project,
   accent,
   isMobile,
+  isDark,
 }) => {
   return (
     <div className={`w-full h-full flex ${isMobile ? 'flex-col gap-4' : 'flex-row gap-8'} p-5 sm:p-8`}>
       {/* Left Column: Narrative Details & CTAs */}
       <div className="flex-1 flex flex-col justify-between overflow-y-auto pr-1">
-        <CardBody project={project} accent={accent} isMobile={isMobile} />
+        <CardBody project={project} accent={accent} isMobile={isMobile} isDark={isDark} />
       </div>
 
       {/* Right Column: Architectural Schematic Card */}
       <div
         className={`${isMobile ? 'w-full' : 'w-[42%] max-w-[420px]'} flex-shrink-0 flex flex-col justify-between p-5 rounded-2xl border text-zinc-300 select-none shadow-xl`}
         style={{
-          background: 'linear-gradient(150deg, #100f1c 0%, #171526 100%)',
-          borderColor: 'rgba(255,255,255,0.08)',
+          background: isDark ? 'linear-gradient(150deg, #090812 0%, #121020 100%)' : 'linear-gradient(150deg, #100f1c 0%, #171526 100%)',
+          borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.08)',
         }}
       >
         <div>
@@ -805,10 +865,11 @@ const ArchitectureBlueprint: React.FC<{ project: Project; accent: string; isMobi
 };
 
 /* ── Active Foreground Project Card (Polished 2-Column Desktop Grid) ─── */
-const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolean }> = ({
+const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolean; isDark: boolean }> = ({
   project,
   accent,
   isMobile,
+  isDark,
 }) => {
   const isMedia = (url?: string) => Boolean(url && url.trim().length > 0);
   const hasMedia = Boolean(
@@ -817,23 +878,27 @@ const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolea
 
   return (
     <div
-      className="w-full h-full bg-white overflow-hidden flex"
+      className="w-full h-full overflow-hidden flex"
       style={{
+        background: isDark ? '#0d0c15' : '#ffffff',
         borderRadius: isMobile ? 18 : 22,
-        boxShadow: `0 16px 48px rgba(0,0,0,0.07), 0 2px 8px rgba(0,0,0,0.04), 0 0 1px ${accent}33`,
+        border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.04)',
+        boxShadow: isDark
+          ? `0 24px 60px rgba(0,0,0,0.7), 0 0 1px ${accent}40`
+          : `0 16px 48px rgba(0,0,0,0.07), 0 2px 8px rgba(0,0,0,0.04), 0 0 1px ${accent}33`,
         flexDirection: isMobile ? 'column' : 'row',
       }}
     >
       {!hasMedia ? (
-        <ArchitectureBlueprint project={project} accent={accent} isMobile={isMobile} />
+        <ArchitectureBlueprint project={project} accent={accent} isMobile={isMobile} isDark={isDark} />
       ) : isMobile ? (
         /* Mobile Vertical Layout: Media on top, content below */
         <>
-          <div className="h-[190px] flex-shrink-0 p-2.5 bg-[#12111d]">
-            <ImageShowcase key={project.id} project={project} accent={accent} isMobile={isMobile} />
+          <div className={`h-[190px] flex-shrink-0 p-2.5 ${isDark ? 'bg-[#090812]' : 'bg-[#12111d]'}`}>
+            <ImageShowcase key={project.id} project={project} accent={accent} isMobile={isMobile} isDark={isDark} />
           </div>
           <div className="flex-1 min-h-0 p-4 sm:p-5 overflow-y-auto">
-            <CardBody project={project} accent={accent} isMobile={isMobile} />
+            <CardBody project={project} accent={accent} isMobile={isMobile} isDark={isDark} />
           </div>
         </>
       ) : (
@@ -844,20 +909,24 @@ const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolea
             className="flex-1 min-w-0 p-7 sm:p-8 flex flex-col justify-between overflow-y-auto"
             style={{
               scrollbarWidth: 'thin',
-              scrollbarColor: '#cbd5e1 transparent',
+              scrollbarColor: isDark ? '#334155 transparent' : '#cbd5e1 transparent',
             }}
           >
-            <CardBody project={project} accent={accent} isMobile={isMobile} />
+            <CardBody project={project} accent={accent} isMobile={isMobile} isDark={isDark} />
           </div>
 
           {/* Right Column: Visual Media Showcase with Gallery Strip */}
           <div
-            className="w-[45%] max-w-[490px] min-w-[340px] flex-shrink-0 p-4 sm:p-5 flex flex-col justify-between border-l border-slate-100"
+            className={`w-[45%] max-w-[490px] min-w-[340px] flex-shrink-0 p-4 sm:p-5 flex flex-col justify-between border-l ${
+              isDark ? 'border-white/10' : 'border-slate-100'
+            }`}
             style={{
-              background: 'linear-gradient(175deg, #fbfaff 0%, #f3f1fb 100%)',
+              background: isDark
+                ? 'linear-gradient(175deg, #090812 0%, #110f1e 100%)'
+                : 'linear-gradient(175deg, #fbfaff 0%, #f3f1fb 100%)',
             }}
           >
-            <ImageShowcase key={project.id} project={project} accent={accent} isMobile={isMobile} />
+            <ImageShowcase key={project.id} project={project} accent={accent} isMobile={isMobile} isDark={isDark} />
           </div>
         </>
       )}
@@ -871,18 +940,19 @@ const BackgroundCard: React.FC<{
   accent: string;
   isHovered: boolean;
   isMobile: boolean;
-}> = ({ project, accent, isHovered, isMobile }) => {
+  isDark: boolean;
+}> = ({ project, accent, isHovered, isMobile, isDark }) => {
   return (
     <div
       style={{
         width: '100%',
         height: '100%',
-        background: '#ffffff',
+        background: isDark ? '#0d0c15' : '#ffffff',
         borderRadius: isMobile ? 18 : 22,
-        border: `2px solid ${accent}${isHovered ? '99' : '60'}`,
+        border: `2px solid ${accent}${isHovered ? '99' : isDark ? '40' : '60'}`,
         boxShadow: isHovered
-          ? `0 20px 48px rgba(0,0,0,0.18), 0 0 32px ${accent}45`
-          : `0 12px 34px rgba(0,0,0,0.11), ${isMobile ? '0 8px 20px' : '4px 0 16px'} rgba(0,0,0,0.06)`,
+          ? `0 20px 48px rgba(0,0,0,${isDark ? '0.7' : '0.18'}), 0 0 32px ${accent}45`
+          : `0 12px 34px rgba(0,0,0,${isDark ? '0.5' : '0.11'}), ${isMobile ? '0 8px 20px' : '4px 0 16px'} rgba(0,0,0,${isDark ? '0.3' : '0.06'})`,
         overflow: 'hidden',
         position: 'relative',
         transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
@@ -898,14 +968,14 @@ const BackgroundCard: React.FC<{
                 right: 0,
                 bottom: 0,
                 height: 42,
-                background: `linear-gradient(to top, ${accent}18, transparent)`,
+                background: `linear-gradient(to top, ${accent}22, transparent)`,
               }
             : {
                 right: 0,
                 top: 0,
                 bottom: 0,
                 width: 64,
-                background: `linear-gradient(to left, ${accent}18, transparent)`,
+                background: `linear-gradient(to left, ${accent}22, transparent)`,
               }),
           pointerEvents: 'none',
         }}
@@ -951,7 +1021,7 @@ const BackgroundCard: React.FC<{
                 gap: 6,
               }
             : {
-                right: 16,
+                right: 14,
                 top: '50%',
                 transform: 'translateY(-50%)',
                 display: 'flex',
@@ -963,11 +1033,11 @@ const BackgroundCard: React.FC<{
       >
         <div
           style={{
-            width: isMobile ? 22 : 34,
-            height: isMobile ? 22 : 34,
+            width: isMobile ? 22 : 32,
+            height: isMobile ? 22 : 32,
             borderRadius: 999,
-            background: '#ffffff',
-            boxShadow: `0 2px 10px rgba(0,0,0,0.12), 0 0 8px ${accent}40`,
+            background: isDark ? '#151424' : '#ffffff',
+            boxShadow: `0 2px 10px rgba(0,0,0,${isDark ? '0.5' : '0.12'}), 0 0 8px ${accent}40`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -982,7 +1052,7 @@ const BackgroundCard: React.FC<{
             style={{
               fontSize: '0.64rem',
               fontFamily: 'Archivo Black, sans-serif',
-              color: '#334155',
+              color: isDark ? '#cbd5e1' : '#334155',
               letterSpacing: '0.02em',
               whiteSpace: 'nowrap',
             }}
@@ -1002,9 +1072,10 @@ interface ProjectDeckProps {
   accent: string;
   onSelect: (index: number) => void;
   isMobile: boolean;
+  isDark: boolean;
 }
 
-const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, onSelect, isMobile }) => {
+const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, onSelect, isMobile, isDark }) => {
   const n = projects.length;
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
@@ -1051,12 +1122,16 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
     }
   };
 
-  // Dynamically calibrated step offset to maximize active card viewport space
-  const stepX = isMobile ? 0 : n > 5 ? 44 : 52;
-  const rightReserve = isMobile ? 0 : (n - 1) * stepX + 16;
+  // Only show up to the upcoming 3 cards; cap the space so the active card has maximum width
+  const MAX_PEEK = isMobile ? 2 : 3;
+  const visiblePeekCount = Math.min(n - 1, MAX_PEEK);
 
-  const stepY = 22;
-  const bottomReserve = isMobile ? (n - 1) * stepY + 10 : 0;
+  const stepX = isMobile ? 0 : 28;
+  const maxRightReserve = 96;
+  const rightReserve = isMobile ? 0 : Math.min(visiblePeekCount * stepX + 12, maxRightReserve);
+
+  const stepY = 14;
+  const bottomReserve = isMobile ? visiblePeekCount * stepY + 6 : 0;
 
   return (
     <div
@@ -1072,42 +1147,58 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
         // Circular depth order: depth 0 is active; depth 1, 2, ... are stacked
         const depth = (i - activeIdx + n) % n;
         const isActive = depth === 0;
+        const isVisiblePeek = depth <= MAX_PEEK;
         const isHovered = hoveredIdx === i;
 
+        // If card is beyond MAX_PEEK, it takes 0 width, doesn't show up, and cannot be clicked
+        if (!isActive && !isVisiblePeek) {
+          return (
+            <div
+              key={p.id}
+              style={{
+                display: 'none',
+                pointerEvents: 'none',
+              }}
+              aria-hidden="true"
+            />
+          );
+        }
+
         // Positioning:
-        // Desktop: horizontally staggered to the right
+        // Desktop: horizontally staggered to the right within the capped rightReserve
         // Mobile: vertically staggered to the bottom
         const left = isMobile
           ? 0
           : isActive
             ? 0
-            : depth * stepX + (isHovered ? 8 : 0);
+            : depth * stepX + (isHovered ? 4 : 0);
 
         const right = isMobile
           ? 0
           : isActive
             ? rightReserve
-            : Math.max(0, rightReserve - depth * stepX - (isHovered ? 8 : 0));
+            : Math.max(0, rightReserve - depth * stepX - (isHovered ? 4 : 0));
 
         const top = isMobile
           ? isActive
             ? 0
-            : depth * stepY + (isHovered ? 4 : 0)
+            : depth * stepY + (isHovered ? 3 : 0)
           : 0;
 
         const bottom = isMobile
           ? isActive
             ? bottomReserve
-            : Math.max(0, bottomReserve - depth * stepY - (isHovered ? 4 : 0))
+            : Math.max(0, bottomReserve - depth * stepY - (isHovered ? 3 : 0))
           : 0;
 
-        // Refined optical depth blur and scale
+        // Optical depth blur and scale
         const scale = isMobile
-          ? (isActive ? 1 : Math.max(0.92, 1 - depth * 0.035))
-          : (isActive ? 1 : Math.max(0.90, 1 - depth * 0.04));
+          ? (isActive ? 1 : Math.max(0.93, 1 - depth * 0.035))
+          : (isActive ? 1 : Math.max(0.91, 1 - depth * 0.03));
         const transformOrigin = isMobile ? 'center bottom' : 'right center';
-        const blurPx = isActive ? 0 : isHovered ? 0 : depth === 1 ? 1 : 2.5;
+        const blurPx = isActive ? 0 : isHovered ? 0 : depth === 1 ? 0.6 : depth === 2 ? 1.6 : 3;
         const zIndex = isActive ? 20 : 20 - depth;
+        const opacity = isActive ? 1 : Math.max(0.65, 1 - depth * 0.12);
 
         return (
           <div
@@ -1126,20 +1217,21 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
               top,
               bottom,
               zIndex,
+              opacity,
               transform: `scale(${scale})`,
               transformOrigin,
               filter: `blur(${blurPx}px)`,
               transition:
-                'left 0.42s cubic-bezier(0.25, 1, 0.5, 1), right 0.42s cubic-bezier(0.25, 1, 0.5, 1), top 0.42s cubic-bezier(0.25, 1, 0.5, 1), bottom 0.42s cubic-bezier(0.25, 1, 0.5, 1), transform 0.42s cubic-bezier(0.25, 1, 0.5, 1), filter 0.3s ease',
+                'left 0.38s cubic-bezier(0.25, 1, 0.5, 1), right 0.38s cubic-bezier(0.25, 1, 0.5, 1), top 0.38s cubic-bezier(0.25, 1, 0.5, 1), bottom 0.38s cubic-bezier(0.25, 1, 0.5, 1), transform 0.38s cubic-bezier(0.25, 1, 0.5, 1), filter 0.3s ease, opacity 0.3s ease',
               cursor: isActive ? 'default' : 'pointer',
               pointerEvents: 'auto',
             }}
             title={!isActive ? `Click to view ${p.label}` : undefined}
           >
             {isActive ? (
-              <ProjectCard project={p} accent={accent} isMobile={isMobile} />
+              <ProjectCard project={p} accent={accent} isMobile={isMobile} isDark={isDark} />
             ) : (
-              <BackgroundCard project={p} accent={accent} isHovered={isHovered} isMobile={isMobile} />
+              <BackgroundCard project={p} accent={accent} isHovered={isHovered} isMobile={isMobile} isDark={isDark} />
             )}
           </div>
         );
@@ -1149,18 +1241,23 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
       {n > 1 && (
         <div
           className={`absolute ${
-            isMobile ? 'right-2 top-2' : 'right-4 bottom-3'
-          } z-30 flex items-center gap-2 pointer-events-auto`}
+            isMobile ? 'right-2 top-2' : 'right-3 bottom-3'
+          } z-30 flex items-center gap-2 pointer-events-auto border`}
           style={{
-            background: '#ffffff',
-            boxShadow: '0 4px 18px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)',
+            background: isDark ? '#141322' : '#ffffff',
+            borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)',
+            boxShadow: isDark
+              ? '0 4px 20px rgba(0, 0, 0, 0.5)'
+              : '0 4px 18px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)',
             borderRadius: 999,
             padding: isMobile ? '3px 8px' : '4px 10px',
           }}
         >
           <button
             onClick={() => onSelect((activeIdx - 1 + n) % n)}
-            className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full hover:bg-black/5 text-zinc-700 transition-colors cursor-pointer"
+            className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full transition-colors cursor-pointer ${
+              isDark ? 'text-zinc-300 hover:bg-white/10' : 'text-zinc-700 hover:bg-black/5'
+            }`}
             title="Previous project (Arrow Left)"
             aria-label="Previous project"
           >
@@ -1170,7 +1267,7 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
             style={{
               fontSize: isMobile ? '0.68rem' : '0.72rem',
               fontFamily: 'Archivo Black, sans-serif',
-              color: '#343147',
+              color: isDark ? '#e2e8f0' : '#343147',
               letterSpacing: '0.04em',
             }}
           >
@@ -1178,7 +1275,9 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
           </span>
           <button
             onClick={() => onSelect((activeIdx + 1) % n)}
-            className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full hover:bg-black/5 text-zinc-700 transition-colors cursor-pointer"
+            className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full transition-colors cursor-pointer ${
+              isDark ? 'text-zinc-300 hover:bg-white/10' : 'text-zinc-700 hover:bg-black/5'
+            }`}
             title="Next project (Arrow Right)"
             aria-label="Next project"
           >
@@ -1199,6 +1298,7 @@ interface ProjectSectionProps {
 export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSectionActive = false }) => {
   const [activeIdx, setActiveIdx] = useState(0);
   const { isMobile } = useScreenSize();
+  const isDark = section.key === '3d';
 
   // Keyboard navigation for switching projects horizontally when this section is active
   useEffect(() => {
@@ -1231,8 +1331,8 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
     <div
       className="w-full h-full relative flex flex-col justify-center"
       style={{
-        padding: isMobile ? '16px 14px 60px' : '36px 7vw 24px',
-        maxWidth: 1440,
+        padding: isMobile ? '16px 14px 60px' : '36px 6vw 24px',
+        maxWidth: 1480,
         margin: '0 auto',
       }}
     >
@@ -1246,7 +1346,7 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
           background: `radial-gradient(circle, ${section.accent} 0%, transparent 68%)`,
           top: -150,
           right: -100,
-          opacity: 0.08,
+          opacity: isDark ? 0.14 : 0.08,
           pointerEvents: 'none',
           zIndex: 0,
         }}
@@ -1265,7 +1365,7 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
         <h2
           style={{
             fontSize: 'clamp(1.5rem, 4.5vw, 2.6rem)',
-            color: '#1c1b20',
+            color: isDark ? '#f8fafc' : '#1c1b20',
             margin: isMobile ? '0 0 10px' : '0 0 14px',
             lineHeight: 1.1,
           }}
@@ -1305,13 +1405,23 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
                   padding: isActive ? (isMobile ? '0 14px 0 10px' : '0 18px 0 12px') : '0',
                   justifyContent: 'center',
                   borderRadius: 999,
-                  border: 'none',
-                  background: '#ffffff',
+                  border: isDark
+                    ? isActive
+                      ? `1px solid ${section.accent}`
+                      : '1px solid rgba(255, 255, 255, 0.08)'
+                    : 'none',
+                  background: isDark
+                    ? isActive
+                      ? '#1c1930'
+                      : '#13121f'
+                    : '#ffffff',
                   cursor: 'pointer',
                   outline: 'none',
                   boxShadow: isActive
                     ? `0 4px 18px ${section.accent}35, 0 1px 3px rgba(0,0,0,0.06)`
-                    : '0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
+                    : isDark
+                      ? '0 2px 8px rgba(0,0,0,0.4)'
+                      : '0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
                   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   flexShrink: 0,
                   whiteSpace: 'nowrap',
@@ -1357,6 +1467,7 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
           accent={section.accent}
           onSelect={handleSelect}
           isMobile={isMobile}
+          isDark={isDark}
         />
       </div>
     </div>

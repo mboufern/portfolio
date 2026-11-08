@@ -360,7 +360,7 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
     label: '3D Modeling & Animation',
     sublabel: 'Blender & Motion',
     accent: '#a78bfa',
-    bg: '#f7f4ff',
+    bg: '#08070d',
     projects: [
       {
         id: '3d-animations-reel',

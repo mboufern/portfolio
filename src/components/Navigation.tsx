@@ -10,6 +10,7 @@ interface NavigationProps {
 export const Navigation: React.FC<NavigationProps> = ({ activeSectionIdx, onNavigate }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const isDarkSection = activeSectionIdx === 4 || activeSectionIdx === 5;
   const dotRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
@@ -36,11 +37,12 @@ export const Navigation: React.FC<NavigationProps> = ({ activeSectionIdx, onNavi
       <nav
         className="fixed bottom-3 sm:bottom-auto left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:top-1/2 sm:-translate-y-1/2 sm:translate-x-0 z-50 flex flex-row sm:flex-col items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:p-2 rounded-full pointer-events-auto"
         style={{
-          background: 'rgba(255, 255, 255, 0.82)',
+          background: isDarkSection ? 'rgba(16, 14, 26, 0.85)' : 'rgba(255, 255, 255, 0.82)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.90)',
-          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.08)',
+          border: isDarkSection ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.90)',
+          boxShadow: isDarkSection ? '0 4px 24px rgba(0, 0, 0, 0.5)' : '0 4px 24px rgba(0, 0, 0, 0.08)',
+          transition: 'background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
         }}
         aria-label="Section Navigation"
       >
@@ -88,7 +90,9 @@ export const Navigation: React.FC<NavigationProps> = ({ activeSectionIdx, onNavi
                   backgroundColor:
                     isActive || isHovered
                       ? item.accent
-                      : 'rgba(120, 117, 138, 0.38)',
+                      : isDarkSection
+                        ? 'rgba(160, 155, 185, 0.45)'
+                        : 'rgba(120, 117, 138, 0.38)',
                   boxShadow:
                     isActive || isHovered
                       ? '0 2px 6px rgba(0, 0, 0, 0.16)'
