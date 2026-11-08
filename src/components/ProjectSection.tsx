@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import type { Project, ProjectSection as IProjectSection } from '../data/portfolioData';
 import { TechIcon } from './TechIcon';
 import {
@@ -52,18 +53,11 @@ const getProjectIcon = (iconName: string, className = 'w-5 h-5 flex-shrink-0') =
   }
 };
 
-/* ── High-Fidelity Interactive Project Viewport ───────────────────── */
+/* ── High-Fidelity Clean Project Visual Fallback ───────────────────── */
 const ProjectVisualFallback: React.FC<{ project: Project; accent: string }> = ({ project, accent }) => {
-  const [viewMode, setViewMode] = useState<'wireframe' | 'shaded' | 'inspect'>('shaded');
-  const is3D = project.id.includes('3d');
-  const isGame = project.id.includes('game') || project.id.includes('party');
-  const isEnv = project.id.includes('env');
-  const isChar = project.id.includes('char');
-  const isSpring = project.id.includes('spring') || project.id.includes('api');
-
   return (
     <div
-      className="relative w-full h-full overflow-hidden flex flex-col justify-between p-3.5 sm:p-5"
+      className="relative w-full h-full overflow-hidden flex flex-col justify-between p-4 sm:p-5 select-none"
       style={{
         background: 'linear-gradient(145deg, #12111d 0%, #1a1829 100%)',
         borderRadius: 14,
@@ -71,292 +65,85 @@ const ProjectVisualFallback: React.FC<{ project: Project; accent: string }> = ({
         border: '1px solid rgba(255, 255, 255, 0.08)',
       }}
     >
-      {/* Ambient background glow */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-20%',
-          right: '-20%',
-          width: '75%',
-          height: '75%',
-          background: `radial-gradient(circle, ${accent}22 0%, transparent 70%)`,
-          filter: 'blur(30px)',
-          pointerEvents: 'none',
-        }}
-      />
+      <div className="flex items-center justify-between pb-2 border-b border-white/10 text-[11px] font-mono text-zinc-400">
+        <span className="flex items-center gap-1.5 font-bold tracking-wider uppercase text-zinc-300">
+          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: accent }} />
+          {project.category || 'Architecture'}
+        </span>
+        <span className="text-[10px] text-zinc-500 font-mono">{project.year}</span>
+      </div>
 
-      {/* Top Viewport Header */}
-      <div className="flex items-center justify-between relative z-10 pb-2 border-b border-white/10">
-        <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-          <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-          <span className="ml-2 text-[10px] font-mono uppercase tracking-wider text-zinc-400">
-            {is3D ? 'Blender Viewport 4.2' : isGame ? 'Unity 6 Engine Preview' : 'Systems Architecture View'}
-          </span>
+      <div className="flex flex-col items-center justify-center py-4 text-center">
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center mb-2.5"
+          style={{
+            background: `${accent}15`,
+            border: `1px solid ${accent}40`,
+          }}
+        >
+          {getProjectIcon(project.icon, 'w-6 h-6')}
         </div>
-
-        {/* Interactive Mode Pills */}
-        <div className="flex items-center gap-1 bg-black/40 p-0.5 rounded-lg border border-white/10">
-          <button
-            type="button"
-            onClick={() => setViewMode('shaded')}
-            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
-              viewMode === 'shaded' ? 'bg-white/20 text-white font-bold' : 'text-zinc-400 hover:text-zinc-200'
-            }`}
-          >
-            {is3D ? 'Shaded' : 'Overview'}
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode('wireframe')}
-            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
-              viewMode === 'wireframe' ? 'bg-white/20 text-white font-bold' : 'text-zinc-400 hover:text-zinc-200'
-            }`}
-          >
-            {is3D ? 'Wireframe' : 'Topology'}
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode('inspect')}
-            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
-              viewMode === 'inspect' ? 'bg-white/20 text-white font-bold' : 'text-zinc-400 hover:text-zinc-200'
-            }`}
-          >
-            Telemetry
-          </button>
+        <div className="text-sm font-bold text-white font-mono tracking-wide">{project.label}</div>
+        <div className="text-xs text-zinc-400 mt-1 max-w-[220px] line-clamp-2">
+          {project.technologies.slice(0, 3).join(' · ')}
         </div>
       </div>
 
-      {/* Interactive Center Stage */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center py-2 min-h-0">
-        {is3D && isEnv && (
-          <div className="w-full h-full flex flex-col items-center justify-center">
-            {viewMode === 'wireframe' ? (
-              <svg viewBox="0 0 320 160" className="w-full h-32 text-indigo-400 stroke-current fill-none">
-                <path d="M 40 120 L 160 40 L 280 120 Z" strokeWidth="1.2" strokeOpacity="0.8" />
-                <path d="M 40 120 L 160 140 L 280 120" strokeWidth="1.2" strokeOpacity="0.8" />
-                <path d="M 160 40 L 160 140" strokeWidth="1.2" strokeOpacity="0.8" />
-                <path d="M 100 80 L 220 80" strokeWidth="0.8" strokeDasharray="3 3" strokeOpacity="0.6" />
-                <path d="M 70 100 L 160 70 L 250 100" strokeWidth="0.8" strokeOpacity="0.7" />
-                <circle cx="160" cy="40" r="3" fill="#a78bfa" />
-                <circle cx="40" cy="120" r="3" fill="#a78bfa" />
-                <circle cx="280" cy="120" r="3" fill="#a78bfa" />
-                <circle cx="160" cy="140" r="3" fill="#a78bfa" />
-              </svg>
-            ) : viewMode === 'inspect' ? (
-              <div className="w-full bg-black/50 rounded-lg p-2.5 font-mono text-[11px] text-zinc-300 space-y-1">
-                <div className="flex justify-between border-b border-white/5 pb-1">
-                  <span className="text-zinc-400">Mesh Triangles:</span>
-                  <span className="text-purple-300 font-bold">14,820 tris</span>
-                </div>
-                <div className="flex justify-between border-b border-white/5 pb-1">
-                  <span className="text-zinc-400">Material Passes:</span>
-                  <span className="text-emerald-400 font-bold">Albedo · Normal · Roughness · AO</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-400">Target Pipeline:</span>
-                  <span className="text-cyan-300 font-bold">Universal RP (Unity 6 / Mobile Ready)</span>
-                </div>
-              </div>
-            ) : (
-              <div className="relative w-full h-32 flex items-center justify-center">
-                <div
-                  className="w-24 h-24 rounded-2xl flex items-center justify-center shadow-2xl transition-transform duration-500 hover:rotate-6"
-                  style={{
-                    background: 'linear-gradient(135deg, #a78bfa30, #6366f120)',
-                    border: '1.5px solid #a78bfa80',
-                    boxShadow: '0 0 30px rgba(167, 139, 250, 0.25)',
-                  }}
-                >
-                  <TbTrees className="w-12 h-12 text-[#a78bfa]" />
-                </div>
-                <div className="absolute bottom-1 px-2.5 py-0.5 rounded-full bg-black/60 text-[10px] font-mono text-zinc-300 border border-white/10">
-                  Modular PBR Environment Assets
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {is3D && isChar && (
-          <div className="w-full h-full flex flex-col items-center justify-center">
-            {viewMode === 'wireframe' ? (
-              <svg viewBox="0 0 240 160" className="w-full h-32 text-indigo-300 stroke-current fill-none">
-                <circle cx="120" cy="35" r="18" strokeWidth="1.2" strokeOpacity="0.85" />
-                <path d="M 120 53 L 120 105" strokeWidth="1.5" strokeOpacity="0.9" />
-                <path d="M 85 70 L 120 60 L 155 70" strokeWidth="1.2" strokeOpacity="0.85" />
-                <path d="M 70 100 L 85 70" strokeWidth="1.2" strokeOpacity="0.8" />
-                <path d="M 170 100 L 155 70" strokeWidth="1.2" strokeOpacity="0.8" />
-                <path d="M 120 105 L 95 150" strokeWidth="1.2" strokeOpacity="0.85" />
-                <path d="M 120 105 L 145 150" strokeWidth="1.2" strokeOpacity="0.85" />
-                <circle cx="120" cy="60" r="2.5" fill="#a78bfa" />
-                <circle cx="85" cy="70" r="2.5" fill="#a78bfa" />
-                <circle cx="155" cy="70" r="2.5" fill="#a78bfa" />
-                <circle cx="120" cy="105" r="2.5" fill="#a78bfa" />
-              </svg>
-            ) : viewMode === 'inspect' ? (
-              <div className="w-full bg-black/50 rounded-lg p-2.5 font-mono text-[11px] text-zinc-300 space-y-1">
-                <div className="flex justify-between border-b border-white/5 pb-1">
-                  <span className="text-zinc-400">Skeletal Rig:</span>
-                  <span className="text-purple-300 font-bold">68 Humanoid Mecanim Bones</span>
-                </div>
-                <div className="flex justify-between border-b border-white/5 pb-1">
-                  <span className="text-zinc-400">Topology Integrity:</span>
-                  <span className="text-emerald-400 font-bold">100% Quad Loops (Zero Poles)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-400">Subsurface Scattering:</span>
-                  <span className="text-cyan-300 font-bold">4K Skin PBR Textures</span>
-                </div>
-              </div>
-            ) : (
-              <div className="relative w-full h-32 flex items-center justify-center">
-                <div
-                  className="w-24 h-24 rounded-2xl flex items-center justify-center shadow-2xl transition-transform duration-500 hover:scale-105"
-                  style={{
-                    background: 'linear-gradient(135deg, #a78bfa30, #ec489920)',
-                    border: '1.5px solid #a78bfa80',
-                    boxShadow: '0 0 30px rgba(167, 139, 250, 0.25)',
-                  }}
-                >
-                  <TbUser className="w-12 h-12 text-[#a78bfa]" />
-                </div>
-                <div className="absolute bottom-1 px-2.5 py-0.5 rounded-full bg-black/60 text-[10px] font-mono text-zinc-300 border border-white/10">
-                  Game-Ready FK/IK Rigged Mesh
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {isSpring && (
-          <div className="w-full h-full flex flex-col justify-center">
-            {viewMode === 'wireframe' ? (
-              <div className="grid grid-cols-3 gap-2 text-center font-mono text-[10px]">
-                <div className="p-2 rounded bg-black/40 border border-white/10 text-cyan-300">
-                  <div className="font-bold">API GATEWAY</div>
-                  <div className="text-[9px] text-zinc-400 mt-1">Rate Limiting · SSL</div>
-                </div>
-                <div className="p-2 rounded bg-purple-950/40 border border-purple-500/40 text-purple-300">
-                  <div className="font-bold">SPRING BOOT 3</div>
-                  <div className="text-[9px] text-zinc-400 mt-1">JWT Security · RBAC</div>
-                </div>
-                <div className="p-2 rounded bg-emerald-950/40 border border-emerald-500/40 text-emerald-300">
-                  <div className="font-bold">POSTGRESQL</div>
-                  <div className="text-[9px] text-zinc-400 mt-1">HikariCP Pool</div>
-                </div>
-              </div>
-            ) : viewMode === 'inspect' ? (
-              <div className="bg-black/50 rounded-lg p-2.5 font-mono text-[11px] text-zinc-300 space-y-1">
-                <div className="flex justify-between border-b border-white/5 pb-1">
-                  <span className="text-zinc-400">p99 Latency:</span>
-                  <span className="text-emerald-400 font-bold">14ms across endpoints</span>
-                </div>
-                <div className="flex justify-between border-b border-white/5 pb-1">
-                  <span className="text-zinc-400">Auth Mechanism:</span>
-                  <span className="text-cyan-300 font-bold">Stateless JWT + Refresh Rotation</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-400">CI/CD Automation:</span>
-                  <span className="text-purple-300 font-bold">GitHub Actions Multi-Stage Docker</span>
-                </div>
-              </div>
-            ) : (
-              <div className="w-full text-left font-mono text-[11px] sm:text-xs leading-relaxed text-zinc-300 bg-black/45 rounded-lg p-3 shadow-inner">
-                <div className="text-zinc-500">// Spring Boot Microservice Controller</div>
-                <div className="text-purple-300">
-                  <span className="text-cyan-400">@RestController</span>
-                  <br />
-                  <span className="text-cyan-400">@PreAuthorize</span>("hasRole('ARCHITECT')")
-                </div>
-                <div className="text-zinc-400 mt-1">
-                  ResponseEntity&lt;ClusterHealth&gt; <span className="text-sky-300">verifyStatus</span>() {'{'}
-                  <br />
-                  &nbsp;&nbsp;return ok(service.<span className="text-amber-300">getTelemetry</span>());
-                  <br />
-                  {'}'}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {isGame && !isEnv && !isChar && (
-          <div className="w-full h-full flex flex-col justify-center">
-            {viewMode === 'inspect' ? (
-              <div className="bg-black/50 rounded-lg p-2.5 font-mono text-[11px] text-zinc-300 space-y-1">
-                <div className="flex justify-between border-b border-white/5 pb-1">
-                  <span className="text-zinc-400">Tick Rate:</span>
-                  <span className="text-emerald-400 font-bold">60Hz FixedUpdate</span>
-                </div>
-                <div className="flex justify-between border-b border-white/5 pb-1">
-                  <span className="text-zinc-400">Input Buffer:</span>
-                  <span className="text-cyan-300 font-bold">4-Frame Lenient Queue</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-400">FSM Combat Architecture:</span>
-                  <span className="text-pink-300 font-bold">Hierarchical State Machine</span>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-2 text-center">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center p-3"
-                  style={{
-                    background: `linear-gradient(135deg, ${accent}30, ${accent}10)`,
-                    border: `1px solid ${accent}80`,
-                    boxShadow: `0 0 24px ${accent}35`,
-                  }}
-                >
-                  <TbDeviceGamepad2 className="w-8 h-8" style={{ color: accent }} />
-                </div>
-                <span className="text-xs text-zinc-200 font-mono tracking-wider font-semibold">
-                  CHRONO RIFT COMBAT CONTROLLER
-                </span>
-                <span className="text-[10px] text-zinc-400 font-mono">
-                  Unity 6 · Custom HLSL Shaders · Procedural Arenas
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {!is3D && !isSpring && !isGame && (
-          <div className="w-full bg-black/45 rounded-lg p-3 font-mono text-[11px] text-zinc-300">
-            <div className="text-zinc-500">// {project.label} Telemetry & Architecture</div>
-            <div className="text-cyan-300 mt-1">Platform: {project.technologies.slice(0, 4).join(' · ')}</div>
-            <div className="text-emerald-300 mt-1">Status: {project.status} ({project.year})</div>
-          </div>
-        )}
-      </div>
-
-      {/* Bottom Info Bar */}
-      <div className="flex items-center justify-between text-[10px] text-zinc-400 relative z-10 font-mono pt-2 border-t border-white/10">
-        <span className="truncate">Active Stack: {project.technologies.slice(0, 3).join(' · ')}</span>
-        <span className="text-emerald-400 flex items-center gap-1.5 flex-shrink-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-          Hardware Accelerated
+      <div className="flex items-center justify-between text-[10px] text-zinc-400 font-mono pt-2 border-t border-white/10">
+        <span className="truncate">Status: <span style={{ color: project.statusColor }}>{project.status}</span></span>
+        <span className="text-emerald-400 flex items-center gap-1 flex-shrink-0">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Ready
         </span>
       </div>
     </div>
   );
 };
 
-/* ── Performant Image Showcase & Lightbox ───────────────────────────── */
+/* ── Performant Image, Video & Lottie Showcase with Lightbox ────────── */
 interface ImageShowcaseProps {
   project: Project;
   accent: string;
 }
 
+interface MediaItem {
+  type: 'video' | 'lottie' | 'image';
+  src: string;
+}
+
+const isVideoUrl = (url: string) => /\.(mp4|webm|mov|mkv)(\?.*)?$/i.test(url);
+const isLottieUrl = (url: string) => /\.lottie(\?.*)?$/i.test(url);
+
 const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
-  const images = project.images;
-  const n = images.length;
+  const mediaItems: MediaItem[] = [];
+
+  if (project.video) {
+    mediaItems.push({ type: 'video', src: project.video });
+  }
+  if (project.lottie) {
+    mediaItems.push({ type: 'lottie', src: project.lottie });
+  }
+  if (project.images && project.images.length > 0) {
+    for (const img of project.images) {
+      if (isVideoUrl(img)) {
+        if (!mediaItems.some((m) => m.src === img)) {
+          mediaItems.push({ type: 'video', src: img });
+        }
+      } else if (isLottieUrl(img)) {
+        if (!mediaItems.some((m) => m.src === img)) {
+          mediaItems.push({ type: 'lottie', src: img });
+        }
+      } else {
+        mediaItems.push({ type: 'image', src: img });
+      }
+    }
+  }
+
+  const n = mediaItems.length;
   const [idx, setIdx] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  // Handle keyboard events when lightbox is open
   useEffect(() => {
     if (!isLightboxOpen) return;
 
@@ -378,7 +165,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
     return <ProjectVisualFallback project={project} accent={accent} />;
   }
 
-  const currentSrc = images[idx];
+  const currentItem = mediaItems[idx];
 
   return (
     <>
@@ -390,8 +177,8 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
           boxShadow: '0 4px 20px rgba(0,0,0,0.08), inset 0 0 15px rgba(0,0,0,0.1)',
         }}
       >
-        {/* Shimmer skeleton before image loads */}
-        {!isLoaded && (
+        {/* Shimmer skeleton before image loads (only for images) */}
+        {currentItem.type === 'image' && !isLoaded && (
           <div
             className="absolute inset-0 animate-pulse"
             style={{
@@ -400,41 +187,72 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
           />
         )}
 
-        {/* High performance image with async decoding and layout containment */}
-        <img
-          key={currentSrc}
-          src={currentSrc}
-          alt={`${project.label} visual preview`}
-          loading={idx === 0 ? 'eager' : 'lazy'}
-          decoding="async"
-          onLoad={() => setIsLoaded(true)}
-          onClick={() => setIsLightboxOpen(true)}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: project.imageLayout === 'portrait' ? 'contain' : 'cover',
-            display: 'block',
-            cursor: 'zoom-in',
-            opacity: isLoaded ? 1 : 0,
-            transition: 'opacity 0.3s ease, transform 0.4s ease',
-          }}
-          className="group-hover:scale-[1.02]"
-        />
+        {/* Media rendering based on type */}
+        {currentItem.type === 'video' ? (
+          <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden rounded-[14px]">
+            <video
+              key={currentItem.src}
+              src={currentItem.src}
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls
+              className="w-full h-full object-cover"
+              style={{ borderRadius: 14 }}
+            />
+          </div>
+        ) : currentItem.type === 'lottie' ? (
+          <div
+            className="relative w-full h-full bg-zinc-950 flex items-center justify-center p-3 overflow-hidden rounded-[14px] cursor-zoom-in"
+            onClick={() => setIsLightboxOpen(true)}
+          >
+            <DotLottieReact
+              key={currentItem.src}
+              src={currentItem.src}
+              loop
+              autoplay
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
+          </div>
+        ) : (
+          <img
+            key={currentItem.src}
+            src={currentItem.src}
+            alt={`${project.label} visual preview`}
+            loading={idx === 0 ? 'eager' : 'lazy'}
+            decoding="async"
+            onLoad={() => setIsLoaded(true)}
+            onClick={() => setIsLightboxOpen(true)}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: project.imageLayout === 'portrait' ? 'contain' : 'cover',
+              display: 'block',
+              cursor: 'zoom-in',
+              opacity: isLoaded ? 1 : 0,
+              transition: 'opacity 0.3s ease, transform 0.4s ease',
+            }}
+            className="group-hover:scale-[1.02]"
+          />
+        )}
 
         {/* Expand / Lightbox Zoom Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsLightboxOpen(true);
-          }}
-          className="absolute top-2.5 right-2.5 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white/90 bg-black/55 hover:bg-black/80 backdrop-blur-md transition-all opacity-85 hover:opacity-100 hover:scale-105 shadow-md"
-          title="Click to expand (Lightbox)"
-          aria-label="Expand image"
-        >
-          <TbMaximize className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        </button>
+        {currentItem.type !== 'video' && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsLightboxOpen(true);
+            }}
+            className="absolute top-2.5 right-2.5 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white/90 bg-black/55 hover:bg-black/80 backdrop-blur-md transition-all opacity-85 hover:opacity-100 hover:scale-105 shadow-md"
+            title="Click to expand (Lightbox)"
+            aria-label="Expand image"
+          >
+            <TbMaximize className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </button>
+        )}
 
-        {/* Multi-image carousel controls */}
+        {/* Multi-media carousel controls */}
         {n > 1 && (
           <>
             <button
@@ -444,7 +262,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
                 setIdx((i) => (i - 1 + n) % n);
               }}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-zinc-900 bg-white/90 hover:bg-white backdrop-blur-md shadow-lg transition-all hover:scale-110 active:scale-95"
-              aria-label="Previous image"
+              aria-label="Previous media"
             >
               <TbChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
@@ -455,14 +273,14 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
                 setIdx((i) => (i + 1) % n);
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-zinc-900 bg-white/90 hover:bg-white backdrop-blur-md shadow-lg transition-all hover:scale-110 active:scale-95"
-              aria-label="Next image"
+              aria-label="Next media"
             >
               <TbChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
 
             {/* Slide Dots */}
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md shadow-md">
-              {images.map((_, dotIdx) => (
+              {mediaItems.map((_, dotIdx) => (
                 <button
                   key={dotIdx}
                   onClick={(e) => {
@@ -478,7 +296,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
                     boxShadow: dotIdx === idx ? `0 0 6px ${accent}` : 'none',
                     transform: dotIdx === idx ? 'scale(1.25)' : 'scale(1)',
                   }}
-                  aria-label={`Jump to image ${dotIdx + 1}`}
+                  aria-label={`Jump to media ${dotIdx + 1}`}
                 />
               ))}
             </div>
@@ -522,29 +340,55 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent }) => {
             </button>
           </div>
 
-          {/* Centered Image with smooth scale */}
+          {/* Centered Media with smooth scale */}
           <div
             className="relative max-w-5xl max-h-[82vh] w-full flex items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src={currentSrc}
-              alt={`${project.label} high resolution preview`}
-              className="max-w-full max-h-[82vh] rounded-xl object-contain shadow-2xl"
-              decoding="async"
-            />
+            {currentItem.type === 'video' ? (
+              <video
+                src={currentItem.src}
+                controls
+                autoPlay
+                loop
+                playsInline
+                className="max-w-full max-h-[82vh] rounded-xl object-contain shadow-2xl"
+              />
+            ) : currentItem.type === 'lottie' ? (
+              <div className="w-[85vw] max-w-3xl h-[65vh] flex items-center justify-center bg-zinc-950/80 rounded-2xl p-6">
+                <DotLottieReact
+                  src={currentItem.src}
+                  loop
+                  autoplay
+                  style={{ width: '100%', height: '100%' }}
+                />
+              </div>
+            ) : (
+              <img
+                src={currentItem.src}
+                alt={`${project.label} high resolution preview`}
+                className="max-w-full max-h-[82vh] rounded-xl object-contain shadow-2xl"
+                decoding="async"
+              />
+            )}
 
             {n > 1 && (
               <>
                 <button
-                  onClick={() => setIdx((i) => (i - 1 + n) % n)}
+                  onClick={() => {
+                    setIsLoaded(false);
+                    setIdx((i) => (i - 1 + n) % n);
+                  }}
                   className="absolute left-1 sm:-left-12 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-lg"
                   aria-label="Previous"
                 >
                   <TbChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
                 <button
-                  onClick={() => setIdx((i) => (i + 1) % n)}
+                  onClick={() => {
+                    setIsLoaded(false);
+                    setIdx((i) => (i + 1) % n);
+                  }}
                   className="absolute right-1 sm:-right-12 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-lg"
                   aria-label="Next"
                 >
@@ -830,8 +674,12 @@ const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolea
   isMobile,
 }) => {
   const isPortrait = project.imageLayout === 'portrait';
+  const isMedia = (url?: string) => Boolean(url && url.trim().length > 0);
+  const hasMedia = Boolean(
+    (project.images && project.images.length > 0) || isMedia(project.video) || isMedia(project.lottie)
+  );
   // On mobile screens, always use vertical column to prevent squishing the layout
-  const useRowLayout = isPortrait && !isMobile;
+  const useRowLayout = isPortrait && !isMobile && hasMedia;
 
   return (
     <div
@@ -846,7 +694,20 @@ const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolea
         flexDirection: useRowLayout ? 'row' : 'column',
       }}
     >
-      {useRowLayout ? (
+      {!hasMedia ? (
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            padding: isMobile ? '20px 20px' : '32px 42px',
+            display: 'flex',
+            flexDirection: 'column',
+            overflowY: 'auto',
+          }}
+        >
+          <CardBody project={project} accent={accent} isMobile={isMobile} />
+        </div>
+      ) : useRowLayout ? (
         <>
           <div
             style={{
