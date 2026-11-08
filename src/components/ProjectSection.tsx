@@ -271,6 +271,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
               loop
               muted={isMuted}
               playsInline
+              preload="metadata"
               className={`w-full h-full ${isPortrait ? 'object-contain' : 'object-contain sm:object-cover'} transition-transform duration-500 group-hover:scale-[1.01]`}
             />
 
@@ -305,9 +306,8 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
           </div>
         ) : currentItem.type === 'lottie' ? (
           <div
-            className={`relative w-full h-full flex items-center justify-center p-4 overflow-hidden cursor-zoom-in ${
-              isMaisonBurger ? 'bg-white' : ''
-            }`}
+            className={`relative w-full h-full flex items-center justify-center p-4 overflow-hidden cursor-zoom-in ${isMaisonBurger ? 'bg-white' : ''
+              }`}
             onClick={() => setIsLightboxOpen(true)}
           >
             <DotLottieReact
@@ -342,11 +342,10 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
 
         {/* Top-Left Media Type Badge */}
         <div
-          className={`absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-mono tracking-wider uppercase border shadow-sm pointer-events-none ${
-            isMaisonBurger
+          className={`absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-mono tracking-wider uppercase border shadow-sm pointer-events-none ${isMaisonBurger
               ? 'bg-black/75 text-white backdrop-blur-md border-black/10'
               : 'bg-black/60 backdrop-blur-md text-zinc-300 border-white/10'
-          }`}
+            }`}
         >
           {currentItem.type === 'video' ? (
             <>
@@ -372,11 +371,10 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
             e.stopPropagation();
             setIsLightboxOpen(true);
           }}
-          className={`absolute top-2.5 right-2.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all opacity-90 hover:opacity-100 hover:scale-105 border shadow-md cursor-pointer ${
-            isMaisonBurger
+          className={`absolute top-2.5 right-2.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all opacity-90 hover:opacity-100 hover:scale-105 border shadow-md cursor-pointer ${isMaisonBurger
               ? 'text-zinc-800 bg-white/90 hover:bg-white border-zinc-200'
               : 'text-white/90 bg-black/60 hover:bg-black/90 backdrop-blur-md border-white/10'
-          }`}
+            }`}
           title="Click to expand (Lightbox)"
           aria-label="Expand media"
         >
@@ -430,11 +428,10 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
                     setIdx(mIdx);
                   }
                 }}
-                className={`relative flex-shrink-0 ${isMobile ? 'h-8 w-12' : 'h-9 sm:h-11 w-14 sm:w-16'} rounded-md overflow-hidden transition-all cursor-pointer border ${
-                  isSelected
+                className={`relative flex-shrink-0 ${isMobile ? 'h-8 w-12' : 'h-9 sm:h-11 w-14 sm:w-16'} rounded-md overflow-hidden transition-all cursor-pointer border ${isSelected
                     ? 'ring-2 ring-offset-1 ring-offset-zinc-950 scale-105'
                     : 'opacity-65 hover:opacity-100 hover:scale-[1.02] border-white/10'
-                }`}
+                  }`}
                 style={{
                   borderColor: isSelected ? accent : isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.12)',
                   ['--tw-ring-color' as any]: accent,
@@ -451,7 +448,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
                     <TbSparkles className="w-4 h-4" />
                   </div>
                 ) : (
-                  <img src={item.src} alt="" className="w-full h-full object-cover" />
+                  <img src={item.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 )}
 
                 {/* Selected active pip */}
@@ -520,11 +517,10 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
               />
             ) : currentItem.type === 'lottie' ? (
               <div
-                className={`w-[85vw] max-w-3xl h-[65vh] flex items-center justify-center rounded-2xl p-6 border ${
-                  isMaisonBurger
+                className={`w-[85vw] max-w-3xl h-[65vh] flex items-center justify-center rounded-2xl p-6 border ${isMaisonBurger
                     ? 'bg-white border-zinc-200 shadow-2xl'
                     : 'bg-zinc-950/80 border-white/10'
-                }`}
+                  }`}
               >
                 <DotLottieReact
                   src={currentItem.src}
@@ -581,9 +577,8 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
                     setIsLoaded(false);
                     setIdx(mIdx);
                   }}
-                  className={`w-12 h-9 sm:w-14 sm:h-10 rounded-md overflow-hidden border transition-all cursor-pointer ${
-                    mIdx === idx ? 'ring-2 ring-white scale-105' : 'opacity-50 hover:opacity-85 border-white/20'
-                  }`}
+                  className={`w-12 h-9 sm:w-14 sm:h-10 rounded-md overflow-hidden border transition-all cursor-pointer ${mIdx === idx ? 'ring-2 ring-white scale-105' : 'opacity-50 hover:opacity-85 border-white/20'
+                    }`}
                   style={{
                     ['--tw-ring-color' as any]: accent,
                     borderColor: mIdx === idx ? accent : 'rgba(255,255,255,0.2)',
@@ -599,7 +594,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({ project, accent, isMobile
                       <TbSparkles className="w-3.5 h-3.5" />
                     </div>
                   ) : (
-                    <img src={item.src} alt="" className="w-full h-full object-cover" />
+                    <img src={item.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   )}
                 </button>
               ))}
@@ -711,150 +706,142 @@ const CardBody: React.FC<{ project: Project; accent: string; isMobile: boolean; 
   const actionLinks = resolveProjectLinks(project);
 
   return (
-  <div className="flex flex-col h-full justify-between">
-    <div>
-      {/* Streamlined Header: Title + Status Icon + Category/Year */}
-      <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-2.5'} flex-wrap mb-3 sm:mb-3.5 pb-2.5 border-b ${
-        isDark ? 'border-white/10' : 'border-slate-100'
-      }`}>
-        <h3
-          className={`m-0 tracking-tight leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}
-          style={{
-            fontFamily: 'Archivo Black, sans-serif',
-            fontSize: isMobile ? 'clamp(1.15rem, 4vw, 1.4rem)' : 'clamp(1.2rem, 2.5vw, 1.6rem)',
-          }}
-        >
-          {project.label}
-        </h3>
-
-        {/* Simple Release Status Icon with Tooltip */}
-        <span
-          title={`Status: ${project.status}`}
-          className="flex items-center justify-center flex-shrink-0 cursor-help"
-        >
-          {getStatusIcon(project.status, project.statusColor)}
-        </span>
-
-        {/* Clean Category Badge & Release Year (No redundant duration or repeated roles) */}
-        <div className="flex items-center gap-2 ml-auto flex-shrink-0">
-          <span className={`text-[11.5px] font-mono flex items-center gap-1 ${isDark ? 'text-zinc-400' : 'text-slate-400'}`}>
-            <TbCalendar className="w-3.5 h-3.5" />
-            <span>{project.year}</span>
-          </span>
-          {project.category && (
-            <span
-              className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${
-                isDark
-                  ? 'bg-white/10 text-zinc-300 border-white/10'
-                  : 'bg-slate-100 text-slate-600 border-slate-200/60'
-              }`}
-            >
-              {project.category}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Narrative Description */}
-      <p
-        className={`text-[13px] sm:text-[13.5px] leading-relaxed mb-3.5 sm:mb-4.5 m-0 ${
-          isDark ? 'text-zinc-300' : 'text-slate-600'
-        }`}
-        style={{ maxWidth: '65ch' }}
-      >
-        {project.description}
-      </p>
-
-      {/* Technical Highlights with Card Rhythm */}
-      {project.highlights && project.highlights.length > 0 && (
-        <div className="mb-3.5 sm:mb-4">
-          <div className={`text-[10.5px] font-bold tracking-wider uppercase flex items-center gap-1.5 mb-2 ${
-            isDark ? 'text-zinc-400' : 'text-slate-400'
+    <div className="flex flex-col h-full justify-between">
+      <div>
+        {/* Streamlined Header: Title + Status Icon + Category/Year */}
+        <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-2.5'} flex-wrap mb-3 sm:mb-3.5 pb-2.5 border-b ${isDark ? 'border-white/10' : 'border-slate-100'
           }`}>
-            <TbCheck className="w-3.5 h-3.5" style={{ color: accent }} />
-            <span>Key Engineering Highlights</span>
-          </div>
-          <div className="grid grid-cols-1 gap-1.5">
-            {project.highlights.map((h, i) => (
-              <div
-                key={i}
-                className={`flex items-start gap-2.5 text-[12px] sm:text-[12.5px] rounded-lg px-2.5 py-1.5 transition-colors border ${
-                  isDark
-                    ? 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10 hover:border-white/15'
-                    : 'bg-slate-50/70 border-slate-100 text-slate-700 hover:bg-white hover:border-slate-200'
-                }`}
+          <h3
+            className={`m-0 tracking-tight leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}
+            style={{
+              fontFamily: 'Archivo Black, sans-serif',
+              fontSize: isMobile ? 'clamp(1.15rem, 4vw, 1.4rem)' : 'clamp(1.2rem, 2.5vw, 1.6rem)',
+            }}
+          >
+            {project.label}
+          </h3>
+
+          {/* Simple Release Status Icon with Tooltip */}
+          <span
+            title={`Status: ${project.status}`}
+            className="flex items-center justify-center flex-shrink-0 cursor-help"
+          >
+            {getStatusIcon(project.status, project.statusColor)}
+          </span>
+
+          {/* Clean Category Badge & Release Year (No redundant duration or repeated roles) */}
+          <div className="flex items-center gap-2 ml-auto flex-shrink-0">
+            <span className={`text-[11.5px] font-mono flex items-center gap-1 ${isDark ? 'text-zinc-400' : 'text-slate-400'}`}>
+              <TbCalendar className="w-3.5 h-3.5" />
+              <span>{project.year}</span>
+            </span>
+            {project.category && (
+              <span
+                className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${isDark
+                    ? 'bg-white/10 text-zinc-300 border-white/10'
+                    : 'bg-slate-100 text-slate-600 border-slate-200/60'
+                  }`}
               >
-                <span
-                  className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
-                  style={{
-                    backgroundColor: accent,
-                    boxShadow: `0 0 6px ${accent}88`,
-                  }}
-                />
-                <span className="leading-snug">{h}</span>
-              </div>
-            ))}
+                {project.category}
+              </span>
+            )}
           </div>
         </div>
-      )}
 
-      {/* Technologies Badges */}
-      <div className="flex gap-1.5 sm:gap-2 flex-wrap mb-4">
-        {project.technologies.map((t) => (
-          <span
-            key={t}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11.5px] font-medium shadow-sm transition-all border ${
-              isDark
-                ? 'bg-white/5 border-white/10 text-zinc-200 hover:border-white/20 hover:bg-white/10 hover:-translate-y-0.5'
-                : 'bg-white border-slate-200/80 text-slate-800 hover:border-slate-300 hover:shadow hover:-translate-y-0.5'
+        {/* Narrative Description */}
+        <p
+          className={`text-[13px] sm:text-[13.5px] leading-relaxed mb-3.5 sm:mb-4.5 m-0 ${isDark ? 'text-zinc-300' : 'text-slate-600'
             }`}
-          >
-            <TechIcon name={t} className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
-            <span>{t}</span>
-          </span>
-        ))}
-      </div>
-    </div>
+          style={{ maxWidth: '65ch' }}
+        >
+          {project.description}
+        </p>
 
-    {/* Action CTA Links - Inviting, prominent & bold */}
-    {actionLinks.length > 0 && (
-      <div
-        className={`flex items-center gap-2.5 sm:gap-3 pt-3 border-t flex-wrap mt-auto ${
-          isDark ? 'border-white/10' : 'border-slate-100'
-        }`}
-      >
-        {actionLinks.map((link, lIdx) => {
-          const isPrimary = link.primary ?? lIdx === 0;
-          return (
-            <a
-              key={link.url + lIdx}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={
-                isPrimary
-                  ? {
+        {/* Technical Highlights with Card Rhythm */}
+        {project.highlights && project.highlights.length > 0 && (
+          <div className="mb-3.5 sm:mb-4">
+            <div className={`text-[10.5px] font-bold tracking-wider uppercase flex items-center gap-1.5 mb-2 ${isDark ? 'text-zinc-400' : 'text-slate-400'
+              }`}>
+              <TbCheck className="w-3.5 h-3.5" style={{ color: accent }} />
+              <span>Key Engineering Highlights</span>
+            </div>
+            <div className="grid grid-cols-1 gap-1.5">
+              {project.highlights.map((h, i) => (
+                <div
+                  key={i}
+                  className={`flex items-start gap-2.5 text-[12px] sm:text-[12.5px] rounded-lg px-2.5 py-1.5 transition-colors border ${isDark
+                      ? 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10 hover:border-white/15'
+                      : 'bg-slate-50/70 border-slate-100 text-slate-700 hover:bg-white hover:border-slate-200'
+                    }`}
+                >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
+                    style={{
+                      backgroundColor: accent,
+                      boxShadow: `0 0 6px ${accent}88`,
+                    }}
+                  />
+                  <span className="leading-snug">{h}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Technologies Badges */}
+        <div className="flex gap-1.5 sm:gap-2 flex-wrap mb-4">
+          {project.technologies.map((t) => (
+            <span
+              key={t}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11.5px] font-medium shadow-sm transition-all border ${isDark
+                  ? 'bg-white/5 border-white/10 text-zinc-200 hover:border-white/20 hover:bg-white/10 hover:-translate-y-0.5'
+                  : 'bg-white border-slate-200/80 text-slate-800 hover:border-slate-300 hover:shadow hover:-translate-y-0.5'
+                }`}
+            >
+              <TechIcon name={t} className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accent }} />
+              <span>{t}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Action CTA Links - Inviting, prominent & bold */}
+      {actionLinks.length > 0 && (
+        <div
+          className={`flex items-center gap-2.5 sm:gap-3 pt-3 border-t flex-wrap mt-auto ${isDark ? 'border-white/10' : 'border-slate-100'
+            }`}
+        >
+          {actionLinks.map((link, lIdx) => {
+            const isPrimary = link.primary ?? lIdx === 0;
+            return (
+              <a
+                key={link.url + lIdx}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={
+                  isPrimary
+                    ? {
                       backgroundColor: accent,
                       boxShadow: `0 6px 20px ${accent}55`,
                     }
-                  : undefined
-              }
-              className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-[12.5px] sm:text-[13px] font-bold tracking-wide no-underline transition-all duration-200 cursor-pointer ${
-                isPrimary
-                  ? 'text-white hover:-translate-y-0.5 hover:shadow-xl hover:brightness-105 active:translate-y-0 active:scale-[0.98]'
-                  : isDark
-                    ? 'bg-white/10 text-white border-2 border-white/20 hover:bg-white/20 hover:border-white/35 hover:-translate-y-0.5 shadow-sm hover:shadow active:translate-y-0'
-                    : 'bg-white text-slate-900 border-2 border-slate-300 hover:border-slate-800 hover:bg-slate-50 hover:-translate-y-0.5 shadow-sm hover:shadow active:translate-y-0'
-              }`}
-            >
-              {getLinkIcon(link.icon, 'w-4 h-4 flex-shrink-0')}
-              <span>{link.label}</span>
-            </a>
-          );
-        })}
-      </div>
-    )}
-  </div>
+                    : undefined
+                }
+                className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-[12.5px] sm:text-[13px] font-bold tracking-wide no-underline transition-all duration-200 cursor-pointer ${isPrimary
+                    ? 'text-white hover:-translate-y-0.5 hover:shadow-xl hover:brightness-105 active:translate-y-0 active:scale-[0.98]'
+                    : isDark
+                      ? 'bg-white/10 text-white border-2 border-white/20 hover:bg-white/20 hover:border-white/35 hover:-translate-y-0.5 shadow-sm hover:shadow active:translate-y-0'
+                      : 'bg-white text-slate-900 border-2 border-slate-300 hover:border-slate-800 hover:bg-slate-50 hover:-translate-y-0.5 shadow-sm hover:shadow active:translate-y-0'
+                  }`}
+              >
+                {getLinkIcon(link.icon, 'w-4 h-4 flex-shrink-0')}
+                <span>{link.label}</span>
+              </a>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -982,15 +969,13 @@ const FullVideoProjectCard: React.FC<{
         }}
         onClick={() => setIsLightboxOpen(true)}
       >
-        {/* Ambient blurred glow from the video */}
-        <video
-          src={videoSrc}
-          autoPlay
-          loop
-          muted
-          playsInline
+        {/* Hardware-accelerated ambient glow backdrop (single video decode) */}
+        <div
+          className="absolute inset-0 opacity-40 blur-3xl scale-110 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at center, ${accent}45 0%, rgba(139, 92, 246, 0.22) 50%, transparent 80%)`,
+          }}
           aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-110 pointer-events-none"
         />
 
         {/* Main Full-Size Video Element */}
@@ -1001,6 +986,7 @@ const FullVideoProjectCard: React.FC<{
           loop
           muted={isMuted}
           playsInline
+          preload="metadata"
           className="relative z-10 w-full h-full object-contain"
         />
 
@@ -1152,9 +1138,8 @@ const ProjectCard: React.FC<{ project: Project; accent: string; isMobile: boolea
 
           {/* Right Column: Visual Media Showcase with Gallery Strip */}
           <div
-            className={`w-[45%] max-w-[490px] min-w-[340px] flex-shrink-0 p-4 sm:p-5 flex flex-col justify-between border-l ${
-              isDark ? 'border-white/10' : 'border-slate-100'
-            }`}
+            className={`w-[45%] max-w-[490px] min-w-[340px] flex-shrink-0 p-4 sm:p-5 flex flex-col justify-between border-l ${isDark ? 'border-white/10' : 'border-slate-100'
+              }`}
             style={{
               background: isDark
                 ? 'linear-gradient(175deg, #090812 0%, #110f1e 100%)'
@@ -1199,19 +1184,19 @@ const BackgroundCard: React.FC<{
           position: 'absolute',
           ...(isMobile
             ? {
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: 42,
-                background: `linear-gradient(to top, ${accent}22, transparent)`,
-              }
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 42,
+              background: `linear-gradient(to top, ${accent}22, transparent)`,
+            }
             : {
-                right: 0,
-                top: 0,
-                bottom: 0,
-                width: 64,
-                background: `linear-gradient(to left, ${accent}22, transparent)`,
-              }),
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: 64,
+              background: `linear-gradient(to left, ${accent}22, transparent)`,
+            }),
           pointerEvents: 'none',
         }}
       />
@@ -1222,23 +1207,23 @@ const BackgroundCard: React.FC<{
           position: 'absolute',
           ...(isMobile
             ? {
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: 6,
-                background: accent,
-                borderRadius: '0 0 18px 18px',
-                boxShadow: `0 0 16px ${accent}bb`,
-              }
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 6,
+              background: accent,
+              borderRadius: '0 0 18px 18px',
+              boxShadow: `0 0 16px ${accent}bb`,
+            }
             : {
-                right: 0,
-                top: 0,
-                bottom: 0,
-                width: 8,
-                background: accent,
-                borderRadius: '0 22px 22px 0',
-                boxShadow: `0 0 16px ${accent}bb`,
-              }),
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: 8,
+              background: accent,
+              borderRadius: '0 22px 22px 0',
+              boxShadow: `0 0 16px ${accent}bb`,
+            }),
         }}
       />
 
@@ -1248,21 +1233,21 @@ const BackgroundCard: React.FC<{
           position: 'absolute',
           ...(isMobile
             ? {
-                bottom: 9,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }
+              bottom: 9,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }
             : {
-                right: 14,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }),
+              right: 14,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }),
           pointerEvents: 'none',
         }}
       >
@@ -1475,9 +1460,8 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
       {/* Floating Deck Pagination Controls (Previous / Next & Counter) */}
       {n > 1 && (
         <div
-          className={`absolute ${
-            isMobile ? 'right-2 top-2' : 'right-3 bottom-3'
-          } z-30 flex items-center gap-2 pointer-events-auto border`}
+          className={`absolute ${isMobile ? 'right-2 top-2' : 'right-3 bottom-3'
+            } z-30 flex items-center gap-2 pointer-events-auto border`}
           style={{
             background: isDark ? '#141322' : '#ffffff',
             borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)',
@@ -1490,9 +1474,8 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
         >
           <button
             onClick={() => onSelect((activeIdx - 1 + n) % n)}
-            className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full transition-colors cursor-pointer ${
-              isDark ? 'text-zinc-300 hover:bg-white/10' : 'text-zinc-700 hover:bg-black/5'
-            }`}
+            className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full transition-colors cursor-pointer ${isDark ? 'text-zinc-300 hover:bg-white/10' : 'text-zinc-700 hover:bg-black/5'
+              }`}
             title="Previous project (Arrow Left)"
             aria-label="Previous project"
           >
@@ -1510,9 +1493,8 @@ const ProjectDeck: React.FC<ProjectDeckProps> = ({ projects, activeIdx, accent, 
           </span>
           <button
             onClick={() => onSelect((activeIdx + 1) % n)}
-            className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full transition-colors cursor-pointer ${
-              isDark ? 'text-zinc-300 hover:bg-white/10' : 'text-zinc-700 hover:bg-black/5'
-            }`}
+            className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full transition-colors cursor-pointer ${isDark ? 'text-zinc-300 hover:bg-white/10' : 'text-zinc-700 hover:bg-black/5'
+              }`}
             title="Next project (Arrow Right)"
             aria-label="Next project"
           >
@@ -1567,7 +1549,7 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section, isSecti
       className="w-full h-full relative flex flex-col justify-center"
       style={{
         padding: isMobile ? '16px 14px 60px' : '36px 6vw 24px',
-        maxWidth: 1480,
+        maxWidth: 1900,
         margin: '0 auto',
       }}
     >

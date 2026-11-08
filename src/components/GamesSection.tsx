@@ -164,7 +164,7 @@ export const GamesSection: React.FC = () => {
                           src={game.image}
                           alt={game.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          loading="lazy"
+                          loading="lazy" decoding="async"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#11101e] via-[#11101e]/30 to-transparent" />
                       </div>
@@ -211,7 +211,7 @@ export const GamesSection: React.FC = () => {
                     src={game.image}
                     alt={game.title}
                     className="w-16 h-16 rounded-xl object-cover flex-shrink-0 border border-white/10"
-                    loading="lazy"
+                    loading="lazy" decoding="async"
                   />
                   <div className="flex-1 min-w-0">
                     <h3
