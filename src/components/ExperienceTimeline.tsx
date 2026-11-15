@@ -165,7 +165,6 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
                       fontSize: 'clamp(0.68rem, 2.6vw, 0.74rem)',
                       fontWeight: 600,
                       letterSpacing: '0.04em',
-                      textTransform: 'uppercase',
                       display: 'block',
                     }}
                   >
@@ -189,7 +188,7 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 {item.isInternship ? (
                   <span
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold tracking-wide uppercase backdrop-blur-md transition-all duration-300 shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold tracking-wide backdrop-blur-md transition-all duration-300 shadow-sm"
                     style={{
                       backgroundColor: isDark
                         ? 'rgba(255, 255, 255, 0.12)'
@@ -207,7 +206,7 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
                   </span>
                 ) : (
                   <span
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold tracking-wide uppercase backdrop-blur-md transition-all duration-300 shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold tracking-wide backdrop-blur-md transition-all duration-300 shadow-sm"
                     style={{
                       backgroundColor: isDark ? 'rgba(153, 255, 102, 0.16)' : 'rgba(21, 206, 169, 0.14)',
                       color: isDark ? '#99ff66' : '#0d9488',
@@ -275,18 +274,29 @@ const BlobCard: React.FC<BlobCardProps> = ({ item, isActive }) => {
 /* ─── Timeline Metric Heights ────────────────────────────────────── */
 const ITEM_H = 92; // px per timeline entry (more spacious gap)
 
+interface ExperienceTimelineProps {
+  onActiveChange?: (index: number, item: ExperienceItem) => void;
+}
+
 /* ─── Experience Timeline Main Component ─────────────────────────── */
-export const ExperienceTimeline: React.FC = () => {
+export const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({ onActiveChange }) => {
   const [active, setActive] = useState(0);
   const activeRef = useRef(0);
-  useEffect(() => {
-    activeRef.current = active;
-  }, [active]);
-  const cardAreaRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const cooldown = useRef(false);
   const touchStartY = useRef<number | null>(null);
   const totalExperience = useMemo(() => calculateTotalExperience(EXPERIENCE_ITEMS), []);
+
+  const currentItem = EXPERIENCE_ITEMS[active] ?? EXPERIENCE_ITEMS[0];
+  const isDarkPage = Boolean(currentItem.isDarkPage);
+
+  useEffect(() => {
+    activeRef.current = active;
+    if (onActiveChange) {
+      onActiveChange(active, EXPERIENCE_ITEMS[active]);
+    }
+  }, [active, onActiveChange]);
 
   /* Auto-scroll timeline to keep active item in center */
   useEffect(() => {
@@ -296,9 +306,9 @@ export const ExperienceTimeline: React.FC = () => {
     tl.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
   }, [active]);
 
-  /* Wheel + touch gestures on the card deck */
+  /* Wheel + touch gestures across the experience view (page itself never scrolls, only timeline) */
   useEffect(() => {
-    const el = cardAreaRef.current;
+    const el = rootRef.current;
     if (!el) return;
 
     const step = (dir: 1 | -1) => {
@@ -306,19 +316,15 @@ export const ExperienceTimeline: React.FC = () => {
       cooldown.current = true;
       setTimeout(() => {
         cooldown.current = false;
-      }, 450);
+      }, 420);
       setActive((a) => Math.min(Math.max(a + dir, 0), EXPERIENCE_ITEMS.length - 1));
     };
 
     const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) < 15) return;
-      const dir = e.deltaY > 0 ? 1 : -1;
-      const current = activeRef.current;
-      if ((dir > 0 && current >= EXPERIENCE_ITEMS.length - 1) || (dir < 0 && current <= 0)) {
-        return;
-      }
-      e.stopPropagation();
+      if (Math.abs(e.deltaY) < 12) return;
       e.preventDefault();
+      e.stopPropagation();
+      const dir = e.deltaY > 0 ? 1 : -1;
       step(dir);
     };
 
@@ -330,13 +336,9 @@ export const ExperienceTimeline: React.FC = () => {
       if (touchStartY.current === null) return;
       const dy = touchStartY.current - e.touches[0].clientY;
       if (Math.abs(dy) < 26) return;
-      const dir = dy > 0 ? 1 : -1;
-      const current = activeRef.current;
-      if ((dir > 0 && current >= EXPERIENCE_ITEMS.length - 1) || (dir < 0 && current <= 0)) {
-        return;
-      }
       e.preventDefault();
       e.stopPropagation();
+      const dir = dy > 0 ? 1 : -1;
       touchStartY.current = null;
       step(dir);
     };
@@ -345,21 +347,36 @@ export const ExperienceTimeline: React.FC = () => {
       touchStartY.current = null;
     };
 
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        e.preventDefault();
+        step(1);
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
+        step(-1);
+      }
+    };
+
     el.addEventListener('wheel', onWheel, { passive: false });
     el.addEventListener('touchstart', onTouchStart, { passive: true });
     el.addEventListener('touchmove', onTouchMove, { passive: false });
     el.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('keydown', onKeyDown);
 
     return () => {
       el.removeEventListener('wheel', onWheel);
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchmove', onTouchMove);
       el.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('keydown', onKeyDown);
     };
   }, []);
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center pointer-events-auto">
+    <div
+      ref={rootRef}
+      className="w-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center pointer-events-auto"
+    >
       {/* Responsive timeline hiding style */}
       <style>{`
         @media (max-width: 768px) {
@@ -374,18 +391,21 @@ export const ExperienceTimeline: React.FC = () => {
         <p
           style={{
             fontSize: '0.82rem',
-            textTransform: 'uppercase',
-            color: '#15cea9',
+            color: isDarkPage ? (currentItem.glowColor ?? '#99ff66') : '#0d9488',
             fontFamily: '"Archivo Black", sans-serif',
             letterSpacing: '0.12em',
             marginBottom: 4,
+            transition: 'color 0.45s ease',
           }}
         >
           {totalExperience.text} of Experience
         </p>
         <h2
-          className="text-zinc-900 font-black tracking-tight relative z-30"
-          style={{ fontSize: 'clamp(1.8rem, 3.8vw, 3rem)' }}
+          className="font-black tracking-tight relative z-30 transition-colors duration-500"
+          style={{
+            fontSize: 'clamp(1.8rem, 3.8vw, 3rem)',
+            color: isDarkPage ? '#ffffff' : '#18181b',
+          }}
         >
           Work Experience
         </h2>
@@ -402,8 +422,18 @@ export const ExperienceTimeline: React.FC = () => {
               onClick={() => setActive(idx)}
               className="px-2.5 py-1 rounded-full text-[11px] font-sans font-semibold transition-all duration-300 border-none cursor-pointer"
               style={{
-                backgroundColor: isCur ? accentColor : 'rgba(255, 255, 255, 0.85)',
-                color: isCur ? '#ffffff' : '#475569',
+                backgroundColor: isCur
+                  ? accentColor
+                  : isDarkPage
+                    ? 'rgba(255, 255, 255, 0.12)'
+                    : 'rgba(255, 255, 255, 0.85)',
+                color: isCur
+                  ? item.bgColor === '#144346'
+                    ? '#0c2628'
+                    : '#ffffff'
+                  : isDarkPage
+                    ? '#e2e8f0'
+                    : '#475569',
                 boxShadow: isCur
                   ? `0 2px 10px ${accentColor}55`
                   : '0 1px 4px rgba(0,0,0,0.06)',
@@ -421,13 +451,14 @@ export const ExperienceTimeline: React.FC = () => {
           className="experience-timeline-nav flex-shrink-0 relative"
           style={{ width: 'clamp(230px, 26vw, 300px)' }}
         >
-          {/* Soft White Cloud Glow Backdrop */}
+          {/* Adaptive Glow Backdrop */}
           <div
             aria-hidden="true"
-            className="absolute -inset-16 -z-10 rounded-[60px] pointer-events-none"
+            className="absolute -inset-16 -z-10 rounded-[60px] pointer-events-none transition-all duration-500"
             style={{
-              background:
-                'radial-gradient(ellipse 90% 85% at 50% 50%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.88) 35%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0.15) 80%, rgba(255, 255, 255, 0) 100%)',
+              background: isDarkPage
+                ? 'radial-gradient(ellipse 90% 85% at 50% 50%, rgba(12, 38, 40, 0.85) 0%, rgba(12, 38, 40, 0.45) 45%, rgba(12, 38, 40, 0) 100%)'
+                : 'radial-gradient(ellipse 90% 85% at 50% 50%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.72) 45%, rgba(255, 255, 255, 0) 100%)',
               filter: 'blur(32px)',
             }}
           />
@@ -463,8 +494,9 @@ export const ExperienceTimeline: React.FC = () => {
                   top: 0,
                   bottom: 0,
                   width: 2,
-                  background:
-                    'linear-gradient(to bottom, transparent, rgba(21,206,169,0.3) 15%, rgba(21,206,169,0.3) 85%, transparent)',
+                  background: isDarkPage
+                    ? 'linear-gradient(to bottom, transparent, rgba(153,255,102,0.35) 15%, rgba(153,255,102,0.35) 85%, transparent)'
+                    : 'linear-gradient(to bottom, transparent, rgba(21,206,169,0.35) 15%, rgba(21,206,169,0.35) 85%, transparent)',
                   pointerEvents: 'none',
                 }}
               />
@@ -472,6 +504,8 @@ export const ExperienceTimeline: React.FC = () => {
               {EXPERIENCE_ITEMS.map((item, i) => {
                 const isCurrent = active === i;
                 const nodeColor = item.accent ?? '#15cea9';
+                const effectiveActiveAccent =
+                  isDarkPage && item.accent === '#6399f0' ? '#93c5fd' : nodeColor;
                 return (
                   <button
                     key={item.id}
@@ -479,14 +513,18 @@ export const ExperienceTimeline: React.FC = () => {
                     className="w-full text-left bg-transparent border-none p-0 flex items-start gap-4 outline-none cursor-pointer"
                     style={{
                       height: ITEM_H,
-                      opacity: isCurrent ? 1 : 0.4,
+                      opacity: isCurrent ? 1 : isDarkPage ? 0.52 : 0.45,
                       transition: 'opacity 0.3s ease',
                     }}
                   >
                     <motion.div
                       animate={{
                         scale: isCurrent ? 1.35 : 1,
-                        backgroundColor: isCurrent ? nodeColor : 'rgba(180, 175, 200, 0.4)',
+                        backgroundColor: isCurrent
+                          ? nodeColor
+                          : isDarkPage
+                            ? 'rgba(255, 255, 255, 0.25)'
+                            : 'rgba(180, 175, 200, 0.4)',
                         boxShadow: isCurrent ? `0 0 16px ${nodeColor}cc` : 'none',
                       }}
                       transition={{ duration: 0.3 }}
@@ -505,7 +543,13 @@ export const ExperienceTimeline: React.FC = () => {
                             margin: 0,
                             fontSize: '0.9rem',
                             lineHeight: 1.25,
-                            color: isCurrent ? '#1c1b20' : '#6b6880',
+                            color: isDarkPage
+                              ? isCurrent
+                                ? '#ffffff'
+                                : 'rgba(226, 232, 240, 0.78)'
+                              : isCurrent
+                                ? '#1c1b20'
+                                : '#6b6880',
                             fontFamily: '"Archivo Black", sans-serif',
                             transition: 'color 0.3s ease',
                           }}
@@ -513,22 +557,44 @@ export const ExperienceTimeline: React.FC = () => {
                           {item.company}
                         </span>
                         {item.isInternship ? (
-                          <span className="text-[9px] font-sans font-bold px-1.5 py-0.5 rounded bg-zinc-200/90 text-zinc-600 uppercase tracking-wider">
+                          <span
+                            className={`text-[9px] font-sans font-bold px-1.5 py-0.5 rounded tracking-wider ${
+                              isDarkPage
+                                ? 'bg-white/15 text-zinc-200'
+                                : 'bg-zinc-200/90 text-zinc-600'
+                            }`}
+                          >
                             Intern
                           </span>
                         ) : (
-                          <span className="text-[9px] font-sans font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 uppercase tracking-wider border border-emerald-300/50">
+                          <span
+                            className={`text-[9px] font-sans font-bold px-1.5 py-0.5 rounded tracking-wider border ${
+                              isDarkPage
+                                ? 'bg-emerald-400/20 text-emerald-200 border-emerald-400/40'
+                                : 'bg-emerald-100 text-emerald-700 border-emerald-300/50'
+                            }`}
+                          >
                             Lead
                           </span>
                         )}
                       </div>
                       <span
                         className="text-[11px] font-sans font-semibold tracking-wide"
-                        style={{ color: isCurrent ? nodeColor : '#8e8b9f' }}
+                        style={{
+                          color: isCurrent
+                            ? effectiveActiveAccent
+                            : isDarkPage
+                              ? 'rgba(203, 213, 225, 0.7)'
+                              : '#8e8b9f',
+                        }}
                       >
                         {item.role}
                       </span>
-                      <span className="text-[10px] text-zinc-400 font-sans">
+                      <span
+                        className={`text-[10px] font-sans ${
+                          isDarkPage ? 'text-zinc-400' : 'text-zinc-400'
+                        }`}
+                      >
                         {item.period}
                       </span>
                     </div>
@@ -541,7 +607,6 @@ export const ExperienceTimeline: React.FC = () => {
 
         {/* ── Right: 3D Layered Card Stack ── */}
         <div
-          ref={cardAreaRef}
           style={{
             flex: '1 1 380px',
             maxWidth: 620,

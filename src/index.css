@@ -10,13 +10,18 @@
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
+    min-height: 100%;
+    min-height: 100dvh;
     font-family: 'Outfit', system-ui, -apple-system, sans-serif;
     background-color: #f8f7fc;
     color: #1c1b20;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow: hidden;
+    overflow-x: clip;
+  }
+
+  #root {
+    min-height: 100dvh;
   }
 
   ::selection {
@@ -217,7 +222,6 @@
   font-size: 0.8em;
   justify-content: center;
   align-items: center;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: bold;
 }
@@ -334,4 +338,80 @@
   filter: blur(28px);
   animation: blob-drift-reverse 7s infinite ease;
 }
+
+/* ── Platform CTA Animated Glows & Shimmer ──────────────────────────── */
+@keyframes cta-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 18px var(--cta-glow, rgba(21, 206, 169, 0.45)), 0 8px 24px rgba(0, 0, 0, 0.35);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 32px var(--cta-glow, rgba(21, 206, 169, 0.78)), 0 10px 30px rgba(0, 0, 0, 0.45);
+    filter: brightness(1.08);
+  }
+}
+
+@keyframes cta-shimmer {
+  0% {
+    transform: translateX(-140%) skewX(-20deg);
+  }
+  45%, 100% {
+    transform: translateX(260%) skewX(-20deg);
+  }
+}
+
+@keyframes vinyl-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.platform-cta-btn {
+  position: relative;
+  overflow: hidden;
+  animation: cta-glow-pulse 2.8s ease-in-out infinite;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), filter 0.25s ease;
+}
+
+.platform-cta-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 100%
+  );
+  animation: cta-shimmer 4.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.platform-cta-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.12);
+}
+
+.platform-cta-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.vinyl-spin-slow {
+  animation: vinyl-spin 9s linear infinite;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 

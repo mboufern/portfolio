@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import React, { useCallback, useEffect, useState } from 'react';
+import logoSvg from '../assets/logo.svg';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { CyclingTitle } from './CyclingTitle';
-import logoSvg from '../assets/logo.svg';
 
 interface HeroSectionProps {
   onExplore?: () => void;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore }) => {
+export const HeroSection: React.FC<HeroSectionProps> = () => {
   const [activeColor, setActiveColor] = useState(PERSONAL_INFO.titleColors[0]);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false
@@ -50,7 +50,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore }) => {
     <div
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center bg-[#f8f7fc] select-none"
+      className="w-screen h-[100dvh] relative overflow-hidden flex flex-col items-center justify-center bg-[#f8f7fc] select-none"
     >
       {/* Subtle Ambient Radial Canvas Lighting synced with Active Discipline Color */}
       <div
@@ -65,7 +65,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore }) => {
       />
 
       {/* Main Content Hero Lockup */}
-      <div className="relative z-10 flex flex-col-reverse md:flex-row items-center justify-center gap-2 md:gap-10 lg:gap-18 px-6 md:px-12 w-full max-w-6xl my-auto">
+      <div className="relative z-10 flex flex-col-reverse md:flex-row items-center justify-center gap-2 md:gap-10 lg:gap-18 px-6 md:px-12 pb-24 sm:pb-0 w-full max-w-6xl my-auto">
         {/* Bio / Heading & Cycling Triad */}
         <div className="text-center md:text-left max-w-xl animate-[fade-in-up_0.6s_ease_forwards]">
           <h1
@@ -129,38 +129,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore }) => {
             />
           </motion.div>
         </div>
-      </div>
-
-      {/* Whisper-Quiet Minimalist Scroll Indicator (Affordance without Clutter) */}
-      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center">
-        <button
-          onClick={onExplore}
-          type="button"
-          className="group flex flex-col items-center gap-2 p-2 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2"
-          aria-label="Scroll to explore work"
-        >
-          <span className="text-[10px] font-medium tracking-[0.24em] uppercase text-zinc-400 group-hover:text-zinc-600 transition-colors">
-            Explore
-          </span>
-          <div className="w-[18px] h-[30px] rounded-full border border-zinc-300 group-hover:border-zinc-400 flex justify-center pt-1.5 transition-colors">
-            <motion.div
-              className="w-1 h-1.5 rounded-full bg-zinc-400 group-hover:bg-zinc-700"
-              animate={
-                prefersReducedMotion
-                  ? { opacity: 0.7 }
-                  : {
-                    y: [0, 8, 0],
-                    opacity: [0.9, 0.3, 0.9],
-                  }
-              }
-              transition={{
-                duration: 1.8,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
-          </div>
-        </button>
       </div>
     </div>
   );

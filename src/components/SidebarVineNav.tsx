@@ -19,6 +19,8 @@ interface DotPoint {
 
 interface VineGeometry {
   path: string;
+  tipX: number;
+  tipY: number;
   labelX: number;
   labelY: number;
   textAlign: 'right' | 'center';
@@ -32,25 +34,33 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
   dotRefs,
 }) => {
   const [dotPoints, setDotPoints] = useState<DotPoint[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 640 : false
+  );
+  const [windowWidth, setWindowWidth] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth : 1200
   );
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(() =>
+    typeof window !== 'undefined' ? window.innerHeight : 800
+  );
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false
+  );
 
-  // Detect reduced motion preference
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mq.matches);
     const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Update layout & dot coordinates on mount, resize, and scroll
   const updatePoints = useCallback(() => {
     const width = window.innerWidth;
+    const height = window.innerHeight;
     setWindowWidth(width);
+    setWindowHeight(height);
     setIsMobile(width < 640);
 
     if (!dotRefs.current) return;
@@ -74,102 +84,101 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
   }, [dotRefs]);
 
   useEffect(() => {
-    updatePoints();
+    // Re-measure dot positions on mount/route/resize cleanly via RAF & timers
+    const rafId = requestAnimationFrame(updatePoints);
+    const timer1 = setTimeout(updatePoints, 80);
+    const timer2 = setTimeout(updatePoints, 260);
     window.addEventListener('resize', updatePoints);
     window.addEventListener('scroll', updatePoints, true);
-    const timer1 = setTimeout(updatePoints, 60);
-    const timer2 = setTimeout(updatePoints, 200);
     return () => {
-      window.removeEventListener('resize', updatePoints);
-      window.removeEventListener('scroll', updatePoints, true);
+      cancelAnimationFrame(rafId);
       clearTimeout(timer1);
       clearTimeout(timer2);
+      window.removeEventListener('resize', updatePoints);
+      window.removeEventListener('scroll', updatePoints, true);
     };
-  }, [updatePoints]);
+  }, [updatePoints, activeSectionIdx]);
 
-  // Algorithmic Liquid Vine Curves (Cubic Bézier, Intertwining Mid-Flight, No Noisy Sub-Branches)
   const geometries = useMemo<VineGeometry[]>(() => {
     if (dotPoints.length !== NAVIGATION_ITEMS.length) return [];
 
     if (isMobile) {
-      // ── Mobile Layout: Smooth Liquid S-Curves Rising from Bottom Bar ──
-      // Moderated heights and gentle lateral sways to avoid crowding
-      const heightTiers = [52, 82, 114, 64, 110, 82, 52];
-      const waveSways = [-10, 12, -14, 10, -12, 12, -10];
-      const fanXOffsets = [-22, -12, -4, 0, 6, 14, 24];
+      // ── Mobile Layout: Long, Smooth Sweeping Veins Across Fullscreen Height ──
+      const hScale = Math.min(1.12, Math.max(0.7, windowHeight / 820));
+      const heightTiers = [86, 140, 198, 114, 190, 138, 84];
+      const waveSways = [-34, 40, -44, 36, -42, 40, -34];
+      const fanXOffsets = [-36, -24, -12, 0, 14, 26, 38];
 
       return dotPoints.map((pt, idx) => {
-        const height = heightTiers[idx];
+        const height = heightTiers[idx] * hScale;
         const sway = waveSways[idx];
         const fanX = fanXOffsets[idx];
 
         const startX = pt.x;
-        const startY = pt.y - pt.height / 2;
-
-        const endX = startX + fanX;
+        const startY = pt.y - 4;
+        const endX = Math.min(windowWidth - 46, Math.max(46, startX + fanX));
         const endY = startY - height;
 
-        // Smooth cubic control points
-        const cp1x = startX + sway;
-        const cp1y = startY - height * 0.45;
-
-        const cp2x = endX - sway * 0.3;
-        const cp2y = endY + height * 0.4;
+        const cp1x = Math.min(windowWidth - 20, Math.max(20, startX + sway));
+        const cp1y = startY - height * 0.52;
+        const cp2x = Math.min(windowWidth - 20, Math.max(20, endX - sway * 0.65));
+        const cp2y = endY + height * 0.36;
 
         const path = `M ${startX.toFixed(1)} ${startY.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${endX.toFixed(1)} ${endY.toFixed(1)}`;
 
         return {
           path,
+          tipX: endX,
+          tipY: endY,
           labelX: endX,
-          labelY: endY - 6,
+          labelY: endY - 8,
           textAlign: 'center',
         };
       });
-    } else {
-      // ── Desktop Layout: Smooth Liquid S-Curves Protruding Leftward ──
-      // Moderated reach (130px to 190px) to prevent over-extension into hero content
-      const scaleFactor = windowWidth < 1024 ? 0.8 : windowWidth < 1280 ? 0.92 : 1.0;
-      const baseReaches = [135, 170, 192, 155, 188, 168, 132];
-
-      // Soft wave amplitudes for organic intertwining without harsh kinks
-      const waveAmps = [11, -13, 15, -11, 13, -11, 9];
-
-      // Vertical fan-out (expands vertical span so labels have ~45px-52px vertical clearance)
-      const fanYOffsets = [-36, -20, -6, 0, 8, 22, 38];
-
-      return dotPoints.map((pt, idx) => {
-        const reach = baseReaches[idx] * scaleFactor;
-        const startX = pt.x - pt.width / 2;
-        const startY = pt.y;
-
-        const fanY = fanYOffsets[idx];
-        const endX = startX - reach;
-        const endY = startY + fanY;
-
-        const wave = waveAmps[idx];
-
-        // Cubic Bézier control points:
-        // cp1 provides the initial gentle wave swell (alternating up/down for intertwining)
-        const cp1x = startX - reach * 0.44;
-        const cp1y = startY + wave;
-
-        // cp2 levels out smoothly into the label position
-        const cp2x = endX + reach * 0.4;
-        const cp2y = endY - wave * 0.28;
-
-        const path = `M ${startX.toFixed(1)} ${startY.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${endX.toFixed(1)} ${endY.toFixed(1)}`;
-
-        return {
-          path,
-          labelX: endX - 8,
-          labelY: endY,
-          textAlign: 'right',
-        };
-      });
     }
-  }, [dotPoints, isMobile, windowWidth]);
 
-  // Only render when in Hero section
+    // ── Desktop Layout: Long, Wild Yet Smooth Organic Tree Veins in Top-Right Corner ──
+    const widthScale =
+      windowWidth < 860 ? 0.68 : windowWidth < 1100 ? 0.82 : windowWidth < 1360 ? 0.94 : 1.08;
+    const heightScale = Math.min(widthScale, windowHeight / 780);
+
+    // Sweeping diagonal cascade across the top-right corner with wide smooth S-curves
+    const reachLefts = [285, 245, 205, 165, 125, 82, 36];
+    const dropDowns = [64, 122, 182, 244, 306, 368, 430];
+    const waveSways = [-64, 72, -78, 68, -74, 62, -50];
+
+    return dotPoints.map((pt, idx) => {
+      const reachX = reachLefts[idx] * widthScale;
+      const dropY = dropDowns[idx] * heightScale;
+      const sway = waveSways[idx] * widthScale;
+
+      const startX = pt.x;
+      const startY = pt.y + 5;
+
+      const endX = startX - reachX;
+      const endY = startY + dropY;
+
+      // Wide, sweeping cubic Bézier control points for wild yet silky curves
+      const cp1x = Math.min(windowWidth - 16, startX - reachX * 0.14 + sway * 1.05);
+      const cp1y = startY + dropY * 0.65;
+
+      const cp2x = Math.min(windowWidth - 16, endX + reachX * 0.28 - sway * 0.92);
+      const cp2y = endY - dropY * 0.3;
+
+      const path = `M ${startX.toFixed(1)} ${startY.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${endX.toFixed(1)} ${endY.toFixed(1)}`;
+
+      return {
+        path,
+        tipX: endX,
+        tipY: endY,
+        labelX: endX - 10,
+        labelY: endY,
+        textAlign: 'right',
+      };
+    });
+  }, [dotPoints, isMobile, windowWidth, windowHeight]);
+
+  // Visible strictly on the Home page only
   const isVisible = activeSectionIdx === 0;
 
   return (
@@ -179,23 +188,22 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
           key="sidebar-vine-nav"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.25, ease: 'easeOut' } }}
-          className="fixed inset-0 pointer-events-none z-40 select-none overflow-hidden"
+          exit={{ opacity: 0, transition: { duration: 0.22, ease: 'easeOut' } }}
+          className="fixed inset-0 w-screen h-[100dvh] pointer-events-none z-40 select-none overflow-hidden"
           aria-hidden={!isVisible}
         >
-          {/* Full-screen SVG for organic vines */}
+          {/* Full-screen SVG for Organic Single-Stem Tree Veins */}
           <svg className="w-full h-full absolute inset-0 pointer-events-none">
             {geometries.map((geo, idx) => {
               const item = NAVIGATION_ITEMS[idx];
               const isHovered = hoveredIdx === idx;
+              const isActive = activeSectionIdx === idx;
               const accentColor = item.accent;
-
-              // Animation delays: Start at 0.95s after logo entrance, then ripple by 45ms
-              const vineDelay = prefersReducedMotion ? 0 : 0.95 + idx * 0.045;
+              const vineDelay = prefersReducedMotion ? 0 : 0.45 + idx * 0.045;
 
               return (
                 <g key={`vine-group-${item.key}`}>
-                  {/* Soft ambient glow along the vine on hover */}
+                  {/* Ambient hover glow along the main vein */}
                   {isHovered && (
                     <motion.path
                       d={geo.path}
@@ -204,29 +212,36 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
                       strokeWidth={7}
                       strokeLinecap="round"
                       initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.24 }}
+                      animate={{ opacity: 0.25 }}
                       exit={{ opacity: 0 }}
                       style={{ filter: 'blur(4px)' }}
                     />
                   )}
 
-                  {/* Main Silky Vine Path */}
+                  {/* Main Organic Vein Path */}
                   <motion.path
                     d={geo.path}
                     fill="none"
-                    stroke={isHovered ? accentColor : 'rgba(135, 130, 155, 0.42)'}
-                    strokeWidth={isHovered ? 2.35 : 1.3}
+                    stroke={
+                      isHovered || isActive
+                        ? accentColor
+                        : 'rgba(135, 130, 155, 0.48)'
+                    }
+                    strokeWidth={isHovered ? 2.2 : isActive ? 1.7 : 1.25}
                     strokeLinecap="round"
-                    initial={{ pathLength: prefersReducedMotion ? 1 : 0, opacity: 0 }}
+                    initial={{
+                      pathLength: prefersReducedMotion ? 1 : 0,
+                      opacity: 0,
+                    }}
                     animate={{
                       pathLength: 1,
-                      opacity: isHovered ? 1 : 0.85,
+                      opacity: isHovered ? 1 : 0.9,
                     }}
                     transition={{
                       pathLength: {
-                        duration: prefersReducedMotion ? 0 : 0.7,
+                        duration: prefersReducedMotion ? 0 : 0.72,
                         delay: vineDelay,
-                        ease: [0.22, 1, 0.36, 1], // natural liquid ease-out
+                        ease: [0.22, 1, 0.36, 1],
                       },
                       opacity: { duration: 0.3, delay: vineDelay },
                       stroke: { duration: 0.2 },
@@ -234,16 +249,20 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
                     }}
                   />
 
-                  {/* Delicate Leaf Bud / Tip Anchor connecting to label */}
+                  {/* Tip Node Anchor connecting vein to label */}
                   <motion.circle
-                    cx={isMobile ? geo.labelX : geo.labelX + 8}
-                    cy={isMobile ? geo.labelY + 6 : geo.labelY}
-                    r={isHovered ? 2.75 : 1.8}
-                    fill={isHovered ? accentColor : 'rgba(135, 130, 155, 0.65)'}
+                    cx={geo.tipX}
+                    cy={geo.tipY}
+                    r={isHovered || isActive ? 3 : 2.1}
+                    fill={
+                      isHovered || isActive
+                        ? accentColor
+                        : 'rgba(135, 130, 155, 0.72)'
+                    }
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{
-                      delay: prefersReducedMotion ? 0 : vineDelay + 0.45,
+                      delay: prefersReducedMotion ? 0 : vineDelay + 0.42,
                       duration: 0.25,
                     }}
                   />
@@ -252,11 +271,12 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
             })}
           </svg>
 
-          {/* Floating Borderless Text Labels */}
+          {/* Clickable Borderless Labels at Branch Tips */}
           {geometries.map((geo, idx) => {
             const item = NAVIGATION_ITEMS[idx];
             const isHovered = hoveredIdx === idx;
-            const labelDelay = prefersReducedMotion ? 0 : 1.35 + idx * 0.045;
+            const isActive = activeSectionIdx === idx;
+            const labelDelay = prefersReducedMotion ? 0 : 0.72 + idx * 0.045;
 
             return (
               <motion.button
@@ -276,11 +296,11 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
                     : 'translate(-100%, -50%)',
                   background: 'transparent',
                   border: 'none',
-                  padding: '2px 4px',
+                  padding: '2px 5px',
                 }}
                 initial={{
                   opacity: 0,
-                  x: isMobile ? 0 : 10,
+                  x: isMobile ? 0 : 8,
                   y: isMobile ? 6 : 0,
                 }}
                 animate={{
@@ -289,7 +309,7 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
                   y: 0,
                 }}
                 transition={{
-                  duration: prefersReducedMotion ? 0 : 0.38,
+                  duration: prefersReducedMotion ? 0 : 0.35,
                   delay: labelDelay,
                   ease: [0.16, 1, 0.3, 1],
                 }}
@@ -298,13 +318,18 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
                 <span
                   className="block whitespace-nowrap transition-all duration-200"
                   style={{
-                    fontSize: isMobile ? '10.5px' : 'clamp(11px, 1.05vw, 12.5px)',
-                    fontWeight: isHovered ? 700 : 500,
+                    fontSize: isMobile
+                      ? '10.5px'
+                      : 'clamp(11px, 1.05vw, 12.5px)',
+                    fontWeight: isHovered || isActive ? 700 : 500,
                     letterSpacing: '0.03em',
-                    color: isHovered ? '#1c1b20' : 'rgba(85, 80, 102, 0.88)',
-                    textShadow: isHovered
-                      ? '0 1px 4px rgba(255, 255, 255, 0.95), 0 0 12px rgba(255, 255, 255, 0.8)'
-                      : '0 1px 3px rgba(255, 255, 255, 0.9), 0 1px 6px rgba(0, 0, 0, 0.05)',
+                    color: isHovered
+                      ? '#1c1b20'
+                      : isActive
+                        ? '#0d9488'
+                        : 'rgba(85, 80, 102, 0.9)',
+                    textShadow:
+                      '0 1px 4px rgba(255, 255, 255, 0.96), 0 0 12px rgba(248, 247, 252, 0.9)',
                   }}
                 >
                   {item.label}
