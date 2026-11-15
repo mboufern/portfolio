@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { NAVIGATION_ITEMS } from '../data/portfolioData';
 import { SidebarVineNav } from './SidebarVineNav';
 
@@ -65,8 +66,9 @@ export const Navigation: React.FC<NavigationProps> = ({
         {NAVIGATION_ITEMS.map((item, idx) => {
           const isActive = activeSectionIdx === idx;
           const isHovered = hoveredIdx === idx;
-          const width = isActive ? (isMobile ? 22 : 24) : 8;
-          const height = 8;
+          const isExpanded = isActive || (!isMobile && isHovered);
+          const dotSize = isMobile ? 11 : 12;
+          const expandedHeight = isMobile ? 24 : 26;
 
           return (
             <button
@@ -80,46 +82,51 @@ export const Navigation: React.FC<NavigationProps> = ({
               onMouseLeave={() => setHoveredIdx(null)}
               onFocus={() => setHoveredIdx(idx)}
               onBlur={() => setHoveredIdx(null)}
-              className="group relative flex items-center justify-center min-w-[30px] min-h-[30px] sm:min-w-[28px] sm:min-h-[28px] outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 rounded-full transition-transform duration-200"
+              className="group relative flex items-center justify-center min-w-[28px] min-h-[34px] sm:min-h-[32px] px-1.5 outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 rounded-full"
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
             >
-              {/* Hover/Focus Tooltip on non-Home pages (Home displays labels at vine tips) */}
-              {activeSectionIdx !== 0 && (
-                <span
-                  className="absolute -top-9 sm:top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-white text-[11px] font-bold tracking-wider opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg"
-                  style={{
-                    background: isDark ? '#181626' : '#1c1b20',
-                    border: isDark ? '1px solid rgba(255,255,255,0.14)' : 'none',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  {item.label}
-                </span>
-              )}
-
-              {/* Minimalist Dot / Active Pill Indicator */}
+              {/* Minimalist Dot / Always-Expanded Active Badge / Hover Badge with 6s Sinusoidal Wave */}
               <div
-                className="transition-all duration-300 ease-out"
+                className="nav-dot-wave flex items-center justify-center"
                 style={{
-                  width,
-                  height,
-                  borderRadius: 9999,
-                  backgroundColor:
-                    isActive || isHovered
-                      ? item.accent
-                      : isDark
-                        ? 'rgba(203, 213, 225, 0.36)'
-                        : 'rgba(113, 113, 122, 0.38)',
-                  boxShadow:
-                    isActive
+                  animationDelay: `${idx * 0.055}s`,
+                  animationPlayState: isHovered ? 'paused' : 'running',
+                }}
+              >
+                <motion.div
+                  initial={false}
+                  animate={{
+                    width: isExpanded ? 'auto' : dotSize,
+                    height: isExpanded ? expandedHeight : dotSize,
+                  }}
+                  transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex items-center justify-center overflow-hidden rounded-full"
+                  style={{
+                    backgroundColor:
+                      isActive || isHovered
+                        ? item.accent
+                        : isDark
+                          ? 'rgba(203, 213, 225, 0.36)'
+                          : 'rgba(113, 113, 122, 0.38)',
+                    boxShadow: isActive
                       ? `0 0 12px ${item.accent}99`
                       : isHovered
-                        ? `0 0 8px ${item.accent}66`
+                        ? `0 0 10px ${item.accent}77`
                         : 'none',
-                  transform: isHovered && !isActive ? 'scale(1.25)' : 'none',
-                }}
-              />
+                  }}
+                >
+                  <span
+                    className="px-2.5 sm:px-3 text-[11px] sm:text-xs font-bold tracking-wider whitespace-nowrap leading-none select-none transition-opacity duration-200"
+                    style={{
+                      opacity: isExpanded ? 1 : 0,
+                      color: '#0e0d18',
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                </motion.div>
+              </div>
             </button>
           );
         })}

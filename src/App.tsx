@@ -68,6 +68,10 @@ const AnimatedRoutes: React.FC = () => {
     activeSectionIdx === 4 ||
     (activeSectionIdx === 1 && experienceDark);
 
+  const isProjectRoute =
+    activeSectionIdx === 2 || activeSectionIdx === 3 || activeSectionIdx === 4;
+  const routeGroupKey = isProjectRoute ? '/projects-group' : location.pathname;
+
   return (
     <>
       <Navigation
@@ -78,7 +82,7 @@ const AnimatedRoutes: React.FC = () => {
 
       <AnimatePresence mode="wait">
         <motion.main
-          key={location.pathname}
+          key={routeGroupKey}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -107,36 +111,15 @@ const AnimatedRoutes: React.FC = () => {
             />
             <Route
               path="/software"
-              element={
-                <PageTransition>
-                  <ProjectSection
-                    key={PROJECT_SECTIONS[0].key}
-                    section={PROJECT_SECTIONS[0]}
-                  />
-                </PageTransition>
-              }
+              element={<ProjectSection section={PROJECT_SECTIONS[0]} />}
             />
             <Route
               path="/gamedev"
-              element={
-                <PageTransition>
-                  <ProjectSection
-                    key={PROJECT_SECTIONS[1].key}
-                    section={PROJECT_SECTIONS[1]}
-                  />
-                </PageTransition>
-              }
+              element={<ProjectSection section={PROJECT_SECTIONS[1]} />}
             />
             <Route
               path="/3d-art"
-              element={
-                <PageTransition>
-                  <ProjectSection
-                    key={PROJECT_SECTIONS[2].key}
-                    section={PROJECT_SECTIONS[2]}
-                  />
-                </PageTransition>
-              }
+              element={<ProjectSection section={PROJECT_SECTIONS[2]} />}
             />
             <Route
               path="/blog"

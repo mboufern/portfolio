@@ -1,9 +1,16 @@
 import type React from 'react';
 
+export type BlogCategory =
+  | 'Game Dev'
+  | 'Software Architecture'
+  | 'Art'
+  | 'Devlogs';
+
 export interface BlogPostMeta {
   slug: string;
   title: string;
   subtitle: string;
+  category: BlogCategory;
   date: string;
   readTime: string;
   tags: string[];

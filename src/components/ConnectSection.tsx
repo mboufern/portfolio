@@ -112,7 +112,7 @@ export const ConnectSection: React.FC = () => {
             <div className="flex items-center gap-2 pt-2 border-t border-zinc-100">
               <a
                 href={`mailto:${PERSONAL_INFO.email}`}
-                className="platform-cta-btn flex-1 py-2.5 px-3 rounded-xl text-white text-xs font-semibold flex items-center justify-center gap-1.5 no-underline"
+                className="platform-cta-btn flex-1 py-2.5 px-3 rounded-xl text-white text-sm sm:text-base font-semibold flex items-center justify-center gap-1.5 no-underline"
                 style={
                   {
                     background: 'linear-gradient(135deg, #18181b 0%, #0d9488 100%)',

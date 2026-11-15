@@ -1,21 +1,50 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { TbArrowUpRight, TbCalendar, TbClock } from 'react-icons/tb';
+import { motion } from 'framer-motion';
+import { FaBomb, FaCode, FaPalette, FaScroll } from 'react-icons/fa6';
 import { BLOG_POSTS } from '../blogs/registry';
+import type { BlogCategory } from '../blogs/types';
+
+const BLOG_CATEGORIES: Array<'All' | BlogCategory> = [
+  'All',
+  'Game Dev',
+  'Software Architecture',
+  'Art',
+  'Devlogs',
+];
+
+const getCategoryIcon = (category: BlogCategory, className = 'w-4 h-4') => {
+  switch (category) {
+    case 'Game Dev':
+      return <FaBomb className={className} />;
+    case 'Software Architecture':
+      return <FaCode className={className} />;
+    case 'Art':
+      return <FaPalette className={className} />;
+    case 'Devlogs':
+    default:
+      return <FaScroll className={className} />;
+  }
+};
+
+const generateCardRotations = (): Record<string, number> => {
+  const rotations: Record<string, number> = {};
+  BLOG_POSTS.forEach((p) => {
+    const sign = Math.random() < 0.5 ? -1 : 1;
+    const mag = 1.4 + Math.random() * 2.8;
+    rotations[p.meta.slug] = Number((sign * mag).toFixed(2));
+  });
+  return rotations;
+};
 
 export const BlogIndexPage: React.FC = () => {
-  const [selectedTag, setSelectedTag] = useState<string>('All');
-
-  const allTags = useMemo(() => {
-    const tags = new Set<string>(['All']);
-    BLOG_POSTS.forEach((p) => p.meta.tags.forEach((t) => tags.add(t)));
-    return Array.from(tags);
-  }, []);
+  const [selectedCategory, setSelectedCategory] = useState<'All' | BlogCategory>('All');
+  const [cardRotations] = useState<Record<string, number>>(generateCardRotations);
 
   const filteredPosts = useMemo(() => {
-    if (selectedTag === 'All') return BLOG_POSTS;
-    return BLOG_POSTS.filter((p) => p.meta.tags.includes(selectedTag));
-  }, [selectedTag]);
+    if (selectedCategory === 'All') return BLOG_POSTS;
+    return BLOG_POSTS.filter((p) => p.meta.category === selectedCategory);
+  }, [selectedCategory]);
 
   return (
     <div className="min-h-[100dvh] w-full bg-[#f8f7fc] text-zinc-900 relative overflow-x-hidden">
@@ -37,11 +66,8 @@ export const BlogIndexPage: React.FC = () => {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-5 sm:px-8 md:px-12 pt-10 sm:pt-20 pb-24 sm:pb-16">
+      <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 md:px-12 pt-10 sm:pt-20 pb-24 sm:pb-16">
         <header className="mb-8 sm:mb-10">
-          <span className="text-xs font-mono tracking-[0.2em] text-[#ff779c] font-bold block mb-2">
-            Writing & Devlogs
-          </span>
           <h1
             className="text-zinc-900 font-black tracking-tight leading-[1.06] m-0"
             style={{
@@ -56,102 +82,158 @@ export const BlogIndexPage: React.FC = () => {
           </p>
         </header>
 
-        {/* Tag Filter Strip */}
-        <div className="flex items-center gap-2 flex-wrap mb-8">
-          {allTags.map((tag) => {
-            const isActive = selectedTag === tag;
+        {/* Category Filter Strip */}
+        <div className="flex items-center gap-2 flex-wrap mb-10">
+          {BLOG_CATEGORIES.map((category) => {
+            const isActive = selectedCategory === category;
             return (
               <button
-                key={tag}
+                key={category}
                 type="button"
-                onClick={() => setSelectedTag(tag)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+                onClick={() => setSelectedCategory(category)}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
                   isActive
                     ? 'bg-zinc-900 text-white border-zinc-900 shadow-sm'
                     : 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300 hover:text-zinc-900'
                 }`}
               >
-                {tag}
+                {category !== 'All' && getCategoryIcon(category, 'w-3.5 h-3.5')}
+                <span>{category}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Posts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredPosts.map((post) => {
-            const { meta } = post;
-            return (
-              <Link
-                key={meta.slug}
-                to={`/blog/${meta.slug}`}
-                className="group bg-white rounded-3xl overflow-hidden border border-zinc-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between no-underline"
-              >
-                <div>
-                  {meta.coverImage && (
-                    <div className="relative h-44 w-full overflow-hidden bg-zinc-950">
-                      <img
-                        src={meta.coverImage}
-                        alt={meta.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                      <div
-                        className="absolute bottom-0 inset-x-0 h-1"
-                        style={{ backgroundColor: meta.accent }}
-                      />
-                    </div>
-                  )}
+        {/* Playing Cards Grid */}
+        {filteredPosts.length === 0 ? (
+          <div className="py-16 text-center text-zinc-500 text-sm font-mono">
+            No articles in this category yet.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 items-center justify-items-center overflow-visible">
+            {filteredPosts.map((post, idx) => {
+              const { meta } = post;
+              const deckIndex = BLOG_POSTS.findIndex((p) => p.meta.slug === meta.slug);
+              const cardNum = (deckIndex >= 0 ? deckIndex : idx) + 1;
+              const isEven = cardNum % 2 === 0;
+              const suitColor = isEven ? '#d92638' : '#18181b';
+              const rotation = cardRotations[meta.slug] ?? (isEven ? -2.2 : 2.2);
 
-                  <div className="p-6">
-                    <div className="flex flex-wrap items-center gap-1.5 mb-3">
-                      {meta.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold"
-                          style={{
-                            backgroundColor: `${meta.accent}18`,
-                            color: meta.accent,
-                          }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+              return (
+                <motion.div
+                  key={meta.slug}
+                  initial={{ opacity: 0, x: 160, rotate: rotation + 10 }}
+                  animate={{ opacity: 1, x: 0, rotate: rotation }}
+                  transition={{
+                    duration: 0.55,
+                    delay: idx * 0.09,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  whileHover={{
+                    y: -12,
+                    scale: 1.035,
+                    rotate: rotation * 0.35,
+                    transition: { duration: 0.25, ease: 'easeOut' },
+                  }}
+                  className="w-full max-w-[310px] aspect-[5/7]"
+                >
+                  <Link
+                    to={`/blog/${meta.slug}`}
+                    className="group relative w-full h-full rounded-[22px] bg-[#f9f6ee] border border-zinc-900/15 shadow-[0_10px_28px_rgba(24,24,27,0.1)] group-hover:shadow-[0_24px_48px_rgba(24,24,27,0.2)] transition-shadow duration-300 overflow-hidden flex flex-col justify-between p-4 sm:p-5 no-underline"
+                  >
+                    {/* Subtle Whole-Card Rough Dither Grain */}
+                    <div
+                      className="pointer-events-none absolute inset-0 z-10 playing-card-dither-grain opacity-25"
+                      aria-hidden="true"
+                    />
 
-                    <h2
-                      className="text-zinc-900 text-xl sm:text-2xl font-black leading-tight mb-2 mt-0 group-hover:text-black"
-                      style={{ fontFamily: 'Archivo Black, sans-serif' }}
+                    {/* Edge-Weighted CSS Dither Texture */}
+                    <div
+                      className="pointer-events-none absolute inset-0 z-10 playing-card-dither-surface opacity-75"
+                      aria-hidden="true"
                     >
-                      {meta.title}
-                    </h2>
+                      <div className="w-full h-full playing-card-dither-grain" />
+                    </div>
 
-                    <p className="text-zinc-600 text-sm leading-relaxed m-0 line-clamp-3">
-                      {meta.subtitle}
-                    </p>
-                  </div>
-                </div>
+                    {/* Inner Playing Card Frame Line */}
+                    <div
+                      className="pointer-events-none absolute inset-2.5 rounded-[14px] border border-zinc-900/[0.08] z-10"
+                      aria-hidden="true"
+                    />
 
-                <div className="px-6 py-4 border-t border-zinc-100 flex items-center justify-between text-xs font-mono text-zinc-500">
-                  <div className="flex items-center gap-3">
-                    <span className="inline-flex items-center gap-1">
-                      <TbCalendar className="w-3.5 h-3.5" />
-                      <span>{meta.date}</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <TbClock className="w-3.5 h-3.5" />
-                      <span>{meta.readTime}</span>
-                    </span>
-                  </div>
-                  <span className="inline-flex items-center gap-1 font-sans font-bold text-zinc-900 group-hover:translate-x-0.5 transition-transform">
-                    <span>Read</span>
-                    <TbArrowUpRight className="w-4 h-4" />
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+                    {/* Top-Left Corner: Index Number (Alfa Slab One) & Category Fill Icon */}
+                    <div
+                      className="relative z-20 flex flex-col items-center self-start leading-none select-none"
+                      style={{ color: suitColor }}
+                    >
+                      <span
+                        className="text-2xl sm:text-[26px] leading-none"
+                        style={{ fontFamily: "'Alfa Slab One', serif" }}
+                      >
+                        {cardNum}
+                      </span>
+                      <span className="mt-1" title={meta.category}>
+                        {getCategoryIcon(meta.category, 'w-4 h-4')}
+                      </span>
+                    </div>
+
+                    {/* Upper-Center Artwork with Dithered Blending Edges */}
+                    <div className="relative z-10 flex-1 w-full flex items-center justify-center -mt-3 mb-2 min-h-0">
+                      {meta.coverImage ? (
+                        <div className="relative w-[94%] h-[92%] max-h-[215px] playing-card-art-dither-fade flex items-center justify-center">
+                          <img
+                            src={meta.coverImage}
+                            alt={meta.title}
+                            loading="lazy"
+                            className="w-full h-full object-cover playing-card-art-core transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <img
+                            src={meta.coverImage}
+                            alt=""
+                            aria-hidden="true"
+                            loading="lazy"
+                            className="absolute inset-0 w-full h-full object-cover playing-card-art-dither-img transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div
+                            className="pointer-events-none absolute inset-0 playing-card-art-dither-rim"
+                            aria-hidden="true"
+                          >
+                            <div className="w-full h-full playing-card-dither-grain opacity-65" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className="w-28 h-28 rounded-full flex items-center justify-center opacity-20"
+                          style={{ color: suitColor }}
+                        >
+                          {getCategoryIcon(meta.category, 'w-14 h-14')}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Centered Title Directly Below Artwork */}
+                    <div className="relative z-20 px-2 pb-3 text-center">
+                      <h2
+                        className="text-zinc-900 text-lg sm:text-xl font-black leading-tight tracking-tight m-0 line-clamp-3 group-hover:text-black"
+                        style={{ fontFamily: 'Archivo Black, sans-serif' }}
+                      >
+                        {meta.title}
+                      </h2>
+                    </div>
+
+                    {/* Bottom-Right Corner: Creation Year & Month */}
+                    <div
+                      className="relative z-20 self-end text-[11px] font-mono font-bold tracking-wider select-none opacity-85"
+                      style={{ color: suitColor }}
+                    >
+                      {meta.date}
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

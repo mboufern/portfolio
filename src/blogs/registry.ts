@@ -9,7 +9,8 @@ export const BLOG_POSTS: BlogPostEntry[] = [
       title: 'Design Influences & Games I Like',
       subtitle:
         'Deconstructing world architecture, kinetic physics, reactive AI, and player agency in the titles that shape how I design software and games.',
-      date: '2026',
+      category: 'Game Dev',
+      date: 'Nov 2026',
       readTime: '4 min read',
       tags: ['Game Design', 'Architecture', 'Personal Picks'],
       accent: '#ff779c',
@@ -23,10 +24,12 @@ export const BLOG_POSTS: BlogPostEntry[] = [
       title: 'Building Modular Combat & Devlog Notes',
       subtitle:
         'Behind the scenes of architecting wave-based survival rigs, Shader Graph effects, and rapid iteration workflows.',
-      date: '2026',
+      category: 'Devlogs',
+      date: 'Oct 2026',
       readTime: '3 min read',
       tags: ['Devlog', 'Unity', 'Engineering'],
       accent: '#2bbece',
+      coverImage: '/assets/projects/scrap-vanguard/trailer_1.png',
     },
     Component: TemplatePost,
   },

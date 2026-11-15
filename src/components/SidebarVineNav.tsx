@@ -99,6 +99,20 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
     };
   }, [updatePoints, activeSectionIdx]);
 
+  useEffect(() => {
+    if (activeSectionIdx !== 0) return;
+    let rafId = 0;
+    const start = performance.now();
+    const tick = () => {
+      updatePoints();
+      if (performance.now() - start < 320) {
+        rafId = requestAnimationFrame(tick);
+      }
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [hoveredIdx, activeSectionIdx, updatePoints]);
+
   const geometries = useMemo<VineGeometry[]>(() => {
     if (dotPoints.length !== NAVIGATION_ITEMS.length) return [];
 

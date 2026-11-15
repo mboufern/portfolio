@@ -44,7 +44,6 @@ import {
   TbSparkles,
   TbCode,
   TbCheck,
-  TbPhoto,
   TbMovie,
   TbLayersIntersect,
 } from 'react-icons/tb';
@@ -243,7 +242,31 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [touchControlsVisible, setTouchControlsVisible] = useState(false);
+  const touchTimeoutRef = useRef<number | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const triggerTouchControls = useCallback(() => {
+    setTouchControlsVisible(true);
+    if (touchTimeoutRef.current) {
+      window.clearTimeout(touchTimeoutRef.current);
+    }
+    touchTimeoutRef.current = window.setTimeout(() => {
+      setTouchControlsVisible(false);
+    }, 2500);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (touchTimeoutRef.current) {
+        window.clearTimeout(touchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const controlsVisibilityClass = touchControlsVisible
+    ? 'opacity-100 pointer-events-auto'
+    : 'opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto';
 
   const isMaisonBurger = project.id === 'maison-du-burger';
   const currentAccent = project.vinylColor || accent;
@@ -286,7 +309,7 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
   if (n === 0) {
     return (
       <div
-        className="w-full rounded-2xl border border-white/15 p-6 sm:p-8 backdrop-blur-xl"
+        className="w-full project-glass-card rounded-lg p-6 sm:p-8 backdrop-blur-xl"
         style={{
           background:
             'linear-gradient(145deg, rgba(16, 15, 28, 0.72) 0%, rgba(10, 10, 20, 0.85) 100%)',
@@ -336,7 +359,8 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
     <div className="w-full flex flex-col gap-3">
       {/* Full-Width Showcase Container */}
       <div
-        className="relative w-full aspect-[16/10] sm:aspect-[16/9] max-h-[68vh] overflow-hidden select-none group rounded-2xl flex items-center justify-center"
+        onTouchStart={triggerTouchControls}
+        className="relative w-full aspect-[16/10] sm:aspect-[16/9] max-h-[68vh] overflow-hidden select-none group rounded-lg flex items-center justify-center"
         style={{
           background: isMaisonBurger
             ? '#ffffff'
@@ -393,38 +417,39 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
               </div>
             )}
 
-            <div className="absolute bottom-3 left-3 z-20 flex items-center gap-2">
+            <div
+              className={`absolute bottom-3 left-3 z-20 flex items-center gap-3 transition-opacity duration-200 ${controlsVisibilityClass}`}
+            >
               <button
                 type="button"
                 onClick={togglePlay}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-white/90 bg-black/65 hover:bg-black/90 backdrop-blur-md transition-all border border-white/15 hover:scale-105 shadow-md cursor-pointer"
+                className="p-1 text-white hover:scale-110 active:scale-95 transition-transform cursor-pointer bg-transparent border-none outline-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? (
-                  <TbPlayerPause className="w-4 h-4" />
+                  <TbPlayerPause className="w-5 h-5 sm:w-6 sm:h-6" />
                 ) : (
-                  <TbPlayerPlay className="w-4 h-4 ml-0.5" />
+                  <TbPlayerPlay className="w-5 h-5 sm:w-6 sm:h-6" />
                 )}
               </button>
               <button
                 type="button"
                 onClick={toggleMute}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-white/90 bg-black/65 hover:bg-black/90 backdrop-blur-md transition-all border border-white/15 hover:scale-105 shadow-md cursor-pointer"
+                className="p-1 text-white hover:scale-110 active:scale-95 transition-transform cursor-pointer bg-transparent border-none outline-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]"
                 aria-label={isMuted ? 'Unmute' : 'Mute'}
               >
                 {isMuted ? (
-                  <TbVolumeOff className="w-4 h-4" />
+                  <TbVolumeOff className="w-5 h-5 sm:w-6 sm:h-6" />
                 ) : (
-                  <TbVolume className="w-4 h-4" />
+                  <TbVolume className="w-5 h-5 sm:w-6 sm:h-6" />
                 )}
               </button>
             </div>
           </div>
         ) : currentItem.type === 'lottie' ? (
           <div
-            className={`relative w-full h-full flex items-center justify-center p-6 overflow-hidden cursor-zoom-in ${
-              isMaisonBurger ? 'bg-white' : ''
-            }`}
+            className={`relative w-full h-full flex items-center justify-center p-6 overflow-hidden cursor-zoom-in ${isMaisonBurger ? 'bg-white' : ''
+              }`}
             onClick={() => setIsLightboxOpen(true)}
           >
             <DotLottieReact
@@ -457,32 +482,6 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
           />
         )}
 
-        {/* Top-Left Media Type Tag */}
-        <div
-          className={`absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-mono tracking-wider border shadow-sm pointer-events-none ${
-            isMaisonBurger
-              ? 'bg-black/75 text-white backdrop-blur-md border-black/10'
-              : 'bg-black/60 backdrop-blur-md text-zinc-200 border-white/10'
-          }`}
-        >
-          {currentItem.type === 'video' ? (
-            <>
-              <TbMovie className="w-3.5 h-3.5 text-amber-400" />
-              <span>Video Reel</span>
-            </>
-          ) : currentItem.type === 'lottie' ? (
-            <>
-              <TbSparkles className="w-3.5 h-3.5 text-purple-400" />
-              <span>Live Vector</span>
-            </>
-          ) : (
-            <>
-              <TbPhoto className="w-3.5 h-3.5" style={{ color: currentAccent }} />
-              <span>{currentItem.label}</span>
-            </>
-          )}
-        </div>
-
         {/* Top-Right Expand Lightbox Button */}
         <button
           type="button"
@@ -490,15 +489,14 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
             e.stopPropagation();
             setIsLightboxOpen(true);
           }}
-          className={`absolute top-3 right-3 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center transition-all opacity-90 hover:opacity-100 hover:scale-105 border shadow-md cursor-pointer ${
-            isMaisonBurger
-              ? 'text-zinc-800 bg-white/90 hover:bg-white border-zinc-200'
-              : 'text-white/90 bg-black/60 hover:bg-black/90 backdrop-blur-md border-white/15'
-          }`}
+          className={`absolute top-3 right-3 z-20 p-1.5 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer bg-transparent border-none outline-none ${controlsVisibilityClass} ${isMaisonBurger
+            ? 'text-zinc-900 drop-shadow-[0_1px_4px_rgba(255,255,255,0.8)]'
+            : 'text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]'
+            }`}
           title="Expand fullscreen"
           aria-label="Expand media"
         >
-          <TbMaximize className="w-4 h-4" />
+          <TbMaximize className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
         {/* Gallery Carousel Controls */}
@@ -511,10 +509,13 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
                 setIsLoaded(false);
                 setIdx((i) => (i - 1 + n) % n);
               }}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center text-white bg-black/60 hover:bg-black/85 backdrop-blur-md border border-white/15 shadow-lg transition-all hover:scale-110 active:scale-95 cursor-pointer opacity-80 group-hover:opacity-100"
+              className={`absolute left-3 top-1/2 -translate-y-1/2 z-20 p-1.5 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer bg-transparent border-none outline-none ${controlsVisibilityClass} ${isMaisonBurger
+                ? 'text-zinc-900 drop-shadow-[0_1px_4px_rgba(255,255,255,0.8)]'
+                : 'text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]'
+                }`}
               aria-label="Previous media"
             >
-              <TbChevronLeft className="w-5 h-5" />
+              <TbChevronLeft className="w-7 h-7 sm:w-8 sm:h-8" />
             </button>
             <button
               type="button"
@@ -523,10 +524,13 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
                 setIsLoaded(false);
                 setIdx((i) => (i + 1) % n);
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center text-white bg-black/60 hover:bg-black/85 backdrop-blur-md border border-white/15 shadow-lg transition-all hover:scale-110 active:scale-95 cursor-pointer opacity-80 group-hover:opacity-100"
+              className={`absolute right-3 top-1/2 -translate-y-1/2 z-20 p-1.5 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer bg-transparent border-none outline-none ${controlsVisibilityClass} ${isMaisonBurger
+                ? 'text-zinc-900 drop-shadow-[0_1px_4px_rgba(255,255,255,0.8)]'
+                : 'text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]'
+                }`}
               aria-label="Next media"
             >
-              <TbChevronRight className="w-5 h-5" />
+              <TbChevronRight className="w-7 h-7 sm:w-8 sm:h-8" />
             </button>
           </>
         )}
@@ -547,11 +551,10 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
                     setIdx(mIdx);
                   }
                 }}
-                className={`relative flex-shrink-0 h-11 sm:h-12 w-16 sm:w-20 rounded-lg overflow-hidden transition-all cursor-pointer border ${
-                  isSelected
-                    ? 'scale-105 shadow-lg'
-                    : 'opacity-60 hover:opacity-100 border-white/15'
-                }`}
+                className={`relative flex-shrink-0 h-11 sm:h-12 w-16 sm:w-20 rounded-lg overflow-hidden transition-all cursor-pointer border ${isSelected
+                  ? 'scale-105 shadow-lg mx-2'
+                  : 'opacity-60 hover:opacity-100 border-white/15'
+                  }`}
                 style={{
                   borderColor: isSelected ? currentAccent : 'rgba(255,255,255,0.14)',
                   boxShadow: isSelected ? `0 0 14px ${currentAccent}55` : undefined,
@@ -565,9 +568,8 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
                   </div>
                 ) : item.type === 'lottie' ? (
                   <div
-                    className={`w-full h-full flex items-center justify-center ${
-                      isMaisonBurger ? 'bg-white text-amber-500' : 'bg-zinc-900 text-purple-400'
-                    }`}
+                    className={`w-full h-full flex items-center justify-center ${isMaisonBurger ? 'bg-white text-amber-500' : 'bg-zinc-900 text-purple-400'
+                      }`}
                   >
                     <TbSparkles className="w-4 h-4" />
                   </div>
@@ -642,11 +644,10 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
                 />
               ) : currentItem.type === 'lottie' ? (
                 <div
-                  className={`w-[85vw] max-w-3xl h-[65vh] flex items-center justify-center rounded-2xl p-6 border ${
-                    isMaisonBurger
-                      ? 'bg-white border-zinc-200 shadow-2xl'
-                      : 'bg-zinc-950/80 border-white/10'
-                  }`}
+                  className={`w-[85vw] max-w-3xl h-[65vh] flex items-center justify-center rounded-2xl p-6 border ${isMaisonBurger
+                    ? 'bg-white border-zinc-200 shadow-2xl'
+                    : 'bg-zinc-950/80 border-white/10'
+                    }`}
                 >
                   <DotLottieReact
                     src={currentItem.src}
@@ -705,11 +706,10 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
                       setIsLoaded(false);
                       setIdx(mIdx);
                     }}
-                    className={`w-12 h-9 sm:w-14 sm:h-10 rounded-md overflow-hidden border transition-all cursor-pointer ${
-                      mIdx === idx
-                        ? 'scale-105'
-                        : 'opacity-50 hover:opacity-85 border-white/20'
-                    }`}
+                    className={`w-12 h-9 sm:w-14 sm:h-10 rounded-md overflow-hidden border transition-all cursor-pointer ${mIdx === idx
+                      ? 'scale-105'
+                      : 'opacity-50 hover:opacity-85 border-white/20'
+                      }`}
                     style={{
                       borderColor: mIdx === idx ? currentAccent : 'rgba(255,255,255,0.2)',
                       background: isMaisonBurger && item.type === 'lottie' ? '#ffffff' : '#151421',
@@ -721,9 +721,8 @@ const ImageShowcase: React.FC<{ project: Project; accent: string }> = ({
                       </div>
                     ) : item.type === 'lottie' ? (
                       <div
-                        className={`w-full h-full flex items-center justify-center ${
-                          isMaisonBurger ? 'bg-white text-amber-500' : 'bg-zinc-900 text-purple-400'
-                        }`}
+                        className={`w-full h-full flex items-center justify-center ${isMaisonBurger ? 'bg-white text-amber-500' : 'bg-zinc-900 text-purple-400'
+                          }`}
                       >
                         <TbSparkles className="w-3.5 h-3.5" />
                       </div>
@@ -752,9 +751,33 @@ const PureBlackVideoStage: React.FC<{ project: Project }> = ({ project }) => {
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [touchControlsVisible, setTouchControlsVisible] = useState(false);
+  const touchTimeoutRef = useRef<number | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const videoSrc = project.video || (project.images && project.images[0]) || '';
+
+  const triggerTouchControls = useCallback(() => {
+    setTouchControlsVisible(true);
+    if (touchTimeoutRef.current) {
+      window.clearTimeout(touchTimeoutRef.current);
+    }
+    touchTimeoutRef.current = window.setTimeout(() => {
+      setTouchControlsVisible(false);
+    }, 2500);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (touchTimeoutRef.current) {
+        window.clearTimeout(touchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const controlsVisibilityClass = touchControlsVisible
+    ? 'opacity-100 pointer-events-auto'
+    : 'opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto';
 
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -787,7 +810,8 @@ const PureBlackVideoStage: React.FC<{ project: Project }> = ({ project }) => {
   return (
     <>
       <div
-        className="relative w-full aspect-[16/9] max-h-[76vh] bg-black rounded-2xl overflow-hidden flex items-center justify-center group cursor-pointer"
+        onTouchStart={triggerTouchControls}
+        className="relative w-full aspect-[16/9] max-h-[76vh] bg-black rounded-lg overflow-hidden flex items-center justify-center group cursor-pointer"
         onClick={() => setIsLightboxOpen(true)}
       >
         <video
@@ -809,29 +833,31 @@ const PureBlackVideoStage: React.FC<{ project: Project }> = ({ project }) => {
           </div>
         )}
 
-        <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+        <div
+          className={`absolute bottom-4 left-4 z-20 flex items-center gap-3 transition-opacity duration-200 ${controlsVisibilityClass}`}
+        >
           <button
             type="button"
             onClick={togglePlay}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white bg-black/70 hover:bg-black border border-white/15 backdrop-blur-md transition-transform hover:scale-105 cursor-pointer"
+            className="p-1 text-white hover:scale-110 active:scale-95 transition-transform cursor-pointer bg-transparent border-none outline-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]"
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? (
-              <TbPlayerPause className="w-4 h-4" />
+              <TbPlayerPause className="w-5 h-5 sm:w-6 sm:h-6" />
             ) : (
-              <TbPlayerPlay className="w-4 h-4 ml-0.5" />
+              <TbPlayerPlay className="w-5 h-5 sm:w-6 sm:h-6" />
             )}
           </button>
           <button
             type="button"
             onClick={toggleMute}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white bg-black/70 hover:bg-black border border-white/15 backdrop-blur-md transition-transform hover:scale-105 cursor-pointer"
+            className="p-1 text-white hover:scale-110 active:scale-95 transition-transform cursor-pointer bg-transparent border-none outline-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]"
             aria-label={isMuted ? 'Unmute' : 'Mute'}
           >
             {isMuted ? (
-              <TbVolumeOff className="w-4 h-4" />
+              <TbVolumeOff className="w-5 h-5 sm:w-6 sm:h-6" />
             ) : (
-              <TbVolume className="w-4 h-4" />
+              <TbVolume className="w-5 h-5 sm:w-6 sm:h-6" />
             )}
           </button>
         </div>
@@ -842,10 +868,10 @@ const PureBlackVideoStage: React.FC<{ project: Project }> = ({ project }) => {
             e.stopPropagation();
             setIsLightboxOpen(true);
           }}
-          className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full flex items-center justify-center text-white bg-black/70 hover:bg-black border border-white/15 backdrop-blur-md transition-transform hover:scale-105 opacity-80 group-hover:opacity-100 cursor-pointer"
+          className={`absolute top-4 right-4 z-20 p-1.5 flex items-center justify-center text-white transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer bg-transparent border-none outline-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)] ${controlsVisibilityClass}`}
           aria-label="Fullscreen video"
         >
-          <TbMaximize className="w-4 h-4" />
+          <TbMaximize className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
       </div>
 
@@ -898,12 +924,12 @@ const VinylDiscItem: React.FC<MediaItemProps> = ({
 
   return (
     <div className="relative flex items-center justify-center">
-      {/* Unclipped Outer Radial Project Glow */}
+      {/* Unclipped Outer Radial Project Glow (only on selected item) */}
       <div
         className="absolute -inset-5 sm:-inset-6 rounded-full pointer-events-none transition-all duration-300"
         style={{
           background: `radial-gradient(circle, ${vinylTint}88 0%, ${vinylTint}38 42%, transparent 72%)`,
-          opacity: isSelected ? 0.85 : isHovered ? 0.92 : 0.16,
+          opacity: isSelected ? 0.85 : 0,
           filter: 'blur(8px)',
         }}
         aria-hidden="true"
@@ -916,18 +942,20 @@ const VinylDiscItem: React.FC<MediaItemProps> = ({
           boxShadow: isSelected
             ? `0 0 24px ${vinylTint}90, 0 12px 24px rgba(0,0,0,0.75)`
             : isHovered
-              ? `0 0 24px ${vinylTint}90, 0 10px 22px rgba(0,0,0,0.7)`
+              ? '0 10px 22px rgba(0,0,0,0.72)'
               : '0 6px 14px rgba(0,0,0,0.6)',
-          border: `1.5px solid ${
-            isSelected || isHovered ? vinylTint : 'rgba(255,255,255,0.22)'
-          }`,
+          border: `1.5px solid ${isSelected
+            ? vinylTint
+            : isHovered
+              ? 'rgba(255,255,255,0.42)'
+              : 'rgba(255,255,255,0.2)'
+            }`,
         }}
       >
         {/* Entire disc surface + medallion rotates infinitely ONLY when selected */}
         <div
-          className={`absolute inset-0 rounded-full overflow-hidden flex items-center justify-center ${
-            isSelected ? 'vinyl-spin-slow' : ''
-          }`}
+          className={`absolute inset-0 rounded-full overflow-hidden flex items-center justify-center ${isSelected ? 'vinyl-spin-slow' : ''
+            }`}
           style={{
             background:
               'repeating-radial-gradient(circle at center, #07070b 0px, #07070b 2px, #1c1c26 3px, #0d0d14 4.5px)',
@@ -945,25 +973,22 @@ const VinylDiscItem: React.FC<MediaItemProps> = ({
           {/* Subtle colored track ring */}
           <div
             className="absolute inset-[7px] sm:inset-[10px] rounded-full border border-dashed pointer-events-none"
-            style={{ borderColor: `${vinylTint}44` }}
+            style={{ borderColor: isSelected ? `${vinylTint}44` : 'rgba(255,255,255,0.12)' }}
           />
 
           {/* Center Circle Medallion with Custom Project Icon */}
           <div
             className="relative z-10 w-6 h-6 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-300"
             style={{
-              background:
-                isSelected || isHovered
-                  ? `radial-gradient(circle at 30% 30%, ${vinylTint}, ${vinylTint}cc 72%, #0a0a12 100%)`
-                  : `radial-gradient(circle at 30% 30%, ${vinylTint}66, #181822 88%)`,
-              border: `1.5px solid ${
-                isSelected || isHovered ? 'rgba(255,255,255,0.88)' : `${vinylTint}77`
-              }`,
-              boxShadow:
-                isSelected || isHovered
-                  ? `0 0 12px ${vinylTint}aa, inset 0 1px 2px rgba(255,255,255,0.4)`
-                  : 'inset 0 1px 4px rgba(0,0,0,0.7)',
-              color: '#ffffff',
+              background: isSelected
+                ? `radial-gradient(circle at 30% 30%, ${vinylTint}, ${vinylTint}cc 72%, #0a0a12 100%)`
+                : 'radial-gradient(circle at 30% 30%, #3f3f4e, #181822 88%)',
+              border: `1.5px solid ${isSelected ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.25)'
+                }`,
+              boxShadow: isSelected
+                ? `0 0 12px ${vinylTint}aa, inset 0 1px 2px rgba(255,255,255,0.4)`
+                : 'inset 0 1px 4px rgba(0,0,0,0.7)',
+              color: isSelected ? '#ffffff' : 'rgba(255,255,255,0.72)',
             }}
           >
             {/* Tiny off-center label dot so center rotation is unmistakably readable */}
@@ -991,12 +1016,12 @@ const GameDiscBoxItem: React.FC<MediaItemProps> = ({
 
   return (
     <div className="relative flex items-center justify-center">
-      {/* Unclipped Outer Radial Project Glow */}
+      {/* Unclipped Outer Radial Project Glow (only on selected item) */}
       <div
         className="absolute -inset-5 sm:-inset-6 rounded-full pointer-events-none transition-all duration-300"
         style={{
           background: `radial-gradient(circle, ${vinylTint}88 0%, ${vinylTint}38 42%, transparent 72%)`,
-          opacity: isSelected ? 0.85 : isHovered ? 0.92 : 0.16,
+          opacity: isSelected ? 0.85 : 0,
           filter: 'blur(8px)',
         }}
         aria-hidden="true"
@@ -1009,11 +1034,14 @@ const GameDiscBoxItem: React.FC<MediaItemProps> = ({
           boxShadow: isSelected
             ? `0 0 22px ${vinylTint}88, 0 14px 26px rgba(0,0,0,0.8)`
             : isHovered
-              ? `0 0 22px ${vinylTint}88, 0 10px 22px rgba(0,0,0,0.75)`
+              ? '0 10px 22px rgba(0,0,0,0.75)'
               : '0 6px 14px rgba(0,0,0,0.62)',
-          border: `1.5px solid ${
-            isSelected || isHovered ? vinylTint : 'rgba(255,255,255,0.22)'
-          }`,
+          border: `1.5px solid ${isSelected
+            ? vinylTint
+            : isHovered
+              ? 'rgba(255,255,255,0.42)'
+              : 'rgba(255,255,255,0.2)'
+            }`,
         }}
       >
         {/* Left Plastic Spine */}
@@ -1026,7 +1054,7 @@ const GameDiscBoxItem: React.FC<MediaItemProps> = ({
         >
           <span
             className="h-3 w-full block opacity-90"
-            style={{ backgroundColor: vinylTint }}
+            style={{ backgroundColor: isSelected ? vinylTint : 'rgba(255,255,255,0.25)' }}
           />
         </div>
 
@@ -1036,7 +1064,9 @@ const GameDiscBoxItem: React.FC<MediaItemProps> = ({
           <div
             className="h-[5px] sm:h-[6px] w-full flex-shrink-0 border-b border-white/20"
             style={{
-              background: `linear-gradient(90deg, ${vinylTint}, ${vinylTint}cc)`,
+              background: isSelected
+                ? `linear-gradient(90deg, ${vinylTint}, ${vinylTint}cc)`
+                : 'linear-gradient(90deg, #3f3f4e, #272733)',
             }}
           />
 
@@ -1049,7 +1079,8 @@ const GameDiscBoxItem: React.FC<MediaItemProps> = ({
                 loading="lazy"
                 decoding="async"
                 onError={() => setImgError(true)}
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover transition-all duration-300 ${isSelected ? '' : 'saturate-50 opacity-85'
+                  }`}
               />
               <div
                 className="absolute inset-0 pointer-events-none"
@@ -1063,7 +1094,9 @@ const GameDiscBoxItem: React.FC<MediaItemProps> = ({
             <div
               className="flex-1 w-full flex items-center justify-center"
               style={{
-                background: `radial-gradient(circle at 50% 45%, ${vinylTint}44 0%, #12111d 85%)`,
+                background: isSelected
+                  ? `radial-gradient(circle at 50% 45%, ${vinylTint}44 0%, #12111d 85%)`
+                  : 'radial-gradient(circle at 50% 45%, rgba(255,255,255,0.12) 0%, #12111d 85%)',
               }}
             >
               {getProjectIcon(project.icon, 'w-4 h-4 sm:w-5 sm:h-5 text-white drop-shadow')}
@@ -1085,12 +1118,12 @@ const FloppyDiskItem: React.FC<MediaItemProps> = ({
 
   return (
     <div className="relative flex items-center justify-center">
-      {/* Unclipped Outer Radial Project Glow */}
+      {/* Unclipped Outer Radial Project Glow (only on selected item) */}
       <div
         className="absolute -inset-5 sm:-inset-6 rounded-full pointer-events-none transition-all duration-300"
         style={{
           background: `radial-gradient(circle, ${vinylTint}88 0%, ${vinylTint}38 42%, transparent 72%)`,
-          opacity: isSelected ? 0.85 : isHovered ? 0.92 : 0.16,
+          opacity: isSelected ? 0.85 : 0,
           filter: 'blur(8px)',
         }}
         aria-hidden="true"
@@ -1105,11 +1138,14 @@ const FloppyDiskItem: React.FC<MediaItemProps> = ({
           boxShadow: isSelected
             ? `0 0 22px ${vinylTint}88, 0 14px 26px rgba(0,0,0,0.8)`
             : isHovered
-              ? `0 0 22px ${vinylTint}88, 0 10px 22px rgba(0,0,0,0.75)`
+              ? '0 10px 22px rgba(0,0,0,0.75)'
               : '0 6px 14px rgba(0,0,0,0.62)',
-          border: `1.5px solid ${
-            isSelected || isHovered ? vinylTint : 'rgba(255,255,255,0.22)'
-          }`,
+          border: `1.5px solid ${isSelected
+            ? vinylTint
+            : isHovered
+              ? 'rgba(255,255,255,0.42)'
+              : 'rgba(255,255,255,0.2)'
+            }`,
         }}
       >
         {/* Subtle Top-Right Corner Notch */}
@@ -1144,16 +1180,15 @@ const FloppyDiskItem: React.FC<MediaItemProps> = ({
         <div className="absolute bottom-[7%] left-[12%] right-[12%] h-[54%] rounded-[3px] overflow-hidden flex flex-col border border-black/40 shadow-inner">
           <div
             className="h-[24%] w-full flex-shrink-0"
-            style={{ background: vinylTint }}
+            style={{ background: isSelected ? vinylTint : '#3f3f4e' }}
           />
           <div
             className="flex-1 flex items-center justify-center"
             style={{
-              background:
-                isSelected || isHovered
-                  ? 'linear-gradient(180deg, #272638 0%, #191826 100%)'
-                  : '#181724',
-              color: isSelected || isHovered ? '#ffffff' : vinylTint,
+              background: isSelected
+                ? 'linear-gradient(180deg, #272638 0%, #191826 100%)'
+                : '#181724',
+              color: isSelected ? '#ffffff' : 'rgba(255,255,255,0.68)',
             }}
           >
             {getProjectIcon(project.icon, 'w-3.5 h-3.5 sm:w-[18px] sm:h-[18px] drop-shadow')}
@@ -1192,7 +1227,7 @@ const StackedVinylBar: React.FC<StackedVinylBarProps> = ({
   const activeProject = projects[activeIdx] ?? projects[0];
   const displayProject =
     hoveredIdx !== null && projects[hoveredIdx] ? projects[hoveredIdx] : activeProject;
-  const displayTint = displayProject.vinylColor || accent;
+  const activeTint = activeProject.vinylColor || accent;
 
   const checkScroll = useCallback(() => {
     const el = scrollContainerRef.current;
@@ -1243,26 +1278,26 @@ const StackedVinylBar: React.FC<StackedVinylBarProps> = ({
           : undefined;
 
   return (
-    <div className="sticky top-2 sm:top-3 z-40 mb-6 sm:mb-8 w-full sm:w-fit sm:max-w-[calc(100%-255px)] xl:max-w-fit sm:mr-auto sm:ml-0 xl:mx-auto">
+    <div className="sticky top-2 sm:top-3 z-40 mb-6 sm:mb-8 w-full sm:w-fit sm:max-w-[calc(100%-210px)] lg:max-w-fit sm:mr-auto sm:ml-0 xl:mx-auto">
       {/* Fading Shadow Dock (no solid background or border) */}
       <div className="relative flex items-center justify-center gap-0.5 sm:gap-1.5 px-2 sm:px-4 py-1.5">
-        {/* Ambient Fading Shadow Backdrop (no solid box, fades smoothly at all edges) */}
+        {/* Elliptical Ambient Shadow Backdrop */}
         <div
-          className="pointer-events-none absolute -inset-x-8 -inset-y-4 z-0"
+          className="pointer-events-none absolute -inset-x-10 -inset-y-3 rounded-[50%] z-0"
           style={{
             background:
-              'radial-gradient(ellipse 68% 55% at 50% 58%, rgba(0, 0, 0, 0.9) 0%, rgba(5, 4, 12, 0.72) 42%, rgba(5, 4, 12, 0.28) 68%, transparent 100%)',
-            filter: 'blur(8px)',
+              'radial-gradient(closest-side, rgba(0, 0, 0, 0.92) 0%, rgba(5, 4, 12, 0.72) 52%, rgba(5, 4, 12, 0.25) 78%, transparent 100%)',
+            filter: 'blur(12px)',
           }}
           aria-hidden="true"
         />
-        {/* Concentrated Shelf Shadow underneath items so selected item extrudes above the top */}
+        {/* Concentrated Elliptical Shelf Shadow */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-4 -bottom-2 z-0"
+          className="pointer-events-none absolute -inset-x-4 top-2 -bottom-2 rounded-[50%] z-0"
           style={{
             background:
-              'radial-gradient(ellipse 72% 58% at 50% 62%, rgba(0, 0, 0, 0.95) 0%, rgba(8, 7, 18, 0.68) 50%, transparent 100%)',
-            filter: 'blur(5px)',
+              'radial-gradient(closest-side, rgba(0, 0, 0, 0.95) 0%, rgba(8, 7, 18, 0.65) 58%, transparent 100%)',
+            filter: 'blur(8px)',
           }}
           aria-hidden="true"
         />
@@ -1288,9 +1323,8 @@ const StackedVinylBar: React.FC<StackedVinylBarProps> = ({
               el.scrollLeft += e.deltaY;
             }
           }}
-          className={`relative z-10 flex-1 min-w-0 max-w-[265px] sm:max-w-[350px] md:max-w-[385px] ${
-            canScrollLeft || canScrollRight ? 'overflow-x-auto' : 'overflow-visible'
-          } no-scrollbar pt-14 pb-10 -mt-12 -mb-8 px-9 sm:px-11 -mx-3 sm:-mx-4`}
+          className={`relative z-10 flex-1 min-w-0 max-w-[320px] sm:max-w-[480px] md:max-w-[620px] lg:max-w-[760px] ${canScrollLeft || canScrollRight ? 'overflow-x-auto' : 'overflow-visible'
+            } no-scrollbar pt-14 pb-10 -mt-12 -mb-8 px-9 sm:px-11 -mx-3 sm:-mx-4`}
           style={{
             maskImage: edgeMaskImage,
             WebkitMaskImage: edgeMaskImage,
@@ -1306,15 +1340,14 @@ const StackedVinylBar: React.FC<StackedVinylBarProps> = ({
               const offset = idx - activeIdx;
               const absOffset = Math.abs(offset);
 
-              // Symmetric Y-axis tilt: items right of selected tilt right (-deg), left tilt left (+deg)
+              // Tilt towards the selected item with decreasing magnitude the further away the item is
               let tiltY = 0;
               if (!isSelected) {
-                if (isHovered) {
-                  tiltY = offset > 0 ? -10 : 10;
-                } else {
-                  const tiltMagnitude = Math.min(42, 24 + (absOffset - 1) * 7);
-                  tiltY = offset > 0 ? -tiltMagnitude : tiltMagnitude;
-                }
+                const baseMagnitude = Math.max(6, 32 - (absOffset - 1) * 8);
+                const tiltMagnitude = isHovered
+                  ? Math.max(4, baseMagnitude * 0.45)
+                  : baseMagnitude;
+                tiltY = offset > 0 ? -tiltMagnitude : tiltMagnitude;
               }
 
               const translateY = isSelected ? -15 : isHovered ? -5 : 2;
@@ -1419,7 +1452,10 @@ const StackedVinylBar: React.FC<StackedVinylBarProps> = ({
           className="px-2.5 py-0.5 rounded-full text-[11px] font-medium backdrop-blur-md border transition-all duration-300"
           style={{
             backgroundColor: 'rgba(11, 10, 20, 0.72)',
-            borderColor: `${displayTint}44`,
+            borderColor:
+              hoveredIdx !== null && hoveredIdx !== activeIdx
+                ? 'rgba(255,255,255,0.22)'
+                : `${activeTint}44`,
             color: '#f4f4f5',
           }}
         >
@@ -1437,11 +1473,18 @@ interface ProjectSectionProps {
 
 export const ProjectSection: React.FC<ProjectSectionProps> = ({ section }) => {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [prevSectionKey, setPrevSectionKey] = useState(section.key);
+  if (prevSectionKey !== section.key) {
+    setPrevSectionKey(section.key);
+    setActiveIdx(0);
+  }
   const topAnchorRef = useRef<HTMLDivElement>(null);
 
   const projects = section.projects;
   const n = projects.length;
-  const activeProject = projects[activeIdx] ?? projects[0];
+  const safeActiveIdx =
+    prevSectionKey !== section.key ? 0 : Math.min(activeIdx, Math.max(0, n - 1));
+  const activeProject = projects[safeActiveIdx] ?? projects[0];
 
   const isAnimReel = activeProject.id === '3d-animations-reel';
   const themeBg = isAnimReel ? '#000000' : activeProject.themeBg || '#0b0a14';
@@ -1459,12 +1502,12 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section }) => {
   );
 
   const handlePrev = useCallback(() => {
-    goToProject(activeIdx - 1);
-  }, [activeIdx, goToProject]);
+    goToProject(safeActiveIdx - 1);
+  }, [safeActiveIdx, goToProject]);
 
   const handleNext = useCallback(() => {
-    goToProject(activeIdx + 1);
-  }, [activeIdx, goToProject]);
+    goToProject(safeActiveIdx + 1);
+  }, [safeActiveIdx, goToProject]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -1531,212 +1574,206 @@ export const ProjectSection: React.FC<ProjectSectionProps> = ({ section }) => {
 
       {/* Main Scrollable Foreground Container */}
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-8 md:px-12 pt-6 sm:pt-16 pb-24 sm:pb-16">
-        {/* Compact Section Header */}
-        <div className="flex items-center justify-between gap-4 mb-3 sm:mb-4">
-          <div className="flex items-center gap-3">
-            <span
-              className="text-xs font-mono tracking-[0.16em] font-semibold"
-              style={{ color: isAnimReel ? 'rgba(255,255,255,0.55)' : projectAccent }}
-            >
-              {section.label}
-            </span>
-          </div>
-          <span className="text-xs font-mono text-zinc-400">
-            {String(activeIdx + 1).padStart(2, '0')} / {String(n).padStart(2, '0')}
-          </span>
-        </div>
-
-        {/* Top Sticky Stacked Media Project Selector + Simplified Prev/Next Chevrons */}
-        <StackedVinylBar
-          sectionKey={section.key}
-          projects={projects}
-          activeIdx={activeIdx}
-          accent={section.accent}
-          onSelect={goToProject}
-          onPrev={handlePrev}
-          onNext={handleNext}
-        />
-
-        {/* Single Visible Project Stage with Page-Switch Transition */}
         <AnimatePresence mode="wait">
-          {isAnimReel ? (
-            <motion.div
-              key={activeProject.id}
-              initial={{ opacity: 0, scale: 0.985 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.985 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full"
-            >
-              <PureBlackVideoStage project={activeProject} />
-            </motion.div>
-          ) : (
-            <motion.article
-              key={activeProject.id}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -14 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full flex flex-col gap-6 sm:gap-8"
-            >
-              {/* Full-Width Project Media Showcase */}
-              <div className="w-full relative">
-                <ImageShowcase key={activeProject.id} project={activeProject} accent={projectAccent} />
-              </div>
+          <motion.div
+            key={section.key}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            exit={{ opacity: 0, x: -64 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* Top Sticky Stacked Media Project Selector + Simplified Prev/Next Chevrons */}
+            <StackedVinylBar
+              sectionKey={section.key}
+              projects={projects}
+              activeIdx={safeActiveIdx}
+              accent={section.accent}
+              onSelect={goToProject}
+              onPrev={handlePrev}
+              onNext={handleNext}
+            />
 
-              {/* Project Title, Release Year & Status Badge */}
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 pb-6 border-b border-white/10">
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono text-zinc-300 bg-white/[0.06] border border-white/10">
-                      <TbCalendar className="w-3.5 h-3.5 text-zinc-400" />
-                      <span>{activeProject.year}</span>
-                    </span>
-
-                    <span
-                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide"
-                      style={{
-                        backgroundColor: `${activeProject.statusColor}22`,
-                        color: activeProject.statusColor,
-                        border: `1px solid ${activeProject.statusColor}55`,
-                      }}
-                    >
-                      {activeProject.status}
-                    </span>
+            {/* Single Visible Project Stage with Page-Switch Transition */}
+            <AnimatePresence mode="wait">
+              {isAnimReel ? (
+                <motion.div
+                  key={activeProject.id}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, x: 0, y: 0 }}
+                  exit={{ opacity: 0, x: -64 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="w-full"
+                >
+                  <PureBlackVideoStage project={activeProject} />
+                </motion.div>
+              ) : (
+                <motion.article
+                  key={activeProject.id}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, x: 0, y: 0 }}
+                  exit={{ opacity: 0, x: -64 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="w-full flex flex-col gap-6 sm:gap-8"
+                >
+                  {/* Full-Width Project Media Showcase */}
+                  <div className="w-full relative">
+                    <ImageShowcase key={activeProject.id} project={activeProject} accent={projectAccent} />
                   </div>
 
-                  <h1
-                    className="text-white font-black tracking-tight leading-[1.06] m-0"
-                    style={{
-                      fontFamily: 'Archivo Black, sans-serif',
-                      fontSize: 'clamp(2rem, 4.4vw, 3.4rem)',
-                    }}
-                  >
-                    {activeProject.label}
-                  </h1>
-                </div>
-
-                {/* Lively Animated Platform-Glow CTA Buttons */}
-                {actionLinks.length > 0 && (
-                  <div className="flex items-center gap-3 flex-wrap">
-                    {actionLinks.map((link, lIdx) => {
-                      const ctaStyle = getPlatformCtaStyle(link.icon);
-                      return (
-                        <a
-                          key={link.url + lIdx}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="platform-cta-btn inline-flex items-center gap-2.5 px-5 py-3 rounded-xl text-sm font-bold text-white no-underline cursor-pointer"
-                          style={
-                            {
-                              background: ctaStyle.background,
-                              border: `1px solid ${ctaStyle.borderColor}`,
-                              ['--cta-glow' as string]: ctaStyle.glowColor,
-                            } as React.CSSProperties
-                          }
-                        >
-                          {getLinkIcon(link.icon, 'w-4.5 h-4.5 flex-shrink-0')}
-                          <span>{link.label}</span>
-                          <TbExternalLink className="w-3.5 h-3.5 opacity-80" />
-                        </a>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Project Narrative, Highlights & Technologies in Tinted Glass Panels */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Left: Description & Key Highlights */}
-                <div className="lg:col-span-7 flex flex-col gap-6">
-                  <div className="rounded-2xl p-6 sm:p-7 bg-white/[0.045] backdrop-blur-xl border border-white/10 shadow-xl">
-                    <h2 className="text-xs font-mono tracking-[0.14em] text-zinc-400 mb-3">
-                      About This Project
-                    </h2>
-                    <p className="text-zinc-200 text-base sm:text-[17px] leading-relaxed m-0">
-                      {activeProject.description}
-                    </p>
-                  </div>
-
-                  {activeProject.highlights && activeProject.highlights.length > 0 && (
-                    <div className="rounded-2xl p-6 sm:p-7 bg-white/[0.045] backdrop-blur-xl border border-white/10 shadow-xl">
-                      <h2 className="text-xs font-mono tracking-[0.14em] text-zinc-400 mb-4 flex items-center gap-2">
-                        <TbCheck className="w-4 h-4" style={{ color: projectAccent }} />
-                        <span>Key Highlights</span>
-                      </h2>
-                      <ul className="space-y-2.5 m-0 p-0 list-none">
-                        {activeProject.highlights.map((h, i) => (
-                          <li
-                            key={i}
-                            className="flex items-start gap-3 text-sm sm:text-[15px] text-zinc-200 bg-white/[0.03] border border-white/[0.07] rounded-xl px-4 py-3"
-                          >
-                            <span
-                              className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
-                              style={{
-                                backgroundColor: projectAccent,
-                                boxShadow: `0 0 8px ${projectAccent}`,
-                              }}
-                            />
-                            <span className="leading-snug">{h}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-
-                {/* Right: Technologies Stack & Project Switch Arrows */}
-                <div className="lg:col-span-5 flex flex-col gap-6">
-                  <div className="rounded-2xl p-6 sm:p-7 bg-white/[0.045] backdrop-blur-xl border border-white/10 shadow-xl">
-                    <h2 className="text-xs font-mono tracking-[0.14em] text-zinc-400 mb-4">
-                      Technologies Used
-                    </h2>
-                    <div className="flex flex-wrap gap-2">
-                      {activeProject.technologies.map((tech) => (
-                        <span
-                          key={tech}
-                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-white/[0.06] border border-white/10 text-zinc-100 hover:bg-white/[0.12] transition-colors"
-                        >
-                          <TechIcon
-                            name={tech}
-                            className="w-4 h-4 flex-shrink-0"
-                            style={{ color: projectAccent }}
-                          />
-                          <span>{tech}</span>
+                  {/* Project Title, Release Year & Status Badge */}
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 pb-6 border-b border-white/10">
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono text-zinc-300 bg-white/[0.06] border border-white/10">
+                          <TbCalendar className="w-3.5 h-3.5 text-zinc-400" />
+                          <span>{activeProject.year}</span>
                         </span>
-                      ))}
+
+                        <span
+                          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide"
+                          style={{
+                            backgroundColor: `${activeProject.statusColor}22`,
+                            color: activeProject.statusColor,
+                            border: `1px solid ${activeProject.statusColor}55`,
+                          }}
+                        >
+                          {activeProject.status}
+                        </span>
+                      </div>
+
+                      <h1
+                        className="text-white font-black tracking-tight leading-[1.06] m-0"
+                        style={{
+                          fontFamily: 'Archivo Black, sans-serif',
+                          fontSize: 'clamp(2rem, 4.4vw, 3.4rem)',
+                        }}
+                      >
+                        {activeProject.label}
+                      </h1>
                     </div>
+
+                    {/* Lively Animated Platform-Glow CTA Buttons */}
+                    {actionLinks.length > 0 && (
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {actionLinks.map((link, lIdx) => {
+                          const ctaStyle = getPlatformCtaStyle(link.icon);
+                          return (
+                            <a
+                              key={link.url + lIdx}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="platform-cta-btn inline-flex items-center gap-2.5 px-5 py-3 rounded-xl text-base sm:text-lg font-bold text-white no-underline cursor-pointer"
+                              style={
+                                {
+                                  background: ctaStyle.background,
+                                  border: `1px solid ${ctaStyle.borderColor}`,
+                                  ['--cta-glow' as string]: ctaStyle.glowColor,
+                                } as React.CSSProperties
+                              }
+                            >
+                              {getLinkIcon(link.icon, 'w-5 h-5 flex-shrink-0')}
+                              <span>{link.label}</span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Quick Prev/Next Project Switcher Card inside details */}
-                  {n > 1 && (
-                    <div className="rounded-2xl p-5 bg-white/[0.035] backdrop-blur-xl border border-white/10 flex items-center justify-between gap-3">
-                      <button
-                        type="button"
-                        onClick={handlePrev}
-                        className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.14] border border-white/10 text-xs sm:text-sm font-semibold text-zinc-200 transition-all cursor-pointer"
-                      >
-                        <TbChevronLeft className="w-4 h-4" />
-                        <span>Previous</span>
-                      </button>
-                      <span className="text-xs font-mono text-zinc-400">
-                        {activeIdx + 1} of {n}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={handleNext}
-                        className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.14] border border-white/10 text-xs sm:text-sm font-semibold text-zinc-200 transition-all cursor-pointer"
-                      >
-                        <span>Next</span>
-                        <TbChevronRight className="w-4 h-4" />
-                      </button>
+                  {/* Project Narrative, Highlights & Technologies in Tinted Glass Panels */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4">
+                    {/* Left: Description & Key Highlights */}
+                    <div className="lg:col-span-7 flex flex-col gap-3.5 sm:gap-4">
+                      <div className="project-glass-card rounded-lg p-6 sm:p-7 bg-white/[0.045] backdrop-blur-xl shadow-xl">
+                        <h2 className="text-xs font-mono tracking-[0.14em] text-zinc-400 mb-3">
+                          About This Project
+                        </h2>
+                        <p className="text-zinc-200 text-base sm:text-[17px] leading-relaxed m-0">
+                          {activeProject.description}
+                        </p>
+                      </div>
+
+                      {activeProject.highlights && activeProject.highlights.length > 0 && (
+                        <div className="project-glass-card rounded-lg p-6 sm:p-7 bg-white/[0.045] backdrop-blur-xl shadow-xl">
+                          <h2 className="text-xs font-mono tracking-[0.14em] text-zinc-400 mb-4 flex items-center gap-2">
+                            <TbCheck className="w-4 h-4" style={{ color: projectAccent }} />
+                            <span>Key Highlights</span>
+                          </h2>
+                          <ul className="space-y-2 m-0 p-0 list-none">
+                            {activeProject.highlights.map((h, i) => (
+                              <li
+                                key={i}
+                                className="flex items-start gap-3 text-sm sm:text-[15px] text-zinc-200 py-1"
+                              >
+                                <span
+                                  className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
+                                  style={{
+                                    backgroundColor: projectAccent,
+                                    boxShadow: `0 0 8px ${projectAccent}`,
+                                  }}
+                                />
+                                <span className="leading-snug">{h}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-            </motion.article>
-          )}
+
+                    {/* Right: Technologies Stack & Project Switch Arrows */}
+                    <div className="lg:col-span-5 flex flex-col gap-3.5 sm:gap-4">
+                      <div className="project-glass-card rounded-lg p-6 sm:p-7 bg-white/[0.045] backdrop-blur-xl shadow-xl">
+                        <h2 className="text-xs font-mono tracking-[0.14em] text-zinc-400 mb-4">
+                          Technologies Used
+                        </h2>
+                        <div className="flex flex-wrap gap-2">
+                          {activeProject.technologies.map((tech) => (
+                            <span
+                              key={tech}
+                              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-white/[0.06] border border-white/10 text-zinc-100 hover:bg-white/[0.12] transition-colors"
+                            >
+                              <TechIcon
+                                name={tech}
+                                className="w-4 h-4 flex-shrink-0"
+                                style={{ color: projectAccent }}
+                              />
+                              <span>{tech}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Quick Prev/Next Project Switcher Card inside details */}
+                      {n > 1 && (
+                        <div className="project-glass-card rounded-lg p-5 bg-white/[0.035] backdrop-blur-xl flex items-center justify-between gap-3">
+                          <button
+                            type="button"
+                            onClick={handlePrev}
+                            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-transparent hover:bg-white/[0.08] border border-transparent hover:border-white/15 text-xs sm:text-sm font-semibold text-zinc-200 transition-all cursor-pointer"
+                          >
+                            <TbChevronLeft className="w-4 h-4" />
+                            <span>Previous</span>
+                          </button>
+                          <span className="text-xs font-mono text-zinc-400">
+                            {safeActiveIdx + 1} of {n}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={handleNext}
+                            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-transparent hover:bg-white/[0.08] border border-transparent hover:border-white/15 text-xs sm:text-sm font-semibold text-zinc-200 transition-all cursor-pointer"
+                          >
+                            <span>Next</span>
+                            <TbChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.article>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </AnimatePresence>
       </div>
     </div>
