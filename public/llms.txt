@@ -1,0 +1,31 @@
+# Marouan Boufernana — Portfolio
+
+> Portfolio of Marouan Boufernana: Software Engineer, Game Developer, and 3D Artist. Showcases production fullstack web platforms, indie Unity games, 3D modeling and animation reels, work experience, and technical devlogs.
+
+## Main Pages
+- [Home](https://marouan.boufer.com/): Overview and interactive introduction to Marouan Boufernana.
+- [Experience](https://marouan.boufer.com/experience): Professional timeline including Tech Lead & Architect at Valinnov, fullstack engineering, and cloud microservices architecture.
+- [Software Engineering](https://marouan.boufer.com/software): Production web and fullstack software projects.
+- [Game Development](https://marouan.boufer.com/gamedev): Commercial and game-jam indie games built with Unity.
+- [3D Modeling & Animation](https://marouan.boufer.com/3d-art): Blender hard-surface modeling, physics rigs, and mechanical animation reels.
+- [Blog](https://marouan.boufer.com/blog): Articles on game design, systems architecture, and devlogs.
+- [Connect](https://marouan.boufer.com/connect): Contact information and social profiles.
+
+## Featured Projects & External Links
+- [Moraja3ati](https://moraja3ati.ma/): Production EdTech & AI tutoring web platform for Moroccan students (React, TypeScript, Node.js, PostgreSQL, Prisma, Docker).
+- [Walls & Tower Party](https://marouan.boufer.com/gamedev): Online multiplayer indie game published on Steam and Google Play.
+- [Scrap Vanguard](https://marouan.boufer.com/gamedev): Action survival game built in Unity.
+- [Itch.io Games](https://marouan-boufer.itch.io/): Playable game jam entries including Under Under, Cursed Demons, and Agent Diplegia.
+
+## Blog & Writing
+- [Design Influences & Games I Like](https://marouan.boufer.com/blog/games-i-like): Deconstructing world architecture, kinetic physics, reactive AI, and player agency.
+- [Building Modular Combat & Devlog Notes](https://marouan.boufer.com/blog/building-scrap-vanguard-systems): Architecting wave-based survival rigs, Shader Graph effects, and rapid iteration workflows.
+
+## Optional
+- [GitHub](https://github.com/mboufern): Open-source repositories and source code.
+- [LinkedIn](https://www.linkedin.com/in/boufer/): Professional profile and work history.
+- [X (Twitter)](https://x.com/BouferMarouan): Devlogs and tech insights.
+- [LeetCode](https://leetcode.com/u/boufernana17/): Algorithms and problem-solving profile.
+- [Instagram](https://instagram.com/mar1boufer): 3D renders and game art.
+- [Sitemap](https://marouan.boufer.com/sitemap.xml): XML sitemap of all public routes.
+- [AI Catalog](https://marouan.boufer.com/.well-known/ai-catalog.json): Agentic Resource Discovery (ARD) JSON manifest.

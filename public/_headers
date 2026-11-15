@@ -1,0 +1,11 @@
+/llms.txt
+  Content-Type: text/markdown; charset=utf-8
+  Access-Control-Allow-Origin: *
+  X-Robots-Tag: all
+
+/.well-known/ai-catalog.json
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/
+  Link: </.well-known/ai-catalog.json>; rel="ai-catalog", </llms.txt>; rel="llms-txt"

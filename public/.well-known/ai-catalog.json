@@ -1,0 +1,34 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Marouan Boufernana — Portfolio",
+    "identifier": "marouan.boufer.com",
+    "documentationUrl": "https://marouan.boufer.com/llms.txt",
+    "logoUrl": "https://marouan.boufer.com/assets/me/logo.png"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:marouan.boufer.com:docs:llms-txt",
+      "displayName": "LLMs.txt Site Index",
+      "type": "text/markdown",
+      "url": "https://marouan.boufer.com/llms.txt",
+      "description": "Machine-readable Markdown index of Marouan Boufernana's software engineering, game development, 3D art projects, experience, and blog posts.",
+      "tags": ["portfolio", "llms-txt", "documentation"],
+      "representativeQueries": [
+        "Who is Marouan Boufernana and what projects has he built?",
+        "List Marouan Boufernana's software engineering and game development portfolio"
+      ]
+    },
+    {
+      "identifier": "urn:air:marouan.boufer.com:docs:sitemap",
+      "displayName": "Portfolio XML Sitemap",
+      "type": "application/xml",
+      "url": "https://marouan.boufer.com/sitemap.xml",
+      "description": "XML sitemap listing all public routes on marouan.boufer.com.",
+      "tags": ["sitemap", "discovery"],
+      "representativeQueries": [
+        "Get all public pages and routes on marouan.boufer.com"
+      ]
+    }
+  ]
+}
