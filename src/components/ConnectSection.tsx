@@ -10,7 +10,6 @@ import { SiLeetcode } from 'react-icons/si';
 import {
   TbMail,
   TbSend,
-  TbMailOpened,
   TbCopy,
   TbCheck,
   TbArrowUpRight,
@@ -88,29 +87,38 @@ export const ConnectSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Compact Direct Contact Email Card (No full-width stretch, no "Direct Email" label) */}
-        <div className="mb-7">
-          <div className="group/email w-full sm:w-fit sm:min-w-[390px] max-w-md bg-white rounded-2xl p-4 sm:p-5 border-2 border-zinc-900/15 shadow-[0_6px_0_rgba(24,24,27,0.08)] hover:border-zinc-900 hover:shadow-[0_8px_0_#15cea9] transition-all duration-300 flex flex-col gap-4">
-            <div className="flex items-center gap-3.5">
-              {/* Animated Email Icon Badge: transitions from Mail to MailOpened on hover */}
-              <div className="relative w-11 h-11 rounded-xl bg-zinc-900 text-[#15cea9] flex items-center justify-center shrink-0 overflow-hidden shadow-sm transition-transform duration-300 group-hover/email:scale-105">
-                <TbMail className="w-5 h-5 transition-all duration-300 ease-out group-hover/email:-translate-y-7 group-hover/email:opacity-0 group-hover/email:scale-75" />
-                <TbMailOpened className="w-5 h-5 absolute transition-all duration-300 ease-out translate-y-7 opacity-0 scale-75 group-hover/email:translate-y-0 group-hover/email:opacity-100 group-hover/email:scale-100" />
+        {/* Direct Contact Email Hub (Compact width, luminous teal glow, animated icon) */}
+        <div className="mb-6">
+          <div className="group/email relative w-full sm:w-fit sm:min-w-[380px] max-w-md bg-white rounded-2xl p-5 border border-zinc-200/90 shadow-[0_6px_24px_rgba(0,0,0,0.05)] hover:shadow-[0_14px_38px_rgba(21,206,169,0.2)] hover:border-[#15cea9]/70 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+            {/* Soft Ambient Teal Corner Glow */}
+            <div
+              className="pointer-events-none absolute -top-12 -right-12 w-36 h-36 rounded-full opacity-25 group-hover/email:opacity-50 group-hover/email:scale-125 transition-all duration-500"
+              style={{
+                background: 'radial-gradient(circle, #15cea9 0%, transparent 70%)',
+                filter: 'blur(20px)',
+              }}
+              aria-hidden="true"
+            />
+
+            <div className="relative z-10 flex items-center gap-3.5 mb-4">
+              {/* Animated Icon Container: morphs from Mail to Send plane on hover */}
+              <div className="relative w-11 h-11 rounded-xl bg-teal-50 border border-teal-200/80 flex items-center justify-center text-[#0fa68a] shrink-0 overflow-hidden transition-all duration-300 group-hover/email:bg-[#15cea9] group-hover/email:border-[#15cea9] group-hover/email:text-white group-hover/email:shadow-[0_6px_18px_rgba(21,206,169,0.45)]">
+                <TbMail className="w-5 h-5 transition-all duration-300 ease-out group-hover/email:-translate-y-6 group-hover/email:translate-x-6 group-hover/email:opacity-0 group-hover/email:scale-75" />
+                <TbSend className="w-5 h-5 absolute transition-all duration-300 ease-out translate-y-6 -translate-x-6 opacity-0 scale-75 group-hover/email:translate-y-0 group-hover/email:translate-x-0 group-hover/email:opacity-100 group-hover/email:scale-100" />
               </div>
 
               <a
                 href={`mailto:${PERSONAL_INFO.email}`}
-                className="text-zinc-900 font-black text-sm sm:text-base md:text-lg tracking-tight hover:text-[#0fa68a] transition-colors truncate no-underline"
-                style={{ fontFamily: 'Archivo Black, sans-serif' }}
+                className="text-zinc-900 font-bold text-base sm:text-lg tracking-tight hover:text-[#15cea9] transition-colors truncate no-underline"
               >
                 {PERSONAL_INFO.email}
               </a>
             </div>
 
-            <div className="flex items-center gap-2.5 pt-3 border-t border-zinc-200/80">
+            <div className="relative z-10 flex items-center gap-2.5 pt-3 border-t border-zinc-100">
               <a
                 href={`mailto:${PERSONAL_INFO.email}`}
-                className="group/btn platform-cta-btn px-5 py-2.5 rounded-xl text-white text-sm font-bold flex items-center justify-center gap-2 no-underline shrink-0"
+                className="group/btn platform-cta-btn flex-1 py-2.5 px-5 rounded-xl text-white text-sm sm:text-base font-semibold flex items-center justify-center gap-2 no-underline"
                 style={
                   {
                     background: 'linear-gradient(135deg, #18181b 0%, #0d9488 100%)',
@@ -118,10 +126,9 @@ export const ConnectSection: React.FC = () => {
                   } as React.CSSProperties
                 }
               >
-                {/* Animated Button Icon: transitions from Mail to Paper Plane Send on hover */}
                 <span className="relative w-4 h-4 inline-flex items-center justify-center overflow-hidden">
-                  <TbMail className="w-4 h-4 transition-all duration-300 ease-out group-hover/btn:-translate-y-5 group-hover/btn:translate-x-3 group-hover/btn:opacity-0" />
-                  <TbSend className="w-4 h-4 absolute transition-all duration-300 ease-out translate-y-5 -translate-x-3 opacity-0 group-hover/btn:translate-y-0 group-hover/btn:translate-x-0 group-hover/btn:opacity-100" />
+                  <TbMail className="w-4 h-4 transition-all duration-300 ease-out group-hover/btn:-translate-y-5 group-hover/btn:translate-x-4 group-hover/btn:opacity-0" />
+                  <TbSend className="w-4 h-4 absolute transition-all duration-300 ease-out translate-y-5 -translate-x-4 opacity-0 group-hover/btn:translate-y-0 group-hover/btn:translate-x-0 group-hover/btn:opacity-100" />
                 </span>
                 <span>Send Email</span>
               </a>
@@ -129,17 +136,17 @@ export const ConnectSection: React.FC = () => {
               <button
                 type="button"
                 onClick={copyEmail}
-                className={`py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-2 ${
+                className={`py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
                   copiedEmail
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-400'
-                    : 'bg-zinc-50 hover:bg-zinc-900 hover:text-white text-zinc-800 border-zinc-900/15 hover:border-zinc-900'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                    : 'bg-white hover:bg-zinc-50 text-zinc-700 border-zinc-200 hover:border-zinc-300'
                 }`}
                 aria-label="Copy email address"
               >
                 {copiedEmail ? (
                   <TbCheck className="w-4 h-4 text-emerald-600" />
                 ) : (
-                  <TbCopy className="w-4 h-4" />
+                  <TbCopy className="w-4 h-4 text-zinc-500" />
                 )}
                 <span>{copiedEmail ? 'Copied!' : 'Copy'}</span>
               </button>
@@ -148,84 +155,55 @@ export const ConnectSection: React.FC = () => {
         </div>
 
         {/* Bold Channels Grid (6 Verified Links) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3.5">
           {SOCIALS.map((social: SocialLink) => (
             <a
               key={social.name}
               href={social.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative bg-white rounded-2xl p-4 sm:p-5 border-2 border-zinc-900/15 hover:border-zinc-900 shadow-[0_6px_0_rgba(24,24,27,0.08)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between overflow-hidden min-h-[132px] sm:min-h-[152px] no-underline"
-              style={
-                {
-                  ['--social-color' as string]: social.color,
-                } as React.CSSProperties
-              }
+              className="group relative bg-white rounded-2xl p-4 sm:p-5 border border-zinc-200/90 shadow-[0_4px_14px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden no-underline"
             >
-              {/* Top Brand Accent Bar */}
+              {/* Glowing Brand Outline & Shadow on Hover */}
               <div
-                className="
-                  absolute top-0 left-0 right-0 h-1.5 opacity-85 group-hover:h-2 transition-all duration-300
-                "
-                style={{ backgroundColor: social.color }}
-                aria-hidden="true"
+                className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{
+                  boxShadow: `inset 0 0 0 2px ${social.color}88, 0 12px 30px ${social.color}28`,
+                }}
               />
 
               {/* Subtle Oversized Background Watermark Icon */}
               <div
-                className="pointer-events-none absolute -right-4 -bottom-4 opacity-[0.05] group-hover:opacity-[0.11] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-300"
+                className="pointer-events-none absolute -right-3 -bottom-3 opacity-[0.045] group-hover:opacity-[0.1] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-300"
                 style={{ color: social.color }}
                 aria-hidden="true"
               >
-                {getSocialIcon(social.icon, 'w-24 h-24 sm:w-28 sm:h-28')}
+                {getSocialIcon(social.icon, 'w-20 h-20 sm:w-24 sm:h-24')}
               </div>
 
-              {/* Hover Brand Border & Offset Shadow Accent */}
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                style={{
-                  background: `radial-gradient(circle at 100% 0%, ${social.color}16 0%, transparent 70%)`,
-                }}
-                aria-hidden="true"
-              />
-
-              <div className="relative z-10 flex items-start justify-between gap-2 mb-3.5 mt-1">
+              <div className="relative z-10 flex items-center justify-between gap-2 mb-3">
                 <div
-                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white border-2 border-zinc-900/10 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3"
+                  className="w-11 h-11 rounded-xl flex items-center justify-center text-white transition-all duration-300 group-hover:scale-110"
                   style={{
                     backgroundColor: social.color,
-                    boxShadow: `0 6px 16px ${social.color}40`,
+                    boxShadow: `0 6px 16px ${social.color}45`,
                   }}
                 >
                   {getSocialIcon(social.icon)}
                 </div>
-
-                <div className="w-8 h-8 rounded-lg border border-zinc-200 bg-zinc-50 group-hover:bg-zinc-900 group-hover:border-zinc-900 flex items-center justify-center transition-colors duration-300 shrink-0">
-                  <TbArrowUpRight className="w-4 h-4 text-zinc-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
-                </div>
+                <TbArrowUpRight className="w-5 h-5 text-zinc-400 group-hover:text-zinc-900 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
               </div>
 
               <div className="relative z-10">
                 <div
-                  className="font-black text-zinc-900 text-sm sm:text-lg tracking-tight leading-snug group-hover:text-black"
+                  className="font-black text-zinc-900 text-sm sm:text-base tracking-tight group-hover:text-black"
                   style={{ fontFamily: 'Archivo Black, sans-serif' }}
                 >
                   {social.name}
                 </div>
-
-                <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                  <span
-                    className="inline-block text-[11px] sm:text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 group-hover:bg-zinc-900 group-hover:text-white transition-colors duration-300 truncate max-w-full"
-                  >
-                    {social.handle || social.name}
-                  </span>
+                <div className="text-xs text-zinc-600 font-mono font-bold truncate mt-0.5">
+                  {social.handle || social.name}
                 </div>
-
-                {social.category && (
-                  <div className="hidden sm:block text-[11px] font-medium text-zinc-500 mt-1.5 truncate">
-                    {social.category}
-                  </div>
-                )}
               </div>
             </a>
           ))}
