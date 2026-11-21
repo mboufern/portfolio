@@ -40,7 +40,12 @@ export const BlogPostPage: React.FC = () => {
   const PostComponent = post.Component;
 
   return (
-    <BlogLayout post={post} prevPost={prevPost} nextPost={nextPost}>
+    <BlogLayout
+      post={post}
+      postNumber={postIdx + 1}
+      prevPost={prevPost}
+      nextPost={nextPost}
+    >
       <PostComponent />
     </BlogLayout>
   );

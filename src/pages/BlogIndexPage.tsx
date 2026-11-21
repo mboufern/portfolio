@@ -1,31 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaBomb, FaCode, FaPalette, FaScroll } from 'react-icons/fa6';
 import { BLOG_POSTS } from '../blogs/registry';
+import { BLOG_CATEGORIES, getCategoryIcon } from '../blogs/categoryMeta';
 import type { BlogCategory } from '../blogs/types';
-
-const BLOG_CATEGORIES: Array<'All' | BlogCategory> = [
-  'All',
-  'Game Dev',
-  'Software Architecture',
-  'Art',
-  'Devlogs',
-];
-
-const getCategoryIcon = (category: BlogCategory, className = 'w-4 h-4') => {
-  switch (category) {
-    case 'Game Dev':
-      return <FaBomb className={className} />;
-    case 'Software Architecture':
-      return <FaCode className={className} />;
-    case 'Art':
-      return <FaPalette className={className} />;
-    case 'Devlogs':
-    default:
-      return <FaScroll className={className} />;
-  }
-};
 
 const generateCardRotations = (): Record<string, number> => {
   const rotations: Record<string, number> = {};
@@ -78,7 +56,7 @@ export const BlogIndexPage: React.FC = () => {
             Blog
           </h1>
           <p className="text-zinc-600 text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed mt-3 mb-0">
-            Thoughts, engineering notes, project updates, and game studies written as interactive components.
+            Essays, engineering notes, postmortems, and game design studies.
           </p>
         </header>
 
@@ -126,7 +104,7 @@ export const BlogIndexPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0, rotate: rotation }}
                   transition={{
                     duration: 0.55,
-                    delay: idx * 0.09,
+                    delay: Math.min(idx * 0.04, 0.45),
                     ease: [0.22, 1, 0.36, 1],
                   }}
                   whileHover={{

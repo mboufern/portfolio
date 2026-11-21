@@ -8,7 +8,7 @@
 - [Software Engineering](https://marouan.boufer.com/software): Production web and fullstack software projects.
 - [Game Development](https://marouan.boufer.com/gamedev): Commercial and game-jam indie games built with Unity.
 - [3D Modeling & Animation](https://marouan.boufer.com/3d-art): Blender hard-surface modeling, physics rigs, and mechanical animation reels.
-- [Blog](https://marouan.boufer.com/blog): Articles on game design, systems architecture, and devlogs.
+- [Blog](https://marouan.boufer.com/blog): Essays, engineering notes, postmortems, and game design studies.
 - [Connect](https://marouan.boufer.com/connect): Contact information and social profiles.
 
 ## Featured Projects & External Links
@@ -19,7 +19,22 @@
 
 ## Blog & Writing
 - [Design Influences & Games I Like](https://marouan.boufer.com/blog/games-i-like): Deconstructing world architecture, kinetic physics, reactive AI, and player agency.
-- [Building Modular Combat & Devlog Notes](https://marouan.boufer.com/blog/building-scrap-vanguard-systems): Architecting wave-based survival rigs, Shader Graph effects, and rapid iteration workflows.
+- [What Makes a Game Fun? Zelda BOTW](https://marouan.boufer.com/blog/what-makes-a-game-fun-botw): How Breath of the Wild redefined fun.
+- [Anti-Boredom Mechanics: BOTW & MGSV](https://marouan.boufer.com/blog/preventing-player-boredom-botw-mgsv): Preventing the player from boring themselves.
+- [Creating Your Own Game Design Tools](https://marouan.boufer.com/blog/creating-your-own-game-design-tools): Custom editors, debuggers, and workflow tools.
+- [Between a Hobby and a Business](https://marouan.boufer.com/blog/bleeding-edge-hobby-and-business): Navigating passion and sustainable game development.
+- [Frameworks That Explain Abstractions](https://marouan.boufer.com/blog/frameworks-that-explain-abstractions): Software frameworks that clarify complexity.
+- [How Game Pace Controls the Player](https://marouan.boufer.com/blog/how-game-pace-controls-the-player): Tempo, tension, and player emotion.
+- [Insights From Feedback & Analytics](https://marouan.boufer.com/blog/insights-from-feedback-and-analytics): Extracting signal from playtests and telemetry.
+- [Balance and Imbalance in Silksong](https://marouan.boufer.com/blog/balance-and-imbalance-in-silksong): Deliberate imbalance in combat and progression.
+- [AI Can Code Now—Good for Us](https://marouan.boufer.com/blog/ai-can-code-now-good-for-us): Systems thinking and taste in the AI era.
+- [Is Art Really Dying?](https://marouan.boufer.com/blog/is-art-really-dying): Craft, originality, and human expression.
+- [The Game Jam Experience Before AI](https://marouan.boufer.com/blog/game-jam-experience-before-ai): Building prototypes from scratch before AI assistants.
+- [Moroccan Gaming Expo 2025](https://marouan.boufer.com/blog/moroccan-gaming-expo-2025): Floor notes from Morocco Gaming Expo 2025.
+- [Walls & Tower: Cardboard to Steam](https://marouan.boufer.com/blog/walls-and-tower-cardboard-to-steam): Ten-year journey from cardboard to Steam.
+- [Scrap Vanguard: Letting Go of Ideas](https://marouan.boufer.com/blog/scrap-vanguard-letting-go-of-old-ideas): Cutting mechanics that hold the core game back.
+- [Scrap Vanguard: Demo Results](https://marouan.boufer.com/blog/scrap-vanguard-demo-results): Metrics and player feedback from the public demo.
+- [Under Under & Failed Prototypes](https://marouan.boufer.com/blog/under-under-agent-diplegia-failed-prototype): Lessons from Under Under and Agent Diplegia.
 
 ## Optional
 - [GitHub](https://github.com/mboufern): Open-source repositories and source code.
