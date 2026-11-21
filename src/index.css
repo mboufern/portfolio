@@ -456,13 +456,35 @@
 }
 
 .playing-card-art-core {
-  -webkit-mask-image: radial-gradient(ellipse 56% 56% at 50% 50%, #000 42%, transparent 74%);
-  mask-image: radial-gradient(ellipse 56% 56% at 50% 50%, #000 42%, transparent 74%);
+  -webkit-mask-image: radial-gradient(
+    ellipse 46% 46% at 50% 50%,
+    #000 28%,
+    rgba(0, 0, 0, 0.52) 58%,
+    transparent 88%
+  );
+  mask-image: radial-gradient(
+    ellipse 46% 46% at 50% 50%,
+    #000 28%,
+    rgba(0, 0, 0, 0.52) 58%,
+    transparent 88%
+  );
 }
 
 .playing-card-art-dither-fade {
-  -webkit-mask-image: radial-gradient(ellipse 74% 74% at 50% 50%, #000 50%, transparent 96%);
-  mask-image: radial-gradient(ellipse 74% 74% at 50% 50%, #000 50%, transparent 96%);
+  -webkit-mask-image: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    #000 34%,
+    rgba(0, 0, 0, 0.65) 62%,
+    rgba(0, 0, 0, 0.18) 84%,
+    transparent 98%
+  );
+  mask-image: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    #000 34%,
+    rgba(0, 0, 0, 0.65) 62%,
+    rgba(0, 0, 0, 0.18) 84%,
+    transparent 98%
+  );
 }
 
 .playing-card-art-dither-img {
@@ -477,8 +499,18 @@
 
 .playing-card-art-dither-rim {
   background: #f9f6ee;
-  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, transparent 44%, #000 84%);
-  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, transparent 44%, #000 84%);
+  -webkit-mask-image: radial-gradient(
+    ellipse 49% 49% at 50% 50%,
+    transparent 42%,
+    rgba(0, 0, 0, 0.65) 74%,
+    #000 96%
+  );
+  mask-image: radial-gradient(
+    ellipse 49% 49% at 50% 50%,
+    transparent 42%,
+    rgba(0, 0, 0, 0.65) 74%,
+    #000 96%
+  );
 }
 
 /* ── Project Detail Glass Card Directional Border ───────────────────── */

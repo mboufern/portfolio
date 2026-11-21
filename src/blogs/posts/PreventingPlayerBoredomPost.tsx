@@ -4,7 +4,6 @@ import {
   ArticleParagraph,
   ArticleSectionHeading,
   ArticleQuote,
-  ArticleCallout,
 } from '../components/ArticlePrimitives';
 
 export const PreventingPlayerBoredomPost: React.FC = () => {
@@ -98,12 +97,12 @@ export const PreventingPlayerBoredomPost: React.FC = () => {
         night-vision goggles and extra searchlights.
       </ArticleParagraph>
 
-      <ArticleCallout title="A Living Counter-Strategy">
+      <ArticleParagraph>
         Because the world pushes back against your comfort zone, you are forced to adapt
         right alongside it. You either change your tactics on the fly, swap loadouts, or
         send your Combat Unit on dispatch missions to disrupt enemy supply lines before
         deploying. Every operation evolves based on your own history.
-      </ArticleCallout>
+      </ArticleParagraph>
 
       <ArticleSectionHeading>3. Protecting the Player From Themselves</ArticleSectionHeading>
 

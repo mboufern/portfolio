@@ -49,22 +49,6 @@ export const ArticleQuote: React.FC<{
   </blockquote>
 );
 
-export const ArticleCallout: React.FC<{
-  title?: string;
-  children: React.ReactNode;
-}> = ({ title, children }) => (
-  <aside className="my-6 rounded-2xl bg-white/85 border border-zinc-900/10 p-5 sm:p-6 shadow-[0_4px_20px_rgba(24,24,27,0.04)]">
-    {title && (
-      <div className="text-xs font-mono uppercase tracking-[0.14em] text-zinc-500 font-semibold mb-2">
-        {title}
-      </div>
-    )}
-    <div className="text-zinc-700 text-sm sm:text-[15.5px] leading-relaxed">
-      {children}
-    </div>
-  </aside>
-);
-
 export const ArticleFigure: React.FC<{
   src: string;
   alt: string;

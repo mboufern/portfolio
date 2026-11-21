@@ -4,7 +4,6 @@ import {
   ArticleParagraph,
   ArticleSectionHeading,
   ArticleQuote,
-  ArticleCallout,
 } from '../components/ArticlePrimitives';
 
 /**
@@ -29,10 +28,6 @@ export const TemplatePost: React.FC = () => {
       <ArticleQuote>
         Pull quotes highlight a key insight or design takeaway.
       </ArticleQuote>
-
-      <ArticleCallout title="Key Takeaway">
-        Callout blocks hold concise engineering notes, metrics, or sidebars.
-      </ArticleCallout>
     </div>
   );
 };

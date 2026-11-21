@@ -164,6 +164,7 @@ export const BlogIndexPage: React.FC = () => {
                             alt={meta.title}
                             loading="lazy"
                             className="w-full h-full object-cover playing-card-art-core transition-transform duration-500 group-hover:scale-105"
+                            style={{ objectPosition: meta.coverPosition ?? 'center' }}
                           />
                           <img
                             src={meta.coverImage}
@@ -171,6 +172,7 @@ export const BlogIndexPage: React.FC = () => {
                             aria-hidden="true"
                             loading="lazy"
                             className="absolute inset-0 w-full h-full object-cover playing-card-art-dither-img transition-transform duration-500 group-hover:scale-105"
+                            style={{ objectPosition: meta.coverPosition ?? 'center' }}
                           />
                           <div
                             className="pointer-events-none absolute inset-0 playing-card-art-dither-rim"

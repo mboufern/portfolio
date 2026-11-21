@@ -4,7 +4,6 @@ import {
   ArticleParagraph,
   ArticleSectionHeading,
   ArticleQuote,
-  ArticleCallout,
 } from '../components/ArticlePrimitives';
 
 export const WhatMakesGameFunBotwPost: React.FC = () => {
@@ -63,13 +62,13 @@ export const WhatMakesGameFunBotwPost: React.FC = () => {
         face unfamiliar problems out in the world.
       </ArticleParagraph>
 
-      <ArticleCallout title="A Miniature of the Whole Game">
+      <ArticleParagraph>
         Once you clear all four Shrines, you finally earn the Paraglider and are free to
         leap off the cliffs without falling to your death. Technically, the entire Great
         Plateau is just a tutorial, yet in roughly 1 to 2 hours and across only about 1
         to 2% of the total map surface, you have already experienced a complete miniature
         of the game&apos;s core loop and most of what it has to offer.
-      </ArticleCallout>
+      </ArticleParagraph>
 
       <ArticleSectionHeading>2. Stepping Into the Wild</ArticleSectionHeading>
 

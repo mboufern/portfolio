@@ -16,6 +16,7 @@ export interface BlogPostMeta {
   tags: string[];
   accent: string;
   coverImage?: string;
+  coverPosition?: string;
   isDraft?: boolean;
 }
 
