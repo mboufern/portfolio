@@ -23,6 +23,9 @@ interface ZoomingCardState {
     width: number;
     height: number;
   };
+  targetX: number;
+  targetY: number;
+  targetScale: number;
   rotation: number;
   cardNum: number;
   suitColor: string;
@@ -74,6 +77,15 @@ export const BlogIndexPage: React.FC = () => {
       }
       e.preventDefault();
       const rect = e.currentTarget.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const cardCenterX = rect.left + rect.width / 2;
+      const cardCenterY = rect.top + rect.height / 2;
+      const targetX = vw / 2 - cardCenterX;
+      const targetY = vh / 2 - cardCenterY;
+      // Uniform scale so the 5:7 card shape/aspect ratio never distorts while zooming to fill the screen
+      const targetScale = Math.max(vw / rect.width, vh / rect.height) * 1.18;
+
       setZoomingCard({
         post,
         rect: {
@@ -82,6 +94,9 @@ export const BlogIndexPage: React.FC = () => {
           width: rect.width,
           height: rect.height,
         },
+        targetX,
+        targetY,
+        targetScale,
         rotation,
         cardNum,
         suitColor,
@@ -91,7 +106,7 @@ export const BlogIndexPage: React.FC = () => {
         navigate(`/blog/${post.meta.slug}`, {
           state: { fromCardZoom: true },
         });
-      }, 430);
+      }, 460);
     },
     [navigate, zoomingCard]
   );
@@ -122,7 +137,7 @@ export const BlogIndexPage: React.FC = () => {
           <motion.header
             layout
             transition={{
-              layout: { duration: 0.38, ease: [0.22, 1, 0.36, 1] },
+              layout: { duration: 0.36, ease: [0.22, 1, 0.36, 1] },
             }}
             className={
               isHeaderMinimized
@@ -132,6 +147,9 @@ export const BlogIndexPage: React.FC = () => {
           >
             <motion.h1
               layout="position"
+              transition={{
+                layout: { duration: 0.36, ease: [0.22, 1, 0.36, 1] },
+              }}
               onClick={
                 isHeaderMinimized
                   ? () => window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -150,26 +168,23 @@ export const BlogIndexPage: React.FC = () => {
               Blog
             </motion.h1>
 
-            <AnimatePresence initial={false}>
-              {!isHeaderMinimized && (
-                <motion.p
-                  key="blog-description"
-                  initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                  animate={{ opacity: 1, height: 'auto', marginTop: 12 }}
-                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-zinc-600 text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed mb-0 overflow-hidden"
-                >
-                  Essays, engineering notes, postmortems, and game design studies.
-                </motion.p>
-              )}
-            </AnimatePresence>
+            {/* Unmounted immediately when minimized so it never occupies horizontal width in flex-row */}
+            {!isHeaderMinimized && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+                className="text-zinc-600 text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed mt-3 mb-0"
+              >
+                Essays, engineering notes, postmortems, and game design studies.
+              </motion.p>
+            )}
 
             {/* Parallelogram Category Filter Strip */}
             <motion.div
-              layout
+              layout="position"
               transition={{
-                layout: { duration: 0.38, ease: [0.22, 1, 0.36, 1] },
+                layout: { duration: 0.36, ease: [0.22, 1, 0.36, 1] },
               }}
               className={`flex items-center gap-1.5 sm:gap-2 flex-wrap ${
                 isHeaderMinimized ? 'mt-0 pl-1' : 'mt-6'
@@ -183,7 +198,7 @@ export const BlogIndexPage: React.FC = () => {
                     type="button"
                     onClick={() => setSelectedCategory(category)}
                     style={{ transform: 'skewX(-16deg)' }}
-                    className={`inline-flex items-center justify-center rounded-[3px] font-semibold transition-all duration-200 cursor-pointer border ${
+                    className={`inline-flex items-center justify-center rounded-[3px] font-semibold transition-colors duration-200 cursor-pointer border ${
                       isHeaderMinimized
                         ? 'px-2.5 py-1 text-[11px]'
                         : 'px-3.5 py-1.5 text-xs'
@@ -237,8 +252,8 @@ export const BlogIndexPage: React.FC = () => {
                     rotate: rotation,
                   }}
                   transition={{
-                    duration: 0.55,
-                    delay: Math.min(idx * 0.04, 0.45),
+                    duration: isZoomingThisCard ? 0 : 0.55,
+                    delay: isZoomingThisCard ? 0 : Math.min(idx * 0.04, 0.45),
                     ease: [0.22, 1, 0.36, 1],
                   }}
                   whileHover={
@@ -357,38 +372,38 @@ export const BlogIndexPage: React.FC = () => {
         )}
       </div>
 
-      {/* Card Zoom-In Transition Overlay */}
+      {/* Card Zoom-In Transition Overlay: Preserves exact 5:7 card shape & hides image before zooming */}
       <AnimatePresence>
         {zoomingCard && (
-          <motion.div
+          <div
             key="card-zoom-stage"
-            initial={{ backgroundColor: 'rgba(249, 246, 238, 0)' }}
-            animate={{ backgroundColor: 'rgba(249, 246, 238, 0.85)' }}
-            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 z-50 pointer-events-auto overflow-hidden"
           >
             <motion.div
-              initial={{
+              style={{
                 top: zoomingCard.rect.top,
                 left: zoomingCard.rect.left,
                 width: zoomingCard.rect.width,
                 height: zoomingCard.rect.height,
+              }}
+              initial={{
+                x: 0,
+                y: 0,
+                scale: 1,
                 rotate: zoomingCard.rotation,
-                borderRadius: 22,
               }}
               animate={{
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100dvh',
+                x: zoomingCard.targetX,
+                y: zoomingCard.targetY,
+                scale: zoomingCard.targetScale,
                 rotate: 0,
-                borderRadius: 0,
               }}
               transition={{
-                duration: 0.44,
-                ease: [0.22, 1, 0.36, 1],
+                delay: 0.09,
+                duration: 0.37,
+                ease: [0.32, 0, 0.2, 1],
               }}
-              className="fixed bg-[#f9f6ee] border border-zinc-900/15 shadow-[0_32px_90px_rgba(24,24,27,0.3)] overflow-hidden flex flex-col justify-between p-4 sm:p-5"
+              className="fixed rounded-[22px] bg-[#f9f6ee] border border-zinc-900/15 shadow-[0_32px_90px_rgba(24,24,27,0.28)] overflow-hidden flex flex-col justify-between p-4 sm:p-5 origin-center will-change-transform"
             >
               {/* Whole-Card Rough Dither Grain */}
               <div
@@ -396,12 +411,21 @@ export const BlogIndexPage: React.FC = () => {
                 aria-hidden="true"
               />
 
-              {/* Zooming Inner Card Content that scales closer & dissolves into the article */}
+              {/* Inner Playing Card Frame Line fades out cleanly as card zooms */}
               <motion.div
-                initial={{ opacity: 1, scale: 1 }}
-                animate={{ opacity: 0, scale: 1.24 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="relative w-full h-full flex flex-col justify-between origin-center"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 0 }}
+                transition={{ duration: 0.16, ease: 'easeOut' }}
+                className="pointer-events-none absolute inset-2.5 rounded-[14px] border border-zinc-900/[0.08] z-10"
+                aria-hidden="true"
+              />
+
+              {/* Card Details fade out quickly before the zoom scales up */}
+              <motion.div
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 0 }}
+                transition={{ duration: 0.1, ease: 'easeOut' }}
+                className="relative w-full h-full flex flex-col justify-between"
               >
                 <div
                   className="absolute top-0 left-0 z-20 flex flex-col items-center leading-none select-none px-1.5 py-1 rounded-lg bg-[#f9f6ee]/70"
@@ -418,28 +442,8 @@ export const BlogIndexPage: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="relative z-10 flex-1 w-full flex items-center justify-center mb-2 min-h-0">
-                  {zoomingCard.post.meta.coverImage ? (
-                    <div className="relative w-full h-full max-h-[320px] playing-card-art-dither-fade flex items-center justify-center overflow-hidden rounded-xl">
-                      <img
-                        src={zoomingCard.post.meta.coverImage}
-                        alt={zoomingCard.post.meta.title}
-                        className="w-full h-full object-cover playing-card-art-core"
-                        style={{
-                          objectPosition:
-                            zoomingCard.post.meta.coverPosition ?? 'center',
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      className="w-28 h-28 rounded-full flex items-center justify-center opacity-20"
-                      style={{ color: zoomingCard.suitColor }}
-                    >
-                      {getCategoryIcon(zoomingCard.post.meta.category, 'w-14 h-14')}
-                    </div>
-                  )}
-                </div>
+                {/* Image is hidden immediately so it never stretches during zoom */}
+                <div className="flex-1" />
 
                 <div className="relative z-20 px-2 pb-3 text-center">
                   <h2
@@ -458,7 +462,7 @@ export const BlogIndexPage: React.FC = () => {
                 </div>
               </motion.div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
