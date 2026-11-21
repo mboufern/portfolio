@@ -139,7 +139,7 @@ const AnimatedRoutes: React.FC = () => {
             />
             <Route
               path="/games"
-              element={<Navigate to="/blog/games-i-like" replace />}
+              element={<Navigate to="/blog" replace />}
             />
             <Route
               path="/connect"

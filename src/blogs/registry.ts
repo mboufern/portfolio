@@ -1,24 +1,9 @@
 import type { BlogPostEntry } from './types';
-import { GamesILikePost } from './posts/GamesILikePost';
 import { WhatMakesGameFunBotwPost } from './posts/WhatMakesGameFunBotwPost';
+import { PreventingPlayerBoredomPost } from './posts/PreventingPlayerBoredomPost';
 import { DraftPost } from './posts/DraftPost';
 
 export const BLOG_POSTS: BlogPostEntry[] = [
-  {
-    meta: {
-      slug: 'games-i-like',
-      title: 'Design Influences & Games I Like',
-      subtitle:
-        'Deconstructing world architecture, kinetic physics, reactive AI, and player agency in the titles that shape how I design software and games.',
-      category: 'Game Dev',
-      date: 'Nov 2026',
-      readTime: '4 min read',
-      tags: ['Game Design', 'Architecture', 'Personal Picks'],
-      accent: '#ff779c',
-      coverImage: '/assets/games/botw.jpg',
-    },
-    Component: GamesILikePost,
-  },
   {
     meta: {
       slug: 'what-makes-a-game-fun-botw',
@@ -26,11 +11,11 @@ export const BLOG_POSTS: BlogPostEntry[] = [
       subtitle:
         'How The Legend of Zelda: Breath of the Wild completely redefined what fun means to me.',
       category: 'Game Dev',
-      date: 'Nov 2026',
-      readTime: '4 min read',
+      date: '2023',
+      readTime: '5 min read',
       tags: ['Game Design', 'Zelda BOTW', 'Player Agency'],
       accent: '#15cea9',
-      coverImage: '/assets/games/totk.jpg',
+      coverImage: '/assets/games/botw.jpg',
     },
     Component: WhatMakesGameFunBotwPost,
   },
@@ -39,16 +24,15 @@ export const BLOG_POSTS: BlogPostEntry[] = [
       slug: 'preventing-player-boredom-botw-mgsv',
       title: 'Anti-Boredom Mechanics: BOTW & MGSV',
       subtitle:
-        'Preventing the player from boring themselves—systemic lessons from Breath of the Wild and Metal Gear Solid V.',
+        'Preventing the player from boring themselves: systemic lessons from Breath of the Wild and Metal Gear Solid V.',
       category: 'Game Dev',
       date: 'Nov 2026',
-      readTime: 'Coming soon',
+      readTime: '5 min read',
       tags: ['Game Mechanics', 'BOTW', 'MGSV'],
       accent: '#f59e0b',
       coverImage: '/assets/games/mgsv.jpg',
-      isDraft: true,
     },
-    Component: DraftPost,
+    Component: PreventingPlayerBoredomPost,
   },
   {
     meta: {
@@ -135,7 +119,7 @@ export const BLOG_POSTS: BlogPostEntry[] = [
       slug: 'balance-and-imbalance-in-silksong',
       title: 'Balance and Imbalance in Silksong',
       subtitle:
-        'What makes combat and progression feel alive when a game embraces deliberate imbalance—through the lens of Silksong.',
+        'What makes combat and progression feel alive when a game embraces deliberate imbalance, through the lens of Silksong.',
       category: 'Game Dev',
       date: 'Nov 2026',
       readTime: 'Coming soon',
@@ -149,7 +133,7 @@ export const BLOG_POSTS: BlogPostEntry[] = [
   {
     meta: {
       slug: 'ai-can-code-now-good-for-us',
-      title: 'AI Can Code Now—Good for Us',
+      title: 'AI Can Code Now. Good for Us',
       subtitle:
         'When writing syntax stops being the bottleneck, systems thinking, taste, and product direction matter more than ever.',
       category: 'Software Architecture',
@@ -215,7 +199,7 @@ export const BLOG_POSTS: BlogPostEntry[] = [
       slug: 'walls-and-tower-cardboard-to-steam',
       title: 'Walls & Tower: Cardboard to Steam',
       subtitle:
-        'The ten-year journey of Walls & Tower Party—from hand-cut cardboard prototypes to launching on Steam.',
+        'The ten-year journey of Walls & Tower Party, from hand-cut cardboard prototypes to launching on Steam.',
       category: 'Devlogs',
       date: 'Nov 2026',
       readTime: 'Coming soon',
@@ -263,7 +247,7 @@ export const BLOG_POSTS: BlogPostEntry[] = [
       slug: 'under-under-agent-diplegia-failed-prototype',
       title: 'Under Under & Failed Prototypes',
       subtitle:
-        'Developing Under Under and Agent Diplegia—and what a failed prototype teaches you faster than a success.',
+        'Developing Under Under and Agent Diplegia, and what a failed prototype teaches you faster than a success.',
       category: 'Devlogs',
       date: 'Nov 2026',
       readTime: 'Coming soon',

@@ -43,7 +43,7 @@ export const ArticleQuote: React.FC<{
     </p>
     {attribution && (
       <footer className="mt-2 text-xs font-mono text-zinc-500 not-italic">
-        — {attribution}
+        - {attribution}
       </footer>
     )}
   </blockquote>

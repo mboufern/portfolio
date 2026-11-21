@@ -18,7 +18,6 @@
 - [Itch.io Games](https://marouan-boufer.itch.io/): Playable game jam entries including Under Under, Cursed Demons, and Agent Diplegia.
 
 ## Blog & Writing
-- [Design Influences & Games I Like](https://marouan.boufer.com/blog/games-i-like): Deconstructing world architecture, kinetic physics, reactive AI, and player agency.
 - [What Makes a Game Fun? Zelda BOTW](https://marouan.boufer.com/blog/what-makes-a-game-fun-botw): How Breath of the Wild redefined fun.
 - [Anti-Boredom Mechanics: BOTW & MGSV](https://marouan.boufer.com/blog/preventing-player-boredom-botw-mgsv): Preventing the player from boring themselves.
 - [Creating Your Own Game Design Tools](https://marouan.boufer.com/blog/creating-your-own-game-design-tools): Custom editors, debuggers, and workflow tools.
@@ -27,7 +26,7 @@
 - [How Game Pace Controls the Player](https://marouan.boufer.com/blog/how-game-pace-controls-the-player): Tempo, tension, and player emotion.
 - [Insights From Feedback & Analytics](https://marouan.boufer.com/blog/insights-from-feedback-and-analytics): Extracting signal from playtests and telemetry.
 - [Balance and Imbalance in Silksong](https://marouan.boufer.com/blog/balance-and-imbalance-in-silksong): Deliberate imbalance in combat and progression.
-- [AI Can Code Now—Good for Us](https://marouan.boufer.com/blog/ai-can-code-now-good-for-us): Systems thinking and taste in the AI era.
+- [AI Can Code Now. Good for Us](https://marouan.boufer.com/blog/ai-can-code-now-good-for-us): Systems thinking and taste in the AI era.
 - [Is Art Really Dying?](https://marouan.boufer.com/blog/is-art-really-dying): Craft, originality, and human expression.
 - [The Game Jam Experience Before AI](https://marouan.boufer.com/blog/game-jam-experience-before-ai): Building prototypes from scratch before AI assistants.
 - [Moroccan Gaming Expo 2025](https://marouan.boufer.com/blog/moroccan-gaming-expo-2025): Floor notes from Morocco Gaming Expo 2025.
