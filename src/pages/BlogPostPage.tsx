@@ -11,7 +11,7 @@ export const BlogPostPage: React.FC = () => {
 
   if (!post) {
     return (
-      <div className="min-h-[100dvh] w-full bg-[#f8f7fc] flex flex-col items-center justify-center px-6 text-center">
+      <div className="min-h-[100dvh] w-full bg-[#f9f6ee] flex flex-col items-center justify-center px-6 text-center">
         <h1
           className="text-3xl font-black text-zinc-900 mb-3"
           style={{ fontFamily: 'Archivo Black, sans-serif' }}
@@ -32,20 +32,10 @@ export const BlogPostPage: React.FC = () => {
     );
   }
 
-  const prevPost = postIdx > 0 ? BLOG_POSTS[postIdx - 1] : undefined;
-  const nextPost =
-    postIdx >= 0 && postIdx < BLOG_POSTS.length - 1
-      ? BLOG_POSTS[postIdx + 1]
-      : undefined;
   const PostComponent = post.Component;
 
   return (
-    <BlogLayout
-      post={post}
-      postNumber={postIdx + 1}
-      prevPost={prevPost}
-      nextPost={nextPost}
-    >
+    <BlogLayout post={post} postNumber={postIdx + 1}>
       <PostComponent />
     </BlogLayout>
   );

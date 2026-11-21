@@ -456,35 +456,25 @@
 }
 
 .playing-card-art-core {
-  -webkit-mask-image: radial-gradient(
-    ellipse 46% 46% at 50% 50%,
-    #000 28%,
-    rgba(0, 0, 0, 0.52) 58%,
-    transparent 88%
-  );
-  mask-image: radial-gradient(
-    ellipse 46% 46% at 50% 50%,
-    #000 28%,
-    rgba(0, 0, 0, 0.52) 58%,
-    transparent 88%
-  );
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.6) 6%, #000 15%, #000 85%, rgba(0, 0, 0, 0.6) 94%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.6) 6%, #000 15%, #000 85%, rgba(0, 0, 0, 0.6) 94%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.6) 6%, #000 15%, #000 85%, rgba(0, 0, 0, 0.6) 94%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.6) 6%, #000 15%, #000 85%, rgba(0, 0, 0, 0.6) 94%, transparent 100%);
+  mask-composite: intersect;
 }
 
 .playing-card-art-dither-fade {
-  -webkit-mask-image: radial-gradient(
-    ellipse 50% 50% at 50% 50%,
-    #000 34%,
-    rgba(0, 0, 0, 0.65) 62%,
-    rgba(0, 0, 0, 0.18) 84%,
-    transparent 98%
-  );
-  mask-image: radial-gradient(
-    ellipse 50% 50% at 50% 50%,
-    #000 34%,
-    rgba(0, 0, 0, 0.65) 62%,
-    rgba(0, 0, 0, 0.18) 84%,
-    transparent 98%
-  );
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 3%, rgba(0, 0, 0, 0.85) 9%, #000 16%, #000 84%, rgba(0, 0, 0, 0.85) 91%, rgba(0, 0, 0, 0.35) 97%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.35) 3%, rgba(0, 0, 0, 0.85) 9%, #000 16%, #000 84%, rgba(0, 0, 0, 0.85) 91%, rgba(0, 0, 0, 0.35) 97%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 3%, rgba(0, 0, 0, 0.85) 9%, #000 16%, #000 84%, rgba(0, 0, 0, 0.85) 91%, rgba(0, 0, 0, 0.35) 97%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.35) 3%, rgba(0, 0, 0, 0.85) 9%, #000 16%, #000 84%, rgba(0, 0, 0, 0.85) 91%, rgba(0, 0, 0, 0.35) 97%, transparent 100%);
+  mask-composite: intersect;
 }
 
 .playing-card-art-dither-img {
@@ -500,18 +490,117 @@
 .playing-card-art-dither-rim {
   background: #f9f6ee;
   -webkit-mask-image: radial-gradient(
-    ellipse 49% 49% at 50% 50%,
-    transparent 42%,
-    rgba(0, 0, 0, 0.65) 74%,
-    #000 96%
+    ellipse 58% 58% at 50% 50%,
+    transparent 52%,
+    rgba(0, 0, 0, 0.65) 78%,
+    #000 98%
   );
   mask-image: radial-gradient(
-    ellipse 49% 49% at 50% 50%,
-    transparent 42%,
-    rgba(0, 0, 0, 0.65) 74%,
-    #000 96%
+    ellipse 58% 58% at 50% 50%,
+    transparent 52%,
+    rgba(0, 0, 0, 0.65) 78%,
+    #000 98%
   );
 }
+
+/* ── Article Image Left & Right Edge Slight Dither ──────────────────── */
+.article-img-dither-fade {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 1.5%,
+    rgba(0, 0, 0, 0.78) 4.5%,
+    #000 8.5%,
+    #000 91.5%,
+    rgba(0, 0, 0, 0.78) 95.5%,
+    rgba(0, 0, 0, 0.25) 98.5%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 1.5%,
+    rgba(0, 0, 0, 0.78) 4.5%,
+    #000 8.5%,
+    #000 91.5%,
+    rgba(0, 0, 0, 0.78) 95.5%,
+    rgba(0, 0, 0, 0.25) 98.5%,
+    transparent 100%
+  );
+}
+
+.article-img-dither-core {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 3.5%,
+    #000 9%,
+    #000 91%,
+    rgba(0, 0, 0, 0.35) 96.5%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 3.5%,
+    #000 9%,
+    #000 91%,
+    rgba(0, 0, 0, 0.35) 96.5%,
+    transparent 100%
+  );
+}
+
+.article-img-dither-rim {
+  background: #f9f6ee;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    rgba(0, 0, 0, 0.75) 3.5%,
+    rgba(0, 0, 0, 0.25) 7%,
+    transparent 11%,
+    transparent 89%,
+    rgba(0, 0, 0, 0.25) 93%,
+    rgba(0, 0, 0, 0.75) 96.5%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    rgba(0, 0, 0, 0.75) 3.5%,
+    rgba(0, 0, 0, 0.25) 7%,
+    transparent 11%,
+    transparent 89%,
+    rgba(0, 0, 0, 0.25) 93%,
+    rgba(0, 0, 0, 0.75) 96.5%,
+    #000 100%
+  );
+}
+
+.article-editorial-body img:not(.article-img-dither-core):not(.playing-card-art-dither-img) {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 1.5%,
+    rgba(0, 0, 0, 0.78) 4.5%,
+    #000 8.5%,
+    #000 91.5%,
+    rgba(0, 0, 0, 0.78) 95.5%,
+    rgba(0, 0, 0, 0.25) 98.5%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 1.5%,
+    rgba(0, 0, 0, 0.78) 4.5%,
+    #000 8.5%,
+    #000 91.5%,
+    rgba(0, 0, 0, 0.78) 95.5%,
+    rgba(0, 0, 0, 0.25) 98.5%,
+    transparent 100%
+  );
+}
+
 
 /* ── Project Detail Glass Card Directional Border ───────────────────── */
 .project-glass-card {

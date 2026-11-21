@@ -70,7 +70,12 @@ const AnimatedRoutes: React.FC = () => {
 
   const isProjectRoute =
     activeSectionIdx === 2 || activeSectionIdx === 3 || activeSectionIdx === 4;
-  const routeGroupKey = isProjectRoute ? '/projects-group' : location.pathname;
+  const isBlogRoute = activeSectionIdx === 5;
+  const routeGroupKey = isProjectRoute
+    ? '/projects-group'
+    : isBlogRoute
+      ? '/blog-group'
+      : location.pathname;
 
   return (
     <>
@@ -123,19 +128,11 @@ const AnimatedRoutes: React.FC = () => {
             />
             <Route
               path="/blog"
-              element={
-                <PageTransition>
-                  <BlogIndexPage />
-                </PageTransition>
-              }
+              element={<BlogIndexPage />}
             />
             <Route
               path="/blog/:slug"
-              element={
-                <PageTransition>
-                  <BlogPostPage />
-                </PageTransition>
-              }
+              element={<BlogPostPage />}
             />
             <Route
               path="/games"

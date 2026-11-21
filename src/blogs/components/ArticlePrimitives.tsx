@@ -49,15 +49,53 @@ export const ArticleQuote: React.FC<{
   </blockquote>
 );
 
+export const ArticleDitherImage: React.FC<{
+  src: string;
+  alt: string;
+  className?: string;
+  imgClassName?: string;
+  objectPosition?: string;
+  loading?: 'lazy' | 'eager';
+}> = ({
+  src,
+  alt,
+  className = '',
+  imgClassName = 'w-full h-auto block object-cover',
+  objectPosition,
+  loading = 'lazy',
+}) => (
+  <div className={`relative overflow-hidden rounded-xl article-img-dither-fade ${className}`}>
+    <img
+      src={src}
+      alt={alt}
+      loading={loading}
+      className={`${imgClassName} article-img-dither-core`}
+      style={objectPosition ? { objectPosition } : undefined}
+    />
+    <img
+      src={src}
+      alt=""
+      aria-hidden="true"
+      loading={loading}
+      className={`pointer-events-none absolute inset-0 ${imgClassName} playing-card-art-dither-img`}
+      style={objectPosition ? { objectPosition } : undefined}
+    />
+    <div
+      className="pointer-events-none absolute inset-0 article-img-dither-rim"
+      aria-hidden="true"
+    >
+      <div className="w-full h-full playing-card-dither-grain opacity-75" />
+    </div>
+  </div>
+);
+
 export const ArticleFigure: React.FC<{
   src: string;
   alt: string;
   caption?: string;
 }> = ({ src, alt, caption }) => (
   <figure className="my-8 m-0">
-    <div className="rounded-2xl overflow-hidden border border-zinc-900/10 bg-zinc-950 shadow-[0_12px_32px_rgba(24,24,27,0.08)]">
-      <img src={src} alt={alt} loading="lazy" className="w-full h-auto block object-cover" />
-    </div>
+    <ArticleDitherImage src={src} alt={alt} />
     {caption && (
       <figcaption className="mt-2.5 text-xs font-mono text-zinc-500 text-center">
         {caption}
@@ -67,13 +105,13 @@ export const ArticleFigure: React.FC<{
 );
 
 export const ArticleDivider: React.FC = () => (
-  <hr className="my-8 border-0 h-px bg-zinc-200/80" />
+  <hr className="my-8 border-0 h-px bg-zinc-900/12" />
 );
 
 export const ArticleDraftNotice: React.FC<{
   topic?: string;
 }> = ({ topic }) => (
-  <div className="rounded-2xl bg-white/80 border border-zinc-900/10 p-7 sm:p-10 shadow-[0_8px_30px_rgba(24,24,27,0.05)]">
+  <div className="rounded-2xl bg-white/65 border border-zinc-900/12 p-7 sm:p-10 shadow-[0_8px_30px_rgba(24,24,27,0.05)]">
     <div className="flex items-center gap-2.5 text-xs font-mono uppercase tracking-[0.16em] text-zinc-500 font-semibold mb-3">
       <TbFeather className="w-4 h-4 text-zinc-700" />
       <span>Drafting in Progress</span>
@@ -85,7 +123,7 @@ export const ArticleDraftNotice: React.FC<{
         : 'This article is currently being written and will be published here soon.'}
     </p>
 
-    <div className="mt-6 pt-5 border-t border-zinc-200/70">
+    <div className="mt-6 pt-5 border-t border-zinc-900/10">
       <Link
         to="/blog"
         className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-zinc-700 hover:text-zinc-950 transition-colors no-underline"
@@ -96,3 +134,4 @@ export const ArticleDraftNotice: React.FC<{
     </div>
   </div>
 );
+
