@@ -13,7 +13,7 @@ export const BlogScoreHud: React.FC<BlogScoreHudProps> = ({
   compact = false,
   className = '',
 }) => {
-  const { score, completedCount, resetGame } = useBlogGameScore();
+  const { score, resetGame } = useBlogGameScore();
   const [displayScore, setDisplayScore] = useState(score);
   const [popNonce, setPopNonce] = useState(0);
   const [isResetOpen, setIsResetOpen] = useState(false);
@@ -106,7 +106,6 @@ export const BlogScoreHud: React.FC<BlogScoreHudProps> = ({
       <ResetScoreModal
         isOpen={isResetOpen}
         score={score}
-        completedCount={completedCount}
         onCancel={() => setIsResetOpen(false)}
         onConfirm={() => {
           resetGame();

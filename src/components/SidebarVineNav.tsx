@@ -30,7 +30,6 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
   activeSectionIdx,
   onNavigate,
   hoveredIdx,
-  onHoverChange,
   dotRefs,
 }) => {
   const [dotPoints, setDotPoints] = useState<DotPoint[]>([]);

@@ -6,7 +6,6 @@ import { TbRotate } from 'react-icons/tb';
 interface ResetScoreModalProps {
   isOpen: boolean;
   score: number;
-  completedCount: number;
   onCancel: () => void;
   onConfirm: () => void;
 }
@@ -14,7 +13,6 @@ interface ResetScoreModalProps {
 export const ResetScoreModal: React.FC<ResetScoreModalProps> = ({
   isOpen,
   score,
-  completedCount,
   onCancel,
   onConfirm,
 }) => {
