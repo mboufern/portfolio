@@ -93,7 +93,7 @@ export const BlogCardMinimap: React.FC<BlogCardMinimapProps> = ({
       className="sm:hidden fixed right-1.5 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center pointer-events-auto select-none"
     >
       <div
-        className="relative w-10 overflow-hidden"
+        className="relative w-10 overflow-hidden rounded-xl bg-black/[0.05] backdrop-blur-[3px]"
         style={{
           height: `${Math.min(viewportPx, trackHeight)}px`,
           WebkitMaskImage: maskImage,
@@ -114,13 +114,13 @@ export const BlogCardMinimap: React.FC<BlogCardMinimapProps> = ({
           {draggedIndex < 0 && (
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute left-0.5 right-0.5 rounded-[7px] bg-zinc-900/[0.06] z-0"
+              className="pointer-events-none absolute left-1 right-1 rounded-lg bg-black/[0.09] z-0"
               style={{
                 top: `${bracketTop.toFixed(1)}px`,
                 height: `${bracketHeight.toFixed(1)}px`,
               }}
             >
-              <span className="absolute left-0 top-1 bottom-1 w-[3px] rounded-full bg-zinc-900/75" />
+              <span className="absolute left-0 top-1 bottom-1 w-[2.5px] rounded-full bg-black/55" />
             </div>
           )}
 
@@ -143,12 +143,12 @@ export const BlogCardMinimap: React.FC<BlogCardMinimapProps> = ({
                   }
                 }}
                 aria-label={`Jump to card ${idx + 1}: ${card.rankLabel} of ${card.category}`}
-                className={`relative z-10 w-8 shrink-0 rounded-[5px] flex flex-col items-center justify-center leading-none border cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/60 ${
+                className={`relative z-10 w-8 shrink-0 flex flex-col items-center justify-center leading-none border-0 cursor-pointer transition-opacity duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/50 ${
                   isDragged
-                    ? 'bg-white border-zinc-900/75 ring-2 ring-zinc-900/35 scale-105 shadow-md z-20'
+                    ? 'bg-black/[0.14] rounded-lg scale-105 opacity-100 z-20'
                     : isInViewport
-                      ? 'bg-[#f9f6ee]/95 border-zinc-900/40 shadow-xs'
-                      : 'bg-[#f9f6ee]/82 border-zinc-900/16 opacity-80'
+                      ? 'bg-transparent opacity-100'
+                      : 'bg-transparent opacity-45'
                 }`}
                 style={{
                   height: `${CARD_HEIGHT}px`,
