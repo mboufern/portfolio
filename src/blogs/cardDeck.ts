@@ -121,13 +121,15 @@ export function dealRandomCategoryRanks(posts: readonly BlogPostEntry[]): DealtC
   return posts.map((post) => dealtBySlug.get(post.meta.slug)!);
 }
 
+export type GridColumns = 1 | 2 | 3 | 4 | 5;
+
 export function getGridTriples(
   count: number,
-  cols: 1 | 2 | 3
+  cols: GridColumns
 ): [number, number, number][] {
   if (count < 3) return [];
 
-  if (cols !== 3) {
+  if (cols < 3) {
     const triples: [number, number, number][] = [];
     for (let i = 0; i <= count - 3; i += 1) {
       triples.push([i, i + 1, i + 2]);
@@ -136,23 +138,25 @@ export function getGridTriples(
   }
 
   const triples: [number, number, number][] = [];
-  const totalRows = Math.ceil(count / 3);
+  const totalRows = Math.ceil(count / cols);
 
-  // Horizontal rows
+  // Horizontal 3-in-a-row segments
   for (let r = 0; r < totalRows; r += 1) {
-    const i0 = r * 3;
-    const i2 = i0 + 2;
-    if (i2 < count) {
-      triples.push([i0, i0 + 1, i2]);
+    for (let c = 0; c + 2 < cols; c += 1) {
+      const i0 = r * cols + c;
+      const i2 = i0 + 2;
+      if (i2 < count) {
+        triples.push([i0, i0 + 1, i2]);
+      }
     }
   }
 
-  // Vertical columns
-  for (let c = 0; c < 3; c += 1) {
+  // Vertical 3-in-a-column segments
+  for (let c = 0; c < cols; c += 1) {
     for (let r = 0; r + 2 < totalRows; r += 1) {
-      const i0 = r * 3 + c;
-      const i1 = (r + 1) * 3 + c;
-      const i2 = (r + 2) * 3 + c;
+      const i0 = r * cols + c;
+      const i1 = (r + 1) * cols + c;
+      const i2 = (r + 2) * cols + c;
       if (i2 < count) {
         triples.push([i0, i1, i2]);
       }
@@ -161,14 +165,20 @@ export function getGridTriples(
 
   // Diagonals (\ and /)
   for (let r = 0; r + 2 < totalRows; r += 1) {
-    const downDiagEnd = (r + 2) * 3 + 2;
-    if (downDiagEnd < count) {
-      triples.push([r * 3, (r + 1) * 3 + 1, downDiagEnd]);
-    }
-    const upDiagStart = r * 3 + 2;
-    const upDiagEnd = (r + 2) * 3;
-    if (upDiagStart < count && upDiagEnd < count) {
-      triples.push([upDiagStart, (r + 1) * 3 + 1, upDiagEnd]);
+    for (let c = 0; c < cols; c += 1) {
+      if (c + 2 < cols) {
+        const downDiagEnd = (r + 2) * cols + (c + 2);
+        if (downDiagEnd < count) {
+          triples.push([r * cols + c, (r + 1) * cols + (c + 1), downDiagEnd]);
+        }
+      }
+      if (c >= 2) {
+        const upDiagStart = r * cols + c;
+        const upDiagEnd = (r + 2) * cols + (c - 2);
+        if (upDiagStart < count && upDiagEnd < count) {
+          triples.push([upDiagStart, (r + 1) * cols + (c - 1), upDiagEnd]);
+        }
+      }
     }
   }
 
@@ -291,33 +301,98 @@ function buildClosingTriplesMap(
   return byMaxIndex;
 }
 
-function solveComboFreeOrder(
+function solveColorPattern(
+  n: number,
+  redCount: number,
+  closingTriples: readonly [number, number, number][][],
+  maxSteps: number
+): CardColorGroup[] | null {
+  const colors: Array<CardColorGroup | undefined> = new Array(n);
+  let steps = 0;
+
+  const backtrack = (pos: number, remRed: number, remBlack: number): boolean => {
+    if (pos === n) return true;
+    if (steps >= maxSteps) return false;
+
+    const checks = closingTriples[pos];
+    const order: [CardColorGroup, CardColorGroup] =
+      Math.random() < 0.5 ? ['red', 'black'] : ['black', 'red'];
+
+    for (let i = 0; i < 2; i += 1) {
+      const color = order[i];
+      if (color === 'red' && remRed === 0) continue;
+      if (color === 'black' && remBlack === 0) continue;
+
+      steps += 1;
+      if (steps > maxSteps) return false;
+
+      colors[pos] = color;
+      let conflict = false;
+      for (let t = 0; t < checks.length; t += 1) {
+        const [a, b, c] = checks[t];
+        const ca = colors[a];
+        const cb = colors[b];
+        const cc = colors[c];
+        if (ca && cb && cc && ca === cb && cb === cc) {
+          conflict = true;
+          break;
+        }
+      }
+
+      if (!conflict) {
+        if (
+          backtrack(
+            pos + 1,
+            color === 'red' ? remRed - 1 : remRed,
+            color === 'black' ? remBlack - 1 : remBlack
+          )
+        ) {
+          return true;
+        }
+      }
+
+      colors[pos] = undefined;
+    }
+
+    return false;
+  };
+
+  if (backtrack(0, redCount, n - redCount)) {
+    return colors as CardColorGroup[];
+  }
+  return null;
+}
+
+function solveCardsIntoColorPattern(
   cards: readonly DealtCard[],
-  triples: readonly [number, number, number][],
+  pattern: readonly CardColorGroup[],
+  closingTriples: readonly [number, number, number][][],
   maxSteps: number
 ): DealtCard[] | null {
   const n = cards.length;
-  const closingTriples = buildClosingTriplesMap(n, triples);
+  const redCards = shuffleArray(cards.filter((c) => c.colorGroup === 'red'));
+  const blackCards = shuffleArray(cards.filter((c) => c.colorGroup === 'black'));
+  const usedRed = new Array<boolean>(redCards.length).fill(false);
+  const usedBlack = new Array<boolean>(blackCards.length).fill(false);
   const placed: Array<DealtCard | undefined> = new Array(n);
-  const used = new Array<boolean>(n).fill(false);
-  const pool = shuffleArray(cards);
   let steps = 0;
 
   const backtrack = (pos: number): boolean => {
     if (pos === n) return true;
     if (steps >= maxSteps) return false;
 
+    const wantRed = pattern[pos] === 'red';
+    const pool = wantRed ? redCards : blackCards;
+    const used = wantRed ? usedRed : usedBlack;
     const checks = closingTriples[pos];
-    // Try candidates in randomized order per depth to avoid deterministic dead ends
-    const indices = shuffleArray(
-      Array.from({ length: n }, (_, idx) => idx).filter((idx) => !used[idx])
-    );
 
-    for (const candidateIdx of indices) {
+    for (let idx = 0; idx < pool.length; idx += 1) {
+      if (used[idx]) continue;
+
       steps += 1;
       if (steps > maxSteps) return false;
 
-      const candidate = pool[candidateIdx];
+      const candidate = pool[idx];
       placed[pos] = candidate;
 
       let conflicts = false;
@@ -333,11 +408,11 @@ function solveComboFreeOrder(
       }
 
       if (!conflicts) {
-        used[candidateIdx] = true;
+        used[idx] = true;
         if (backtrack(pos + 1)) {
           return true;
         }
-        used[candidateIdx] = false;
+        used[idx] = false;
       }
 
       placed[pos] = undefined;
@@ -350,6 +425,21 @@ function solveComboFreeOrder(
     return placed as DealtCard[];
   }
   return null;
+}
+
+function solveComboFreeOrder(
+  cards: readonly DealtCard[],
+  triples: readonly [number, number, number][],
+  maxSteps: number
+): DealtCard[] | null {
+  const n = cards.length;
+  const closingTriples = buildClosingTriplesMap(n, triples);
+  const redCount = cards.filter((c) => c.colorGroup === 'red').length;
+
+  const pattern = solveColorPattern(n, redCount, closingTriples, maxSteps);
+  if (!pattern) return null;
+
+  return solveCardsIntoColorPattern(cards, pattern, closingTriples, maxSteps);
 }
 
 function mergeUniqueTriples(
@@ -386,14 +476,16 @@ function countAllCombos(
 
 export function dealComboFreeDeck(
   posts: readonly BlogPostEntry[],
-  cols: 1 | 2 | 3
+  cols: GridColumns
 ): DealtCard[] {
   const activeTriples = getGridTriples(posts.length, cols);
-  const altCols: 1 | 3 = cols === 3 ? 1 : 3;
-  const combinedTriples = mergeUniqueTriples(
-    activeTriples,
-    getGridTriples(posts.length, altCols)
-  );
+  const tryDual = cols <= 3;
+  const combinedTriples = tryDual
+    ? mergeUniqueTriples(
+        activeTriples,
+        getGridTriples(posts.length, cols === 3 ? 1 : 3)
+      )
+    : activeTriples;
 
   let bestFallback: DealtCard[] | null = null;
   let bestFallbackCombos = Number.POSITIVE_INFINITY;
@@ -401,12 +493,14 @@ export function dealComboFreeDeck(
   for (let attempt = 0; attempt < 25; attempt += 1) {
     const cards = dealRandomCategoryRanks(posts);
 
-    const dualSolved = solveComboFreeOrder(cards, combinedTriples, 450);
-    if (dualSolved) {
-      return dualSolved;
+    if (tryDual) {
+      const dualSolved = solveComboFreeOrder(cards, combinedTriples, 450);
+      if (dualSolved) {
+        return dualSolved;
+      }
     }
 
-    const activeSolved = solveComboFreeOrder(cards, activeTriples, 1400);
+    const activeSolved = solveComboFreeOrder(cards, activeTriples, 2500);
     if (activeSolved) {
       return activeSolved;
     }
@@ -436,7 +530,7 @@ export function findNewlyFormedCombos(
   nextDeck: readonly DealtCard[],
   fromIdx: number,
   toIdx: number,
-  cols: 1 | 2 | 3
+  cols: GridColumns
 ): DetectedCombo[] {
   if (fromIdx === toIdx) return [];
 

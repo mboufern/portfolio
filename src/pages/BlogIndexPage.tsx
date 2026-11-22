@@ -11,6 +11,7 @@ import {
   dealComboFreeDeck,
   findNewlyFormedCombos,
   type DealtCard,
+  type GridColumns,
 } from '../blogs/cardDeck';
 import { BlogScoreHud } from '../blogs/components/BlogScoreHud';
 import { ScoreToastOverlay } from '../blogs/components/ScoreToastOverlay';
@@ -120,14 +121,16 @@ const LIT_TONE_VARS: Record<
   },
 };
 
-function getGridColsForWidth(width: number): 1 | 2 | 3 {
-  if (width >= 1024) return 3;
+function getGridColsForWidth(width: number): GridColumns {
+  if (width >= 1280) return 5;
+  if (width >= 1024) return 4;
+  if (width >= 768) return 3;
   if (width >= 640) return 2;
   return 1;
 }
 
-function getInitialGridCols(): 1 | 2 | 3 {
-  if (typeof window === 'undefined') return 3;
+function getInitialGridCols(): GridColumns {
+  if (typeof window === 'undefined') return 5;
   return getGridColsForWidth(window.innerWidth);
 }
 
@@ -179,7 +182,7 @@ function findHitSlotIndex(
 export const BlogIndexPage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<'All' | BlogCategory>('All');
-  const [gridCols, setGridCols] = useState<1 | 2 | 3>(getInitialGridCols);
+  const [gridCols, setGridCols] = useState<GridColumns>(getInitialGridCols);
   const [isMobileOrTouch, setIsMobileOrTouch] = useState<boolean>(detectMobileOrTouch);
   const [deck, setDeck] = useState<DealtCard[]>(() =>
     dealComboFreeDeck(BLOG_POSTS, getInitialGridCols())
@@ -768,30 +771,30 @@ export const BlogIndexPage: React.FC = () => {
 
         {/* Inner Playing Card Frame Line */}
         <div
-          className="pointer-events-none absolute inset-2.5 rounded-[14px] border border-zinc-900/[0.08] z-10"
+          className="pointer-events-none absolute inset-2 rounded-[12px] border border-zinc-900/[0.08] z-10"
           aria-hidden="true"
         />
 
         {/* Top-Left Corner Header: Overlaid at z-20 so image rect is visible behind it */}
         <div
-          className="absolute top-4 left-4 sm:top-5 sm:left-5 z-20 flex flex-col items-center leading-none select-none px-1.5 py-1 rounded-lg bg-[#f9f6ee]/70 backdrop-blur-[2px] shadow-[0_0_14px_6px_rgba(249,246,238,0.75)]"
+          className="absolute top-3 left-3 sm:top-3.5 sm:left-3.5 z-20 flex flex-col items-center leading-none select-none px-1.5 py-0.5 rounded-lg bg-[#f9f6ee]/70 backdrop-blur-[2px] shadow-[0_0_12px_5px_rgba(249,246,238,0.75)]"
           style={{ color: suitColor }}
         >
           <span
-            className="text-2xl sm:text-[26px] leading-none"
+            className="text-xl sm:text-[22px] leading-none"
             style={{ fontFamily: "'Alfa Slab One', serif" }}
           >
             {rankLabel}
           </span>
-          <span className="mt-1" title={meta.category}>
-            {getCategoryIcon(meta.category, 'w-4 h-4')}
+          <span className="mt-0.5" title={meta.category}>
+            {getCategoryIcon(meta.category, 'w-3.5 h-3.5')}
           </span>
         </div>
 
         {/* Upper Artwork Rect extending behind the Top-Left Header */}
-        <div className="relative z-10 flex-1 w-full flex items-center justify-center mb-2 min-h-0">
+        <div className="relative z-10 flex-1 w-full flex items-center justify-center mb-1.5 min-h-0">
           {meta.coverImage ? (
-            <div className="relative w-full h-full max-h-[265px] playing-card-art-dither-fade flex items-center justify-center overflow-hidden rounded-xl">
+            <div className="relative w-full h-full max-h-[195px] playing-card-art-dither-fade flex items-center justify-center overflow-hidden rounded-lg">
               <img
                 src={meta.coverImage}
                 alt={meta.title}
@@ -818,18 +821,18 @@ export const BlogIndexPage: React.FC = () => {
             </div>
           ) : (
             <div
-              className="w-28 h-28 rounded-full flex items-center justify-center opacity-20"
+              className="w-20 h-20 rounded-full flex items-center justify-center opacity-20"
               style={{ color: suitColor }}
             >
-              {getCategoryIcon(meta.category, 'w-14 h-14')}
+              {getCategoryIcon(meta.category, 'w-10 h-10')}
             </div>
           )}
         </div>
 
         {/* Centered Title Directly Below Artwork */}
-        <div className="relative z-20 px-2 pb-3 text-center">
+        <div className="relative z-20 px-1.5 pb-2 text-center">
           <h2
-            className="text-zinc-900 text-lg sm:text-xl font-black leading-tight tracking-tight m-0 line-clamp-3 group-hover:text-black"
+            className="text-zinc-900 text-sm sm:text-[15px] font-black leading-snug tracking-tight m-0 line-clamp-3 group-hover:text-black"
             style={{ fontFamily: 'Archivo Black, sans-serif' }}
           >
             {meta.title}
@@ -838,7 +841,7 @@ export const BlogIndexPage: React.FC = () => {
 
         {/* Bottom-Right Corner: Creation Year & Month */}
         <div
-          className="relative z-20 self-end text-[11px] font-mono font-bold tracking-wider select-none opacity-85"
+          className="relative z-20 self-end text-[10px] font-mono font-bold tracking-wider select-none opacity-85"
           style={{ color: suitColor }}
         >
           {meta.date}
@@ -881,7 +884,7 @@ export const BlogIndexPage: React.FC = () => {
         />
       )}
 
-      <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 md:px-12 pt-10 sm:pt-20 pb-24 sm:pb-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-10 sm:pt-16 pb-24 sm:pb-16">
         {/* Header Wrapper reserving height in normal flow so scroll never jumps */}
         <div className="min-h-[168px] sm:min-h-[184px] mb-6 sm:mb-8">
           <motion.header
@@ -1018,7 +1021,7 @@ export const BlogIndexPage: React.FC = () => {
         ) : (
           <div
             ref={gridRef}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 items-center justify-items-center overflow-visible pr-11 sm:pr-0"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 items-center justify-items-center overflow-visible pr-11 sm:pr-0"
           >
             {displayedCards.map((card, idx) => {
               const { post, slug, rotation } = card;
@@ -1039,13 +1042,13 @@ export const BlogIndexPage: React.FC = () => {
                   ref={(el) => {
                     slotRefs.current[idx] = el;
                   }}
-                  className="relative w-full max-w-[310px] aspect-[5/7]"
+                  className="relative w-full max-w-[260px] sm:max-w-[235px] aspect-[5/7]"
                 >
                   {/* Soft Ambient Cell-Background Glow on Newly Scored Combo */}
                   {litState && litVars && (
                     <div
                       key={`lit-${litState.nonce}`}
-                      className="pointer-events-none absolute -inset-5 sm:-inset-6 rounded-[34px] z-0 combo-cell-bg-glow"
+                      className="pointer-events-none absolute -inset-3.5 sm:-inset-4 rounded-[26px] z-0 combo-cell-bg-glow"
                       style={
                         {
                           '--combo-bg-core': litVars.core,
@@ -1059,7 +1062,7 @@ export const BlogIndexPage: React.FC = () => {
                   {/* Dashed Drop Slot Placeholder while card is lifted */}
                   {isDraggedSlot && (
                     <div
-                      className="w-full h-full rounded-[22px] border-2 border-dashed border-zinc-900/20 bg-zinc-900/[0.035]"
+                      className="w-full h-full rounded-[18px] border-2 border-dashed border-zinc-900/20 bg-zinc-900/[0.035]"
                       aria-hidden="true"
                     />
                   )}
@@ -1104,7 +1107,7 @@ export const BlogIndexPage: React.FC = () => {
                     }
                   >
                     <div
-                      className={`group relative w-full h-full rounded-[22px] bg-[#f9f6ee] border border-zinc-900/15 shadow-[0_10px_28px_rgba(24,24,27,0.1)] group-hover:shadow-[0_24px_48px_rgba(24,24,27,0.2)] transition-shadow duration-300 overflow-hidden ${isZoomingThisCard || isDraggedSlot || isSettlingSlot
+                      className={`group relative w-full h-full rounded-[18px] bg-[#f9f6ee] border border-zinc-900/15 shadow-[0_8px_22px_rgba(24,24,27,0.1)] group-hover:shadow-[0_18px_38px_rgba(24,24,27,0.18)] transition-shadow duration-300 overflow-hidden ${isZoomingThisCard || isDraggedSlot || isSettlingSlot
                           ? 'opacity-0 pointer-events-none'
                           : 'opacity-100'
                         }`}
@@ -1124,7 +1127,7 @@ export const BlogIndexPage: React.FC = () => {
                         onClick={(e) =>
                           handleCardClick(e, card, slotRefs.current[idx])
                         }
-                        className="relative w-full h-full flex flex-col justify-between p-4 sm:p-5 no-underline text-inherit select-none"
+                        className="relative w-full h-full flex flex-col justify-between p-3.5 sm:p-4 no-underline text-inherit select-none"
                       >
                         {renderCardFace(card)}
                       </Link>
@@ -1142,7 +1145,7 @@ export const BlogIndexPage: React.FC = () => {
                           }}
                           aria-label={`Drag ${meta.title} card to reorder`}
                           title="Drag corner to reorder"
-                          className="absolute top-2.5 right-2.5 z-30 w-9 h-9 flex items-center justify-center rounded-xl text-zinc-900/35 hover:text-zinc-900/65 active:text-zinc-900/85 active:bg-zinc-900/[0.06] touch-none select-none cursor-grab active:cursor-grabbing transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/50"
+                          className="absolute top-2 right-2 z-30 w-8 h-8 flex items-center justify-center rounded-lg text-zinc-900/35 hover:text-zinc-900/65 active:text-zinc-900/85 active:bg-zinc-900/[0.06] touch-none select-none cursor-grab active:cursor-grabbing transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/50"
                         >
                           <TbGripVertical className="w-4 h-4" />
                         </button>
@@ -1169,7 +1172,7 @@ export const BlogIndexPage: React.FC = () => {
             transform: `translate3d(${activeDrag.initialX}px, ${activeDrag.initialY}px, 0) rotate(${activeDrag.card.rotation}deg) scale(1.035)`,
           }}
         >
-          <div className="relative w-full h-full rounded-[22px] bg-[#f9f6ee] border border-zinc-900/20 shadow-[0_28px_60px_rgba(24,24,27,0.28)] overflow-hidden flex flex-col justify-between p-4 sm:p-5 select-none">
+          <div className="relative w-full h-full rounded-[18px] bg-[#f9f6ee] border border-zinc-900/20 shadow-[0_24px_54px_rgba(24,24,27,0.28)] overflow-hidden flex flex-col justify-between p-3.5 sm:p-4 select-none">
             {renderCardFace(activeDrag.card, true)}
           </div>
         </div>
@@ -1199,7 +1202,7 @@ export const BlogIndexPage: React.FC = () => {
           transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
           onAnimationComplete={() => setSettlingCard(null)}
         >
-          <div className="relative w-full h-full rounded-[22px] bg-[#f9f6ee] border border-zinc-900/15 shadow-[0_14px_34px_rgba(24,24,27,0.16)] overflow-hidden flex flex-col justify-between p-4 sm:p-5 select-none">
+          <div className="relative w-full h-full rounded-[18px] bg-[#f9f6ee] border border-zinc-900/15 shadow-[0_12px_30px_rgba(24,24,27,0.16)] overflow-hidden flex flex-col justify-between p-3.5 sm:p-4 select-none">
             {renderCardFace(settlingCard.card, true)}
           </div>
         </motion.div>
@@ -1236,7 +1239,7 @@ export const BlogIndexPage: React.FC = () => {
                 duration: 0.37,
                 ease: [0.32, 0, 0.2, 1],
               }}
-              className="fixed rounded-[22px] bg-[#f9f6ee] border border-zinc-900/15 shadow-[0_32px_90px_rgba(24,24,27,0.28)] overflow-hidden flex flex-col justify-between p-4 sm:p-5 origin-center will-change-transform"
+              className="fixed rounded-[18px] bg-[#f9f6ee] border border-zinc-900/15 shadow-[0_32px_90px_rgba(24,24,27,0.28)] overflow-hidden flex flex-col justify-between p-3.5 sm:p-4 origin-center will-change-transform"
             >
               {/* Whole-Card Rough Dither Grain */}
               <div
@@ -1249,7 +1252,7 @@ export const BlogIndexPage: React.FC = () => {
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 0 }}
                 transition={{ duration: 0.16, ease: 'easeOut' }}
-                className="pointer-events-none absolute inset-2.5 rounded-[14px] border border-zinc-900/[0.08] z-10"
+                className="pointer-events-none absolute inset-2 rounded-[12px] border border-zinc-900/[0.08] z-10"
                 aria-hidden="true"
               />
 
@@ -1261,26 +1264,26 @@ export const BlogIndexPage: React.FC = () => {
                 className="relative w-full h-full flex flex-col justify-between"
               >
                 <div
-                  className="absolute top-0 left-0 z-20 flex flex-col items-center leading-none select-none px-1.5 py-1 rounded-lg bg-[#f9f6ee]/70"
+                  className="absolute top-0 left-0 z-20 flex flex-col items-center leading-none select-none px-1.5 py-0.5 rounded-lg bg-[#f9f6ee]/70"
                   style={{ color: zoomingCard.card.suitColor }}
                 >
                   <span
-                    className="text-2xl sm:text-[26px] leading-none"
+                    className="text-xl sm:text-[22px] leading-none"
                     style={{ fontFamily: "'Alfa Slab One', serif" }}
                   >
                     {zoomingCard.card.rankLabel}
                   </span>
-                  <span className="mt-1">
-                    {getCategoryIcon(zoomingCard.card.category, 'w-4 h-4')}
+                  <span className="mt-0.5">
+                    {getCategoryIcon(zoomingCard.card.category, 'w-3.5 h-3.5')}
                   </span>
                 </div>
 
                 {/* Image is hidden immediately so it never stretches during zoom */}
                 <div className="flex-1" />
 
-                <div className="relative z-20 px-2 pb-3 text-center">
+                <div className="relative z-20 px-1.5 pb-2 text-center">
                   <h2
-                    className="text-zinc-900 text-lg sm:text-xl font-black leading-tight tracking-tight m-0"
+                    className="text-zinc-900 text-sm sm:text-[15px] font-black leading-snug tracking-tight m-0"
                     style={{ fontFamily: 'Archivo Black, sans-serif' }}
                   >
                     {zoomingCard.card.post.meta.title}
@@ -1288,7 +1291,7 @@ export const BlogIndexPage: React.FC = () => {
                 </div>
 
                 <div
-                  className="relative z-20 self-end text-[11px] font-mono font-bold tracking-wider select-none opacity-85"
+                  className="relative z-20 self-end text-[10px] font-mono font-bold tracking-wider select-none opacity-85"
                   style={{ color: zoomingCard.card.suitColor }}
                 >
                   {zoomingCard.card.post.meta.date}

@@ -122,7 +122,6 @@ export const BlogScoreHud: React.FC<BlogScoreHudProps> = ({
       <ScoreOverviewPopover
         isOpen={isOverviewOpen}
         anchorEl={scoreBtnEl}
-        score={score}
         completedActions={completedActions}
         onClose={() => setIsOverviewOpen(false)}
       />
