@@ -34,6 +34,7 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
   dotRefs,
 }) => {
   const [dotPoints, setDotPoints] = useState<DotPoint[]>([]);
+  const [localHoveredIdx, setLocalHoveredIdx] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth < 640 : false
   );
@@ -210,7 +211,7 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
           <svg className="w-full h-full absolute inset-0 pointer-events-none">
             {geometries.map((geo, idx) => {
               const item = NAVIGATION_ITEMS[idx];
-              const isHovered = hoveredIdx === idx;
+              const isHovered = hoveredIdx === idx || localHoveredIdx === idx;
               const isActive = activeSectionIdx === idx;
               const accentColor = item.accent;
               const vineDelay = prefersReducedMotion ? 0 : 0.45 + idx * 0.045;
@@ -288,7 +289,7 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
           {/* Clickable Borderless Labels at Branch Tips */}
           {geometries.map((geo, idx) => {
             const item = NAVIGATION_ITEMS[idx];
-            const isHovered = hoveredIdx === idx;
+            const isHovered = hoveredIdx === idx || localHoveredIdx === idx;
             const isActive = activeSectionIdx === idx;
             const labelDelay = prefersReducedMotion ? 0 : 0.72 + idx * 0.045;
 
@@ -297,10 +298,10 @@ export const SidebarVineNav: React.FC<SidebarVineNavProps> = ({
                 key={`label-${item.key}`}
                 type="button"
                 onClick={() => onNavigate(idx)}
-                onMouseEnter={() => onHoverChange(idx)}
-                onMouseLeave={() => onHoverChange(null)}
-                onFocus={() => onHoverChange(idx)}
-                onBlur={() => onHoverChange(null)}
+                onMouseEnter={() => setLocalHoveredIdx(idx)}
+                onMouseLeave={() => setLocalHoveredIdx(null)}
+                onFocus={() => setLocalHoveredIdx(idx)}
+                onBlur={() => setLocalHoveredIdx(null)}
                 className="group absolute pointer-events-auto cursor-pointer outline-none transition-transform duration-200"
                 style={{
                   left: geo.labelX,

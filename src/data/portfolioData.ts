@@ -274,17 +274,18 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         period: 'May 2024 – Dec 2024 (8 mos)',
         teamRole: 'Solo Game Developer & Artist',
         description:
-          'An online multiplayer board strategy game built in Unity featuring authoritative real-time network synchronisation via Netcode for GameObjects, room lobby matchmaking, particle dice rolling physics, wall-building strategy mechanics, and cross-platform Android/PC/iOS builds.',
-        technologies: ['Unity', 'C#', 'Netcode for GameObjects', 'Firebase', 'Android', 'iOS', 'Blender'],
+          'An online multiplayer board strategy game built in Unity featuring authoritative real-time network synchronisation via Netcode for GameObjects, particle dice rolling physics, wall-placing strategy mechanics, and Steam SDK online multiplayer.',
+        technologies: ['Unity', 'C#', 'Netcode for GameObjects', 'Android', 'Blender'],
         highlights: [
-          'Real-time sync via Netcode for GameObjects',
-          'Cross-platform play across Android, PC & iOS',
+          'Real-time Multiplayer sync via Netcode for GameObjects',
+          'Multiple game modes both local and online',
           'Custom physics dice and animated board interactions',
         ],
         images: [
           '/assets/wnt/full.gif',
           '/assets/projects/wnt/trailer_1.png',
-          '/assets/projects/wnt/alpha_1.png',
+          '/assets/projects/wnt/trailer_2.png',
+          '/assets/projects/wnt/trailer_3.png',
         ],
         demoUrl: 'https://store.steampowered.com/app/3868960/Walls_And_Tower_Party',
         links: [
@@ -304,7 +305,7 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         year: '2025',
         status: 'Released',
         statusColor: '#84cc16',
-        themeBg: '#0b1608',
+        themeBg: '#10230bff',
         themeBlob1: '#84cc16',
         themeBlob2: '#14b8a6',
         vinylColor: '#a3e635',
@@ -315,21 +316,18 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         icon: 'rocket',
         imageLayout: 'landscape',
         category: 'Action Survival',
-        video: '/assets/projects/scrap-vanguard/preview.mp4',
         description:
-          'Sci-fi top-down survival action game featuring customizable mech combat rigs, wave survival dynamics, weapon crafting, and stylized post-processing shaders.',
-        technologies: ['Unity', 'C#', 'Shader Graph', 'Blender', 'Steamworks'],
+          'A solo game where you fight agains alien invadors and build weapons and buildings from the scrap of your enemies. The game is still a work in progress with a planned release in late 2027',
+        technologies: ['Unity', 'C#', 'Shader Graph', 'Blender'],
         highlights: [
           'Playable Steam demo available',
           'Dynamic wave spawning & modular weapon mechanics',
-          'Custom stylized shaders and lighting',
+          'Unique crafting mechanism where you merge together scrap to get better material',
         ],
         images: [
-          '/assets/projects/scrap-vanguard/preview.mp4',
           '/assets/projects/scrap-vanguard/trailer_1.png',
-          '/assets/projects/scrap-vanguard/gameplay_1.png',
           '/assets/projects/scrap-vanguard/trailer_2.png',
-          '/assets/projects/scrap-vanguard/gameplay_2.png',
+          '/assets/projects/scrap-vanguard/trailer_3.png',
         ],
         demoUrl: 'https://store.steampowered.com/app/4743800/Scrap_Vanguard',
         links: [
@@ -343,10 +341,10 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         year: '2026',
         status: 'Demo Available',
         statusColor: '#f59e0b',
-        themeBg: '#0c1518',
-        themeBlob1: '#84cc16',
-        themeBlob2: '#38bdf8',
-        vinylColor: '#a3e635',
+        themeBg: '#1c0b0bff',
+        themeBlob1: '#cc3a16ff',
+        themeBlob2: '#f83848ff',
+        vinylColor: '#e63535ff',
       },
       {
         id: 'under-under',
@@ -357,11 +355,11 @@ export const PROJECT_SECTIONS: ProjectSection[] = [
         period: '2025',
         teamRole: 'Solo Developer & Artist',
         description:
-          'Subterranean adventure game created for Moroccan Game Jam E2 (2025). Features atmospheric low-light cave exploration, environmental hazards, and puzzle mechanics.',
+          'Submarine survival game created for Moroccan Game Jam E2 (2025). Features atmospheric 3D FPS exploration and puzzle mechanics.',
         technologies: ['Unity', 'C#', 'Lighting', 'Level Design', 'Blender'],
         highlights: [
           'Created for Moroccan Game Jam E2 (2025)',
-          'Atmospheric volumetric lighting and cave aesthetics',
+          'Atmospheric volumetric lighting and submarine aesthetics',
           'Physics-based exploration and environmental puzzles',
         ],
         images: [

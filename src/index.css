@@ -631,4 +631,71 @@
   pointer-events: none;
 }
 
+/* ── Blog Gamification HUD & Combo Light-Up Animations ──────────────── */
+@media (hover: none) {
+  .score-reset-btn {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+}
+
+@keyframes combo-cell-bg-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  16% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  65% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes combo-card-sheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-140%) skewX(-20deg);
+  }
+  20% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(240%) skewX(-20deg);
+  }
+}
+
+.combo-cell-bg-glow {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    var(--combo-bg-core, rgba(16, 185, 129, 0.62)) 0%,
+    var(--combo-bg-mid, rgba(16, 185, 129, 0.32)) 52%,
+    transparent 78%
+  );
+  filter: blur(22px);
+  animation: combo-cell-bg-glow 1.7s ease-out forwards;
+}
+
+.combo-cell-sheen {
+  animation: combo-card-sheen 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .combo-cell-bg-glow {
+    animation-duration: 0.7s;
+  }
+  .combo-cell-sheen {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+
 

@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { TbArrowLeft, TbCalendar, TbClock } from 'react-icons/tb';
 import type { BlogPostEntry } from './types';
 import { getCategoryIcon } from './categoryMeta';
 import { ArticleDitherImage } from './components/ArticlePrimitives';
+import { recordBlogAction } from './blogGameStore';
+import { BlogScoreHud } from './components/BlogScoreHud';
+import { ScoreToastOverlay } from './components/ScoreToastOverlay';
 
 interface BlogLayoutProps {
   post: BlogPostEntry;
@@ -24,6 +27,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
   );
 
   const [isHeaderMinimized, setIsHeaderMinimized] = useState(false);
+  const articleEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,6 +43,81 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Score +2 once when opening an article
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      recordBlogAction(`article:open:${meta.slug}`, 2, {
+        title: 'Article Opened',
+        subtitle: meta.category,
+        tone: 'emerald',
+      });
+    }, 480);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [meta.slug, meta.category]);
+
+  // Score +5 once when finishing reading a published article to the bottom
+  useEffect(() => {
+    if (meta.isDraft) return;
+    const endEl = articleEndRef.current;
+    if (!endEl) return;
+
+    let finished = false;
+    let canAwardShortPage = false;
+
+    const checkArticleCompleted = () => {
+      if (finished) return;
+      const scrollEl = document.scrollingElement || document.documentElement;
+      const scrollTop = Math.max(window.scrollY, scrollEl.scrollTop);
+      const viewportH = window.innerHeight;
+      const scrollHeight = scrollEl.scrollHeight;
+      const maxScroll = Math.max(0, scrollHeight - viewportH);
+      const endRect = endEl.getBoundingClientRect();
+
+      const reachedBottom =
+        endRect.top <= viewportH + 48 ||
+        (maxScroll > 0 && scrollTop >= maxScroll - 80);
+      const scrolledDown =
+        maxScroll > 40
+          ? scrollTop >= Math.min(40, maxScroll * 0.5)
+          : canAwardShortPage;
+
+      if (reachedBottom && scrolledDown) {
+        finished = true;
+        recordBlogAction(`article:read:${meta.slug}`, 5, {
+          title: 'Article Finished',
+          subtitle: meta.title,
+          tone: 'emerald',
+        });
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      () => {
+        checkArticleCompleted();
+      },
+      { threshold: 0, rootMargin: '0px 0px 80px 0px' }
+    );
+
+    observer.observe(endEl);
+    window.addEventListener('scroll', checkArticleCompleted, { passive: true });
+    window.addEventListener('resize', checkArticleCompleted, { passive: true });
+
+    const shortPageTimer = window.setTimeout(() => {
+      canAwardShortPage = true;
+      checkArticleCompleted();
+    }, 2500);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', checkArticleCompleted);
+      window.removeEventListener('resize', checkArticleCompleted);
+      window.clearTimeout(shortPageTimer);
+    };
+  }, [meta.slug, meta.title, meta.isDraft]);
+
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 220,
@@ -52,12 +131,15 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
       : null;
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#f9f6ee] text-zinc-900 relative overflow-x-hidden">
+    <div className="min-h-[100dvh] w-full bg-[#f9f6ee] text-zinc-900 relative overflow-x-clip">
       {/* Subtle Whole-Page Card Dither Texture */}
       <div
         className="pointer-events-none fixed inset-0 z-0 playing-card-dither-grain opacity-20"
         aria-hidden="true"
       />
+
+      {/* Top-Center Floating Score Notifications */}
+      <ScoreToastOverlay isHeaderMinimized={isHeaderMinimized} />
 
       {/* Subtle Top Reading Progress Line */}
       <motion.div
@@ -102,7 +184,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
       >
         {/* Editorial Post Header */}
         <header className="mb-10">
-          {/* Reserved Flow Slot for Morphing Header (Back Button + Title + Category) */}
+          {/* Reserved Flow Slot for Morphing Header (Back Button + Title + Score + Category) */}
           <div className="min-h-[118px] sm:min-h-[138px]">
             <motion.div
               layout
@@ -111,17 +193,17 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
               }}
               className={
                 isHeaderMinimized
-                  ? 'fixed top-3 left-3 right-3 sm:right-auto sm:top-4 sm:left-6 z-40 sm:max-w-[calc(100vw-320px)] flex flex-row items-center gap-2.5 sm:gap-3.5 px-3.5 py-2 sm:px-4 sm:py-2 rounded-2xl bg-[#f9f6ee]/92 backdrop-blur-md border border-zinc-900/15 shadow-[0_10px_28px_rgba(24,24,27,0.1)]'
+                  ? 'fixed top-3 left-3 right-3 sm:right-auto sm:top-4 sm:left-6 z-40 sm:max-w-[calc(100vw-320px)] flex flex-row items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 rounded-2xl bg-[#f9f6ee]/92 backdrop-blur-md border border-zinc-900/15 shadow-[0_10px_28px_rgba(24,24,27,0.1)]'
                   : 'relative flex flex-col'
               }
             >
-              {/* Top Row in Full View / Left+Right Items in Minimized View */}
+              {/* Top Row in Full View / Inline Items in Minimized View */}
               <motion.div
                 layout="position"
                 className={
                   isHeaderMinimized
                     ? 'contents'
-                    : 'flex items-center justify-between gap-4 mb-6 w-full'
+                    : 'flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-6 w-full'
                 }
               >
                 {/* Back Button */}
@@ -139,12 +221,12 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
                   </Link>
                 </motion.div>
 
-                {/* Article Title (rendered inline between Back and Category when minimized) */}
+                {/* Article Title (rendered inline between Back and Score/Category when minimized) */}
                 {isHeaderMinimized && (
                   <motion.h1
                     layoutId="article-main-title"
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="text-zinc-950 font-black tracking-tight leading-tight m-0 truncate cursor-pointer text-xs sm:text-sm md:text-base max-w-[44vw] sm:max-w-[340px] md:max-w-[420px]"
+                    className="text-zinc-950 font-black tracking-tight leading-tight m-0 min-w-0 flex-1 truncate cursor-pointer text-xs sm:text-sm md:text-base sm:max-w-[260px] md:max-w-[340px]"
                     style={{
                       fontFamily: 'Archivo Black, sans-serif',
                     }}
@@ -154,40 +236,48 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
                   </motion.h1>
                 )}
 
-                {/* Category Badge */}
+                {/* Score HUD + Category Badge */}
                 <motion.div
                   layout="position"
-                  className="inline-flex items-center gap-2 text-xs font-mono text-zinc-500 shrink-0"
+                  className={
+                    isHeaderMinimized
+                      ? 'contents'
+                      : 'inline-flex items-center gap-3 sm:gap-4 ml-auto flex-wrap justify-end'
+                  }
                 >
-                  {!isHeaderMinimized && formattedNumber && (
-                    <>
-                      <span className="font-bold text-zinc-800">
-                        No. {formattedNumber}
-                      </span>
-                      <span className="text-zinc-300" aria-hidden="true">
-                        /
-                      </span>
-                    </>
-                  )}
-                  <span
-                    style={{ transform: 'skewX(-14deg)' }}
-                    className={`inline-flex items-center rounded-[3px] border border-zinc-900/20 bg-zinc-900 text-[#f9f6ee] font-sans font-semibold ${
-                      isHeaderMinimized
-                        ? 'px-2.5 py-0.5 text-[11px]'
-                        : 'px-3 py-1 text-xs'
-                    }`}
-                  >
+                  <BlogScoreHud compact={isHeaderMinimized} />
+
+                  <div className="inline-flex items-center gap-2 text-xs font-mono text-zinc-500 shrink-0">
+                    {!isHeaderMinimized && formattedNumber && (
+                      <>
+                        <span className="font-bold text-zinc-800">
+                          No. {formattedNumber}
+                        </span>
+                        <span className="text-zinc-300" aria-hidden="true">
+                          /
+                        </span>
+                      </>
+                    )}
                     <span
-                      style={{ transform: 'skewX(14deg)' }}
-                      className="inline-flex items-center gap-1.5"
+                      style={{ transform: 'skewX(-14deg)' }}
+                      className={`inline-flex items-center rounded-[3px] border border-zinc-900/20 bg-zinc-900 text-[#f9f6ee] font-sans font-semibold ${
+                        isHeaderMinimized
+                          ? 'px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-[11px]'
+                          : 'px-3 py-1 text-xs'
+                      }`}
                     >
-                      {getCategoryIcon(
-                        meta.category,
-                        isHeaderMinimized ? 'w-3 h-3' : 'w-3.5 h-3.5'
-                      )}
-                      <span>{meta.category}</span>
+                      <span
+                        style={{ transform: 'skewX(14deg)' }}
+                        className="inline-flex items-center gap-1.5"
+                      >
+                        {getCategoryIcon(
+                          meta.category,
+                          isHeaderMinimized ? 'w-3 h-3' : 'w-3.5 h-3.5'
+                        )}
+                        <span>{meta.category}</span>
+                      </span>
                     </span>
-                  </span>
+                  </div>
                 </motion.div>
               </motion.div>
 
@@ -253,7 +343,10 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
         </header>
 
         {/* Editorial Body */}
-        <div className="space-y-6 article-editorial-body">{children}</div>
+        <div className="space-y-6 article-editorial-body">
+          {children}
+          <div ref={articleEndRef} className="h-px w-full" aria-hidden="true" />
+        </div>
       </motion.article>
     </div>
   );
