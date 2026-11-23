@@ -55,7 +55,7 @@ interface SettlingCardState {
   height: number;
 }
 
-interface StaticDocRect {
+interface StaticSlotRect {
   left: number;
   top: number;
   width: number;
@@ -86,7 +86,7 @@ interface DragRuntime {
   lastFrameTime: number;
   rafId: number;
   thresholdPx: number;
-  docRects: StaticDocRect[];
+  slotRects: StaticSlotRect[];
 }
 
 interface LitCardState {
@@ -101,23 +101,23 @@ interface MinimapScrollState {
 
 const LIT_TONE_VARS: Record<
   ScoreToastTone,
-  { core: string; mid: string }
+  { solid: string; glow: string }
 > = {
   emerald: {
-    core: 'rgba(16, 185, 129, 0.62)',
-    mid: 'rgba(16, 185, 129, 0.32)',
+    solid: '#10b981',
+    glow: 'rgba(16, 185, 129, 0.55)',
   },
   amber: {
-    core: 'rgba(245, 158, 11, 0.62)',
-    mid: 'rgba(245, 158, 11, 0.32)',
+    solid: '#f59e0b',
+    glow: 'rgba(245, 158, 11, 0.55)',
   },
   crimson: {
-    core: 'rgba(217, 38, 56, 0.58)',
-    mid: 'rgba(217, 38, 56, 0.3)',
+    solid: '#d92638',
+    glow: 'rgba(217, 38, 56, 0.55)',
   },
   muted: {
-    core: 'rgba(82, 82, 91, 0.25)',
-    mid: 'rgba(82, 82, 91, 0.1)',
+    solid: '#71717a',
+    glow: 'rgba(113, 113, 122, 0.35)',
   },
 };
 
@@ -143,19 +143,48 @@ function detectMobileOrTouch(): boolean {
   return narrow || coarse;
 }
 
+function getGridLocalSlotRect(
+  el: HTMLElement,
+  gridEl: HTMLElement
+): StaticSlotRect {
+  let left = 0;
+  let top = 0;
+  let curr: HTMLElement | null = el;
+  while (curr && curr !== gridEl) {
+    left += curr.offsetLeft;
+    top += curr.offsetTop;
+    const parent = curr.offsetParent as HTMLElement | null;
+    if (parent && parent !== gridEl) {
+      left += parent.clientLeft;
+      top += parent.clientTop;
+    }
+    curr = parent;
+  }
+  const width = el.offsetWidth;
+  const height = el.offsetHeight;
+  return {
+    left,
+    top,
+    width,
+    height,
+    centerX: left + width * 0.5,
+    centerY: top + height * 0.5,
+  };
+}
+
 function findHitSlotIndex(
-  docCenterX: number,
-  docCenterY: number,
-  docRects: readonly StaticDocRect[],
+  localCenterX: number,
+  localCenterY: number,
+  slotRects: readonly StaticSlotRect[],
   currentIndex: number
 ): number {
-  for (let i = 0; i < docRects.length; i += 1) {
-    const r = docRects[i];
+  for (let i = 0; i < slotRects.length; i += 1) {
+    const r = slotRects[i];
     if (
-      docCenterX >= r.left &&
-      docCenterX <= r.left + r.width &&
-      docCenterY >= r.top &&
-      docCenterY <= r.top + r.height
+      localCenterX >= r.left &&
+      localCenterX <= r.left + r.width &&
+      localCenterY >= r.top &&
+      localCenterY <= r.top + r.height
     ) {
       return i;
     }
@@ -163,10 +192,10 @@ function findHitSlotIndex(
 
   let bestIdx = currentIndex;
   let bestDistSq = Number.POSITIVE_INFINITY;
-  for (let i = 0; i < docRects.length; i += 1) {
-    const r = docRects[i];
-    const dx = docCenterX - r.centerX;
-    const dy = docCenterY - r.centerY;
+  for (let i = 0; i < slotRects.length; i += 1) {
+    const r = slotRects[i];
+    const dx = localCenterX - r.centerX;
+    const dy = localCenterY - r.centerY;
     if (Math.abs(dx) > r.width * 0.95 || Math.abs(dy) > r.height * 0.72) {
       continue;
     }
@@ -199,7 +228,7 @@ export const BlogIndexPage: React.FC = () => {
   });
 
   const gridRef = useRef<HTMLDivElement | null>(null);
-  const slotRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const slotElsBySlugRef = useRef<Map<string, HTMLDivElement>>(new Map());
   const floatingCardRef = useRef<HTMLDivElement | null>(null);
   const dragRuntimeRef = useRef<DragRuntime | null>(null);
   const suppressClickRef = useRef(false);
@@ -208,7 +237,7 @@ export const BlogIndexPage: React.FC = () => {
   const scrollRafRef = useRef<number>(0);
   const deckRef = useRef(deck);
   const gridColsRef = useRef(gridCols);
-  const displayedCountRef = useRef(deck.length);
+  const displayedCardsRef = useRef<DealtCard[]>(deck);
 
   useEffect(() => {
     deckRef.current = deck;
@@ -240,9 +269,8 @@ export const BlogIndexPage: React.FC = () => {
   }, [deck, selectedCategory, activeDrag]);
 
   useEffect(() => {
-    displayedCountRef.current = displayedCards.length;
-    slotRefs.current.length = displayedCards.length;
-  }, [displayedCards.length]);
+    displayedCardsRef.current = displayedCards;
+  }, [displayedCards]);
 
   const updateScrollAndMinimap = useCallback(() => {
     const scrollEl = document.scrollingElement || document.documentElement;
@@ -257,13 +285,14 @@ export const BlogIndexPage: React.FC = () => {
       return prev;
     });
 
-    const len = displayedCountRef.current;
+    const cards = displayedCardsRef.current;
+    const len = cards.length;
     let startFloat = 0;
     let endFloat = Math.min(len, 1);
 
     if (len >= 2) {
-      const firstEl = slotRefs.current[0];
-      const lastEl = slotRefs.current[len - 1];
+      const firstEl = slotElsBySlugRef.current.get(cards[0].slug);
+      const lastEl = slotElsBySlugRef.current.get(cards[len - 1].slug);
       if (firstEl && lastEl) {
         const firstRect = firstEl.getBoundingClientRect();
         const lastRect = lastEl.getBoundingClientRect();
@@ -464,14 +493,24 @@ export const BlogIndexPage: React.FC = () => {
             )}px, 0) rotate(${r.angle.toFixed(2)}deg) scale(1.035)`;
           }
 
-          // 4. Live insertion slot hit-test using invariant document rects
-          const docCenterX = r.pointerX - r.grabOffsetX + r.width * 0.5 + window.scrollX;
-          const docCenterY = r.pointerY - r.grabOffsetY + r.height * 0.5 + window.scrollY;
-          if (now - r.lastSwapTime >= 95) {
+          // 4. Live insertion slot hit-test using grid-local untransformed slot rects
+          const gridEl = gridRef.current;
+          if (gridEl && now - r.lastSwapTime >= 95) {
+            const gridRect = gridEl.getBoundingClientRect();
+            const localCenterX =
+              r.pointerX -
+              r.grabOffsetX +
+              r.width * 0.5 -
+              (gridRect.left + gridEl.clientLeft);
+            const localCenterY =
+              r.pointerY -
+              r.grabOffsetY +
+              r.height * 0.5 -
+              (gridRect.top + gridEl.clientTop);
             const hitIdx = findHitSlotIndex(
-              docCenterX,
-              docCenterY,
-              r.docRects,
+              localCenterX,
+              localCenterY,
+              r.slotRects,
               r.currentIndex
             );
             if (hitIdx !== r.currentIndex) {
@@ -503,10 +542,12 @@ export const BlogIndexPage: React.FC = () => {
       const card = runtime.card;
       const fromX = runtime.pointerX - runtime.grabOffsetX;
       const fromY = runtime.pointerY - runtime.grabOffsetY;
+      const grabOffsetX = runtime.grabOffsetX;
+      const grabOffsetY = runtime.grabOffsetY;
       const fromAngle = runtime.angle;
       const width = runtime.width;
       const height = runtime.height;
-      const docRects = runtime.docRects;
+      const slotRects = runtime.slotRects;
 
       cleanupDragSession();
 
@@ -524,15 +565,34 @@ export const BlogIndexPage: React.FC = () => {
         return;
       }
 
-      const targetDocRect = docRects[toIdx];
-      if (targetDocRect) {
+      const targetSlotRect = slotRects[toIdx];
+      const gridEl = gridRef.current;
+      if (targetSlotRect && gridEl) {
+        const gridRect = gridEl.getBoundingClientRect();
+        const toX = gridRect.left + gridEl.clientLeft + targetSlotRect.left;
+        const toY = gridRect.top + gridEl.clientTop + targetSlotRect.top;
+
+        // Convert the pivot-origin active drag transform into an equivalent
+        // center-origin start coordinate so the settle animation never jumps.
+        const rad = (fromAngle * Math.PI) / 180;
+        const cos = Math.cos(rad);
+        const sin = Math.sin(rad);
+        const dx = width * 0.5 - grabOffsetX;
+        const dy = height * 0.5 - grabOffsetY;
+        const scaledDx = dx * 1.035;
+        const scaledDy = dy * 1.035;
+        const visualCenterX =
+          fromX + grabOffsetX + (scaledDx * cos - scaledDy * sin);
+        const visualCenterY =
+          fromY + grabOffsetY + (scaledDx * sin + scaledDy * cos);
+
         setSettlingCard({
           card,
-          fromX,
-          fromY,
+          fromX: visualCenterX - width * 0.5,
+          fromY: visualCenterY - height * 0.5,
           fromAngle,
-          toX: targetDocRect.left - window.scrollX,
-          toY: targetDocRect.top - window.scrollY,
+          toX,
+          toY,
           width,
           height,
         });
@@ -602,51 +662,48 @@ export const BlogIndexPage: React.FC = () => {
     (
       e: React.PointerEvent,
       card: DealtCard,
-      index: number,
       thresholdPx: number
     ) => {
       if (!canDragCards || e.button !== 0 || dragRuntimeRef.current) return;
 
-      const slotEl = slotRefs.current[index];
+      const gridEl = gridRef.current;
+      if (!gridEl) return;
+
+      const currentDeck = deckRef.current;
+      const originIndex = currentDeck.findIndex((c) => c.slug === card.slug);
+      if (originIndex < 0) return;
+
+      const slotEl = slotElsBySlugRef.current.get(card.slug);
       if (!slotEl) return;
 
-      const cardRect = slotEl.getBoundingClientRect();
-      const docRects: StaticDocRect[] = [];
-      const currentDeckLen = deckRef.current.length;
-      for (let i = 0; i < currentDeckLen; i += 1) {
-        const el = slotRefs.current[i];
-        if (!el) continue;
-        const r = el.getBoundingClientRect();
-        const docLeft = r.left + window.scrollX;
-        const docTop = r.top + window.scrollY;
-        docRects.push({
-          left: docLeft,
-          top: docTop,
-          width: r.width,
-          height: r.height,
-          centerX: docLeft + r.width * 0.5,
-          centerY: docTop + r.height * 0.5,
-        });
+      const slotRects: StaticSlotRect[] = [];
+      for (let i = 0; i < currentDeck.length; i += 1) {
+        const el = slotElsBySlugRef.current.get(currentDeck[i].slug);
+        if (!el) return;
+        slotRects.push(getGridLocalSlotRect(el, gridEl));
       }
 
-      if (docRects.length !== currentDeckLen) return;
+      // Measure visual bounding box of the grabbed card so pickup is seamless
+      // even if a layout spring is still settling, while keeping unscaled slot size.
+      const visualRect = slotEl.getBoundingClientRect();
+      const layoutSlot = slotRects[originIndex];
 
       suppressClickRef.current = false;
       dragRuntimeRef.current = {
         pointerId: e.pointerId,
         card,
-        originIndex: index,
-        currentIndex: index,
+        originIndex,
+        currentIndex: originIndex,
         isActive: false,
         startX: e.clientX,
         startY: e.clientY,
         pointerX: e.clientX,
         pointerY: e.clientY,
         prevPointerX: e.clientX,
-        grabOffsetX: e.clientX - cardRect.left,
-        grabOffsetY: e.clientY - cardRect.top,
-        width: cardRect.width,
-        height: cardRect.height,
+        grabOffsetX: e.clientX - visualRect.left,
+        grabOffsetY: e.clientY - visualRect.top,
+        width: layoutSlot.width,
+        height: layoutSlot.height,
         smoothedVx: 0,
         angle: card.rotation,
         angularVel: 0,
@@ -654,27 +711,27 @@ export const BlogIndexPage: React.FC = () => {
         lastFrameTime: performance.now(),
         rafId: 0,
         thresholdPx,
-        docRects,
+        slotRects,
       };
     },
     [canDragCards]
   );
 
   const handleCardBodyPointerDown = useCallback(
-    (e: React.PointerEvent, card: DealtCard, index: number) => {
+    (e: React.PointerEvent, card: DealtCard) => {
       if (isMobileOrTouch || e.pointerType === 'touch' || e.pointerType === 'pen') {
         return;
       }
-      initiateDrag(e, card, index, 7);
+      initiateDrag(e, card, 7);
     },
     [initiateDrag, isMobileOrTouch]
   );
 
   const handleCornerHandlePointerDown = useCallback(
-    (e: React.PointerEvent, card: DealtCard, index: number) => {
+    (e: React.PointerEvent, card: DealtCard) => {
       e.preventDefault();
       e.stopPropagation();
-      initiateDrag(e, card, index, 3);
+      initiateDrag(e, card, 3);
     },
     [initiateDrag]
   );
@@ -743,7 +800,8 @@ export const BlogIndexPage: React.FC = () => {
   );
 
   const handleSelectMinimapCard = useCallback((idx: number) => {
-    const el = slotRefs.current[idx];
+    const card = displayedCardsRef.current[idx];
+    const el = card ? slotElsBySlugRef.current.get(card.slug) : undefined;
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -1021,7 +1079,7 @@ export const BlogIndexPage: React.FC = () => {
         ) : (
           <div
             ref={gridRef}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 items-center justify-items-center overflow-visible pr-11 sm:pr-0"
+            className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 items-center justify-items-center overflow-visible pr-11 sm:pr-0"
           >
             {displayedCards.map((card, idx) => {
               const { post, slug, rotation } = card;
@@ -1040,19 +1098,23 @@ export const BlogIndexPage: React.FC = () => {
                     layout: { type: 'spring', stiffness: 420, damping: 34 },
                   }}
                   ref={(el) => {
-                    slotRefs.current[idx] = el;
+                    if (el) {
+                      slotElsBySlugRef.current.set(slug, el);
+                    } else {
+                      slotElsBySlugRef.current.delete(slug);
+                    }
                   }}
                   className="relative w-full max-w-[260px] sm:max-w-[235px] aspect-[5/7]"
                 >
-                  {/* Soft Ambient Cell-Background Glow on Newly Scored Combo */}
+                  {/* Solid Color Backing + Glow on Newly Scored Combo */}
                   {litState && litVars && (
                     <div
                       key={`lit-${litState.nonce}`}
-                      className="pointer-events-none absolute -inset-3.5 sm:-inset-4 rounded-[26px] z-0 combo-cell-bg-glow"
+                      className="pointer-events-none absolute -inset-2 sm:-inset-2.5 rounded-[24px] z-0 combo-cell-bg-glow"
                       style={
                         {
-                          '--combo-bg-core': litVars.core,
-                          '--combo-bg-mid': litVars.mid,
+                          '--combo-bg-solid': litVars.solid,
+                          '--combo-bg-glow': litVars.glow,
                         } as React.CSSProperties
                       }
                       aria-hidden="true"
@@ -1094,8 +1156,8 @@ export const BlogIndexPage: React.FC = () => {
                           transition: { duration: 0.25, ease: 'easeOut' },
                         }
                     }
-                    onPointerDown={(e) => handleCardBodyPointerDown(e, card, idx)}
-                    className={`w-full h-full ${isDraggedSlot || isSettlingSlot ? 'pointer-events-none' : ''
+                    onPointerDown={(e) => handleCardBodyPointerDown(e, card)}
+                    className={`relative z-10 w-full h-full ${isDraggedSlot || isSettlingSlot ? 'pointer-events-none' : ''
                       } ${canDragCards && !isMobileOrTouch
                         ? 'cursor-grab active:cursor-grabbing'
                         : ''
@@ -1125,7 +1187,11 @@ export const BlogIndexPage: React.FC = () => {
                         to={`/blog/${meta.slug}`}
                         draggable={false}
                         onClick={(e) =>
-                          handleCardClick(e, card, slotRefs.current[idx])
+                          handleCardClick(
+                            e,
+                            card,
+                            slotElsBySlugRef.current.get(slug) ?? null
+                          )
                         }
                         className="relative w-full h-full flex flex-col justify-between p-3.5 sm:p-4 no-underline text-inherit select-none"
                       >
@@ -1137,7 +1203,7 @@ export const BlogIndexPage: React.FC = () => {
                         <button
                           type="button"
                           onPointerDown={(e) =>
-                            handleCornerHandlePointerDown(e, card, idx)
+                            handleCornerHandlePointerDown(e, card)
                           }
                           onClick={(e) => {
                             e.preventDefault();
@@ -1162,14 +1228,24 @@ export const BlogIndexPage: React.FC = () => {
       {/* Floating Active Drag Card Overlay (60fps DOM transform + dangling pivot) */}
       {activeDrag && (
         <div
-          ref={floatingCardRef}
+          ref={(el) => {
+            floatingCardRef.current = el;
+            if (el) {
+              const r = dragRuntimeRef.current;
+              const tx = r ? r.pointerX - r.grabOffsetX : activeDrag.initialX;
+              const ty = r ? r.pointerY - r.grabOffsetY : activeDrag.initialY;
+              const angle = r ? r.angle : activeDrag.card.rotation;
+              el.style.transform = `translate3d(${tx.toFixed(1)}px, ${ty.toFixed(
+                1
+              )}px, 0) rotate(${angle.toFixed(2)}deg) scale(1.035)`;
+            }
+          }}
           aria-hidden="true"
           className="fixed top-0 left-0 z-50 pointer-events-none will-change-transform"
           style={{
             width: activeDrag.rect.width,
             height: activeDrag.rect.height,
             transformOrigin: `${activeDrag.grabOffsetX}px ${activeDrag.grabOffsetY}px`,
-            transform: `translate3d(${activeDrag.initialX}px, ${activeDrag.initialY}px, 0) rotate(${activeDrag.card.rotation}deg) scale(1.035)`,
           }}
         >
           <div className="relative w-full h-full rounded-[18px] bg-[#f9f6ee] border border-zinc-900/20 shadow-[0_24px_54px_rgba(24,24,27,0.28)] overflow-hidden flex flex-col justify-between p-3.5 sm:p-4 select-none">
