@@ -20,8 +20,8 @@
 ## Blog & Writing
 - [What Makes a Game Fun? Zelda BOTW](https://marouan.boufer.com/blog/what-makes-a-game-fun-botw): How Breath of the Wild redefined fun.
 - [Anti-Boredom Mechanics: BOTW & MGSV](https://marouan.boufer.com/blog/preventing-player-boredom-botw-mgsv): Preventing the player from boring themselves.
-- [Creating Your Own Game Design Tools](https://marouan.boufer.com/blog/creating-your-own-game-design-tools): Custom editors, debuggers, and workflow tools.
-- [Between a Hobby and a Business](https://marouan.boufer.com/blog/bleeding-edge-hobby-and-business): Navigating passion and sustainable game development.
+- [Creating Your Own Game Design Tools](https://marouan.boufer.com/blog/creating-your-own-game-design-tools): Using AI-built React prototypes to test game mechanics before implementing them in Unity.
+- [Between a Hobby and a Business](https://marouan.boufer.com/blog/bleeding-edge-hobby-and-business): Why solo devs struggle to keep sales pressure from hurting creative choices, and why creation and publishing belong apart.
 - [Frameworks That Explain Abstractions](https://marouan.boufer.com/blog/frameworks-that-explain-abstractions): Software frameworks that clarify complexity.
 - [How Game Pace Controls the Player](https://marouan.boufer.com/blog/how-game-pace-controls-the-player): Tempo, tension, and player emotion.
 - [Insights From Feedback & Analytics](https://marouan.boufer.com/blog/insights-from-feedback-and-analytics): Extracting signal from playtests and telemetry.

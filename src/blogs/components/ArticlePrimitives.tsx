@@ -108,6 +108,39 @@ export const ArticleDivider: React.FC = () => (
   <hr className="my-8 border-0 h-px bg-zinc-900/12" />
 );
 
+export const ArticleMediaPlaceholder: React.FC<{
+  label: string;
+  description: string;
+  mediaType?: 'image' | 'video' | 'image or video';
+  accent?: string;
+}> = ({ label, description, mediaType = 'image or video', accent = '#2bbece' }) => (
+  <figure className="my-8 m-0">
+    <div
+      className="relative rounded-2xl border-2 border-dashed border-zinc-900/20 bg-white/60 px-6 py-12 sm:py-16 flex flex-col items-center justify-center text-center gap-3"
+      style={{
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.7)',
+      }}
+    >
+      <span
+        className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-[0.14em] font-semibold border"
+        style={{
+          color: accent,
+          borderColor: `${accent}44`,
+          backgroundColor: `${accent}12`,
+        }}
+      >
+        {mediaType} placeholder
+      </span>
+      <p className="text-zinc-900 text-base sm:text-lg font-bold m-0">
+        {label}
+      </p>
+      <p className="text-zinc-600 text-sm max-w-md leading-relaxed m-0">
+        {description}
+      </p>
+    </div>
+  </figure>
+);
+
 export const ArticleDraftNotice: React.FC<{
   topic?: string;
 }> = ({ topic }) => (

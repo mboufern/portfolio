@@ -1,6 +1,8 @@
 import type { BlogPostEntry } from './types';
 import { WhatMakesGameFunBotwPost } from './posts/WhatMakesGameFunBotwPost';
 import { PreventingPlayerBoredomPost } from './posts/PreventingPlayerBoredomPost';
+import { CreatingGameDesignToolsPost } from './posts/CreatingGameDesignToolsPost';
+import { HobbyAndBusinessPost } from './posts/HobbyAndBusinessPost';
 import { DraftPost } from './posts/DraftPost';
 
 export const BLOG_POSTS: BlogPostEntry[] = [
@@ -40,30 +42,28 @@ export const BLOG_POSTS: BlogPostEntry[] = [
       slug: 'creating-your-own-game-design-tools',
       title: 'Creating Your Own Game Design Tools',
       subtitle:
-        'Why building custom editors, debuggers, and workflow tools pays off when designing games.',
+        'How I use AI-built React prototypes to test game mechanics, catch edge cases early, and make Unity implementation effortless.',
       category: 'Game Dev',
       date: 'Nov 2026',
-      readTime: 'Coming soon',
-      tags: ['Tooling', 'Game Design', 'Workflow'],
+      readTime: '4 min read',
+      tags: ['Tooling', 'Prototyping', 'Scrap Vanguard'],
       accent: '#2bbece',
-      isDraft: true,
     },
-    Component: DraftPost,
+    Component: CreatingGameDesignToolsPost,
   },
   {
     meta: {
       slug: 'bleeding-edge-hobby-and-business',
       title: 'Between a Hobby and a Business',
       subtitle:
-        'Walking the bleeding edge between building games purely for love and treating them as a sustainable business.',
+        'The daily fight solo developers face to keep sales pressure from hurting creative choices, and why creation and publishing belong apart.',
       category: 'Game Dev',
       date: 'Nov 2026',
-      readTime: 'Coming soon',
+      readTime: '4 min read',
       tags: ['Indie Dev', 'Business', 'Mindset'],
       accent: '#ff779c',
-      isDraft: true,
     },
-    Component: DraftPost,
+    Component: HobbyAndBusinessPost,
   },
   {
     meta: {
